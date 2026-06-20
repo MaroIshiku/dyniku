@@ -265,6 +265,36 @@ tbody tr:last-child td {
   padding: 16px;
 }
 
+.setting-summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.summary-main {
+  display: grid;
+  grid-template-columns: minmax(100px, 0.4fr) minmax(180px, 1fr) minmax(90px, 0.25fr);
+  gap: 14px;
+  align-items: center;
+  min-width: 0;
+}
+
+.summary-main span,
+.summary-main strong {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.icon-button {
+  display: inline-grid;
+  place-items: center;
+  width: 38px;
+  padding: 0;
+}
+
 .setting-head {
   display: flex;
   align-items: center;
@@ -400,7 +430,13 @@ select:focus {
   }
 
   .field-row,
+  .summary-main,
   .history-item {
     grid-template-columns: 1fr;
+  }
+
+  .summary-main span,
+  .summary-main strong {
+    white-space: normal;
   }
 }

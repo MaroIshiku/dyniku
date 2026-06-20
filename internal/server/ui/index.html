@@ -39,8 +39,8 @@
         <table>
           <thead>
             <tr>
-              <th>Domain</th>
               <th>Owner</th>
+              <th>Domain</th>
               <th>Provider</th>
               <th>IP Version</th>
               <th>Status</th>
@@ -172,6 +172,7 @@
     const secretKeys = ["api_key", "key", "password", "secret", "token", "username"];
     let loadedConfig = { settings: [] };
     let savingDisabled = false;
+    let editingSettingIndex = null;
 
     const $ = (selector) => document.querySelector(selector);
 
@@ -210,6 +211,7 @@
       for (const setting of loadedConfig.settings) {
         if (!setting.provider) setting.provider = "netcup";
       }
+      editingSettingIndex = null;
       savingDisabled = result.env_config;
       $("#config-path").textContent = result.path || "";
       $("#save-config-button").disabled = savingDisabled;
@@ -234,8 +236,8 @@
         const row = document.createElement("tr");
         const statusClassName = statusClass(record.status || "unset");
         row.innerHTML = `
-          <td data-label="Domain">${escapeHTML(record.domain || "")}</td>
           <td data-label="Owner">${escapeHTML(record.owner || "")}</td>
+          <td data-label="Domain">${escapeHTML(record.domain || "")}</td>
           <td data-label="Provider">${escapeHTML(record.provider || "")}</td>
           <td data-label="IP Version">${escapeHTML(record.ip_version || "")}</td>
           <td data-label="Status"><span class="status ${statusClassName}">${escapeHTML(record.status || "unset")}</span></td>
@@ -276,10 +278,23 @@
       const list = $("#settings-list");
       list.innerHTML = "";
       loadedConfig.settings.forEach((setting, index) => {
+        if (editingSettingIndex !== index) {
+          list.appendChild(makeSettingSummary(setting, index));
+          return;
+        }
+
         const node = document.importNode($("#setting-template").content, true);
         const article = node.querySelector(".setting");
         article.dataset.index = String(index);
         node.querySelector(".setting-title").textContent = setting.domain || `Entry ${index + 1}`;
+        const closeButton = document.createElement("button");
+        closeButton.type = "button";
+        closeButton.textContent = "Done";
+        closeButton.addEventListener("click", () => {
+          editingSettingIndex = null;
+          renderSettings();
+        });
+        node.querySelector(".setting-head .toolbar").prepend(closeButton);
         node.querySelector(".add-field").addEventListener("click", () => {
           setting[""] = "";
           renderSettings();
@@ -306,6 +321,33 @@
         }
         list.appendChild(node);
       });
+    }
+
+    function makeSettingSummary(setting, index) {
+      const article = document.createElement("article");
+      article.className = "setting setting-summary";
+      const title = document.createElement("div");
+      title.className = "summary-main";
+      title.innerHTML = `
+        <strong>${escapeHTML(setting.provider || "unknown")}</strong>
+        <span>${escapeHTML(setting.owner || setting.host || "@")} / ${escapeHTML(setting.domain || "No domain")}</span>
+        <span>${escapeHTML(setting.ip_version || "default IP")}</span>
+      `;
+
+      const editButton = document.createElement("button");
+      editButton.type = "button";
+      editButton.className = "icon-button";
+      editButton.title = "Edit entry";
+      editButton.setAttribute("aria-label", "Edit entry");
+      editButton.innerHTML = editIcon();
+      editButton.addEventListener("click", () => {
+        editingSettingIndex = index;
+        renderSettings();
+      });
+
+      article.appendChild(title);
+      article.appendChild(editButton);
+      return article;
     }
 
     function makeField(setting, key) {
@@ -335,6 +377,7 @@
         valueInput.replaceWith(select);
         select.addEventListener("change", () => {
           setting[currentKey] = select.value;
+          pruneSettingForProvider(setting, select.value);
           addProviderDefaults(setting, select.value);
           renderSettings();
         });
@@ -381,6 +424,7 @@
 
     function addSetting(setting) {
       loadedConfig.settings.push(setting);
+      editingSettingIndex = loadedConfig.settings.length - 1;
       renderSettings();
       showView("config");
     }
@@ -399,6 +443,15 @@
       if (!("ip_version" in setting) && schema.optional.includes("ip_version")) {
         setting.ip_version = "ipv4";
       }
+    }
+
+    function pruneSettingForProvider(setting, provider) {
+      const schema = schemaFields(provider);
+      const allowed = new Set([...schema.required, ...schema.optional, "owner", "host"]);
+      for (const key of Object.keys(setting)) {
+        if (!allowed.has(key)) delete setting[key];
+      }
+      setting.provider = provider;
     }
 
     function defaultValueForField(key, provider) {
@@ -431,6 +484,7 @@
       }
       const result = await response.json();
       loadedConfig = result.config || loadedConfig;
+      editingSettingIndex = null;
       renderSettings();
       $("#config-warning").classList.remove("hidden");
       const warningText = (result.warnings || []).join(" ");
@@ -478,6 +532,13 @@
 
     function statusClass(status) {
       return String(status).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    }
+
+    function editIcon() {
+      return `<svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 20h9"></path>
+        <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path>
+      </svg>`;
     }
 
     function parseLogLine(line) {
