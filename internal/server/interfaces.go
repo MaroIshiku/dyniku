@@ -31,4 +31,10 @@ type StatusRecord struct {
 	CurrentIP string    `json:"current_ip,omitempty"`
 	Since     time.Time `json:"since,omitempty"`
 	CheckedAt time.Time `json:"checked_at,omitempty"`
+	History   []IPEvent `json:"history,omitempty"`
+}
+
+type IPEvent struct {
+	IP   string    `json:"ip"`
+	Time time.Time `json:"time"`
 }

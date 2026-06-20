@@ -46,6 +46,7 @@
               <th>Status</th>
               <th>Current IP</th>
               <th>Since</th>
+              <th>Log</th>
             </tr>
           </thead>
           <tbody id="records-body"></tbody>
@@ -232,7 +233,8 @@
       $("#record-count").textContent = String(status.records?.length || 0);
       const body = $("#records-body");
       body.innerHTML = "";
-      for (const record of status.records || []) {
+      for (let index = 0; index < (status.records || []).length; index++) {
+        const record = status.records[index];
         const row = document.createElement("tr");
         const statusClassName = statusClass(record.status || "unset");
         row.innerHTML = `
@@ -243,8 +245,20 @@
           <td data-label="Status"><span class="status ${statusClassName}">${escapeHTML(record.status || "unset")}</span></td>
           <td data-label="Current IP">${escapeHTML(record.current_ip || "N/A")}</td>
           <td data-label="Since">${record.since ? escapeHTML(durationSince(record.since)) : "N/A"}</td>
+          <td data-label="Log"><button class="icon-button log-toggle" type="button" aria-expanded="false" aria-controls="record-log-${index}" title="Show update log">${logIcon()}</button></td>
         `;
         body.appendChild(row);
+        const logRow = document.createElement("tr");
+        logRow.className = "record-log-row hidden";
+        logRow.id = `record-log-${index}`;
+        logRow.innerHTML = `<td colspan="8">${renderRecordLog(record.history || [])}</td>`;
+        body.appendChild(logRow);
+        row.querySelector(".log-toggle").addEventListener("click", (event) => {
+          const expanded = event.currentTarget.getAttribute("aria-expanded") === "true";
+          event.currentTarget.setAttribute("aria-expanded", String(!expanded));
+          event.currentTarget.classList.toggle("open", !expanded);
+          logRow.classList.toggle("hidden", expanded);
+        });
       }
 
       renderHistory(status.history_log || []);
@@ -539,6 +553,25 @@
         <path d="M12 20h9"></path>
         <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path>
       </svg>`;
+    }
+
+    function logIcon() {
+      return `<svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 5v14"></path>
+        <path d="m19 12-7 7-7-7"></path>
+      </svg>`;
+    }
+
+    function renderRecordLog(events) {
+      if (events.length === 0) {
+        return `<div class="record-log"><p class="empty">No updates logged for this record yet.</p></div>`;
+      }
+      return `<div class="record-log">${events.map((event) => `
+        <div class="record-log-item">
+          <span>${escapeHTML(formatDate(event.time))}</span>
+          <strong>${escapeHTML(event.ip || "")}</strong>
+        </div>
+      `).join("")}</div>`;
     }
 
     function parseLogLine(line) {

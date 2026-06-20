@@ -295,6 +295,42 @@ tbody tr:last-child td {
   padding: 0;
 }
 
+.log-toggle svg {
+  transition: transform 140ms ease;
+}
+
+.log-toggle.open svg {
+  transform: rotate(180deg);
+}
+
+.record-log-row td {
+  padding: 0;
+  background: #fbfcfc;
+}
+
+.record-log {
+  max-height: 220px;
+  overflow-y: auto;
+  padding: 6px 16px;
+}
+
+.record-log-item {
+  display: grid;
+  grid-template-columns: 220px minmax(120px, 1fr);
+  gap: 16px;
+  align-items: center;
+  min-height: 40px;
+  border-bottom: 1px solid var(--line);
+}
+
+.record-log-item:last-child {
+  border-bottom: 0;
+}
+
+.record-log-item span {
+  color: var(--muted);
+}
+
 .setting-head {
   display: flex;
   align-items: center;
@@ -427,6 +463,16 @@ select:focus {
     font-size: 12px;
     font-weight: 800;
     text-transform: uppercase;
+  }
+
+  .record-log-row td {
+    display: block;
+  }
+
+  .record-log-item {
+    grid-template-columns: 1fr;
+    gap: 4px;
+    padding: 8px 0;
   }
 
   .field-row,

@@ -59,6 +59,17 @@ func makeStatusRecord(record records.Record) StatusRecord {
 	if currentIP.IsValid() {
 		currentIPString = currentIP.String()
 	}
+	history := make([]IPEvent, 0, len(record.History))
+	for i := len(record.History) - 1; i >= 0; i-- {
+		event := record.History[i]
+		if !event.IP.IsValid() {
+			continue
+		}
+		history = append(history, IPEvent{
+			IP:   event.IP.String(),
+			Time: event.Time,
+		})
+	}
 	return StatusRecord{
 		Domain:    record.Provider.Domain(),
 		Owner:     record.Provider.Owner(),
@@ -69,6 +80,7 @@ func makeStatusRecord(record records.Record) StatusRecord {
 		CurrentIP: currentIPString,
 		Since:     record.History.GetSuccessTime(),
 		CheckedAt: record.Time,
+		History:   history,
 	}
 }
 
