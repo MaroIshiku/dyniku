@@ -245,7 +245,7 @@
           <td data-label="Status"><span class="status ${statusClassName}">${escapeHTML(record.status || "unset")}</span></td>
           <td data-label="Current IP">${escapeHTML(record.current_ip || "N/A")}</td>
           <td data-label="Since">${record.since ? escapeHTML(durationSince(record.since)) : "N/A"}</td>
-          <td data-label="Log"><button class="icon-button log-toggle" type="button" aria-expanded="false" aria-controls="record-log-${index}" title="Show update log">${logIcon()}</button></td>
+          <td data-label="Log"><button class="icon-button log-toggle" type="button" aria-expanded="false" aria-controls="record-log-${index}" aria-label="Show update log" title="Show update log">${logIcon()}</button></td>
         `;
         body.appendChild(row);
         const logRow = document.createElement("tr");
@@ -533,15 +533,6 @@
 
     function schemaFields(provider) {
       return providerSchemas[provider] || { required: ["provider", "domain"], optional: ["ip_version", "ipv6_suffix"] };
-    }
-
-    function sortConfigKeys(a, b, provider) {
-      const schema = schemaFields(provider);
-      const order = [...schema.required, ...schema.optional];
-      const ai = order.indexOf(a);
-      const bi = order.indexOf(b);
-      if (ai !== -1 || bi !== -1) return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
-      return a.localeCompare(b);
     }
 
     function statusClass(status) {

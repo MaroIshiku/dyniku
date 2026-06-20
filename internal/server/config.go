@@ -103,6 +103,8 @@ func (h *handlers) putConfig(w http.ResponseWriter, r *http.Request) {
 }
 
 func normalizeJSON(data []byte) (json.RawMessage, error) {
+	data = bytes.TrimPrefix(data, []byte{0xEF, 0xBB, 0xBF})
+
 	var decoded map[string]any
 	if err := json.Unmarshal(data, &decoded); err != nil {
 		return nil, err

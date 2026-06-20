@@ -53,6 +53,16 @@ func TestValidateJSONAcceptsQDM12CompatibleConfigs(t *testing.T) {
 				"ip_version": "ipv4"
 			}]
 		}`,
+		"utf8 bom": "\xef\xbb\xbf" + `{
+			"settings": [{
+				"provider": "netcup",
+				"domain": "sub.example.com",
+				"api_key": "api-key",
+				"password": "api-password",
+				"customer_number": "123456",
+				"ip_version": "ipv4"
+			}]
+		}`,
 	}
 
 	for name, configJSON := range testCases {

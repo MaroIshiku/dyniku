@@ -113,6 +113,8 @@ var (
 func extractAllSettings(jsonBytes []byte) (
 	allProviders []provider.Provider, warnings []string, err error,
 ) {
+	jsonBytes = bytes.TrimPrefix(jsonBytes, []byte{0xEF, 0xBB, 0xBF})
+
 	config := struct {
 		CommonSettings []commonSettings `json:"settings"`
 	}{}
