@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>DDNS Updater</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="static/favicon.svg" sizes="any" type="image/svg+xml">
+  <link rel="icon" href="static/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="static/styles.css" type="text/css">
+</head>
+
+<body>
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">DDNS Updater</p>
+      <h1 id="current-ip">N/A</h1>
+      <p id="current-since" class="muted">Waiting for the first successful update</p>
+    </div>
+    <div class="toolbar">
+      <button id="refresh-button" type="button" title="Refresh">Refresh</button>
+      <button id="force-button" type="button" class="primary" title="Force update">Update now</button>
+    </div>
+  </header>
+
+  <main>
+    <nav class="tabs" aria-label="Views">
+      <button class="tab active" type="button" data-view="records">Records</button>
+      <button class="tab" type="button" data-view="config">Config</button>
+      <button class="tab" type="button" data-view="history">IP Log</button>
+    </nav>
+
+    <section id="records-view" class="view active">
+      <div class="section-head">
+        <h2>Records</h2>
+        <span id="record-count" class="pill">0</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Domain</th>
+              <th>Owner</th>
+              <th>Provider</th>
+              <th>IP Version</th>
+              <th>Status</th>
+              <th>Current IP</th>
+              <th>Since</th>
+            </tr>
+          </thead>
+          <tbody id="records-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="config-view" class="view">
+      <div class="section-head">
+        <div>
+          <h2>Config</h2>
+          <p id="config-path" class="muted"></p>
+        </div>
+        <div class="toolbar">
+          <button id="add-netcup-button" type="button">Netcup entry</button>
+          <button id="add-entry-button" type="button">Add entry</button>
+          <button id="save-config-button" type="button" class="primary">Save</button>
+        </div>
+      </div>
+      <p id="config-warning" class="notice hidden"></p>
+      <div id="settings-list" class="settings-list"></div>
+    </section>
+
+    <section id="history-view" class="view">
+      <div class="section-head">
+        <h2>IP Log</h2>
+        <span id="history-count" class="pill">0</span>
+      </div>
+      <div id="history-list" class="history-list"></div>
+    </section>
+  </main>
+
+  <template id="setting-template">
+    <article class="setting">
+      <div class="setting-head">
+        <strong class="setting-title"></strong>
+        <div class="toolbar">
+          <button class="add-field" type="button">Field</button>
+          <button class="delete-entry danger" type="button">Delete</button>
+        </div>
+      </div>
+      <div class="fields"></div>
+    </article>
+  </template>
+
+  <template id="field-template">
+    <div class="field-row">
+      <input class="field-key" type="text" placeholder="field">
+      <input class="field-value" type="text" placeholder="value">
+      <button class="delete-field danger" type="button" title="Delete field">Delete</button>
+    </div>
+  </template>
+
+  <script>
+    const providerChoices = [
+      "aliyun", "allinkl", "changeip", "cloudflare", "custom", "dd24", "ddnss", "desec",
+      "digitalocean", "dnsomatic", "dnspod", "domeneshop", "dondominio", "dreamhost",
+      "duckdns", "dyn", "dynu", "dynv6", "easydns", "freedns", "gandi", "gcp",
+      "godaddy", "goip", "he", "hetzner", "hetznercloud", "infomaniak", "inwx",
+      "ionos", "ipv64", "linode", "loopia", "luadns", "myaddr", "namecheap",
+      "name.com", "namesilo", "netcup", "njalla", "noip", "nowdns", "opendns",
+      "ovh", "porkbun", "route53", "scaleway", "selfhost.de", "servercow",
+      "spaceship", "spdyn", "strato", "variomedia", "vercel", "vultr", "zoneedit"
+    ];
+    const secretKeys = ["api_key", "key", "password", "secret", "token", "username"];
+    let loadedConfig = { settings: [] };
+    let savingDisabled = false;
+
+    const $ = (selector) => document.querySelector(selector);
+
+    document.addEventListener("DOMContentLoaded", () => {
+      $(".tabs").addEventListener("click", (event) => {
+        const button = event.target.closest("[data-view]");
+        if (!button) return;
+        showView(button.dataset.view);
+      });
+      $("#refresh-button").addEventListener("click", loadAll);
+      $("#force-button").addEventListener("click", forceUpdate);
+      $("#add-entry-button").addEventListener("click", () => addSetting({ provider: "netcup", domain: "", ip_version: "ipv4" }));
+      $("#add-netcup-button").addEventListener("click", () => addSetting({
+        provider: "netcup",
+        domain: "",
+        api_key: "",
+        password: "",
+        customer_number: "",
+        ip_version: "ipv4",
+        ipv6_suffix: ""
+      }));
+      $("#save-config-button").addEventListener("click", saveConfig);
+      loadAll();
+      window.setInterval(loadStatus, 30000);
+    });
+
+    async function loadAll() {
+      await Promise.all([loadStatus(), loadConfig()]);
+    }
+
+    async function loadStatus() {
+      const response = await fetch("api/status");
+      if (!response.ok) throw new Error(await response.text());
+      const status = await response.json();
+      renderStatus(status);
+    }
+
+    async function loadConfig() {
+      const response = await fetch("api/config");
+      if (!response.ok) throw new Error(await response.text());
+      const result = await response.json();
+      loadedConfig = result.config || { settings: [] };
+      if (!Array.isArray(loadedConfig.settings)) loadedConfig.settings = [];
+      savingDisabled = result.env_config;
+      $("#config-path").textContent = result.path || "";
+      $("#save-config-button").disabled = savingDisabled;
+      $("#config-warning").classList.toggle("hidden", !savingDisabled);
+      $("#config-warning").textContent = savingDisabled
+        ? "CONFIG environment variable is active. File editing is disabled because it would be overwritten on restart."
+        : result.restart_hint;
+      renderSettings();
+    }
+
+    function renderStatus(status) {
+      $("#current-ip").textContent = status.current_ip || "N/A";
+      $("#current-since").textContent = status.current_since
+        ? "Since " + formatDate(status.current_since) + " (" + durationSince(status.current_since) + ")"
+        : "Waiting for the first successful update";
+
+      $("#record-count").textContent = String(status.records?.length || 0);
+      const body = $("#records-body");
+      body.innerHTML = "";
+      for (const record of status.records || []) {
+        const row = document.createElement("tr");
+        const statusClassName = statusClass(record.status || "unset");
+        row.innerHTML = `
+          <td data-label="Domain">${escapeHTML(record.domain || "")}</td>
+          <td data-label="Owner">${escapeHTML(record.owner || "")}</td>
+          <td data-label="Provider">${escapeHTML(record.provider || "")}</td>
+          <td data-label="IP Version">${escapeHTML(record.ip_version || "")}</td>
+          <td data-label="Status"><span class="status ${statusClassName}">${escapeHTML(record.status || "unset")}</span></td>
+          <td data-label="Current IP">${escapeHTML(record.current_ip || "N/A")}</td>
+          <td data-label="Since">${record.since ? escapeHTML(durationSince(record.since)) : "N/A"}</td>
+        `;
+        body.appendChild(row);
+      }
+
+      renderHistory(status.history_log || []);
+    }
+
+    function renderHistory(lines) {
+      $("#history-count").textContent = String(lines.length);
+      const list = $("#history-list");
+      list.innerHTML = "";
+      if (lines.length === 0) {
+        list.innerHTML = `<p class="empty">No public IP changes logged yet.</p>`;
+        return;
+      }
+      const newestFirst = [...lines].reverse();
+      for (let i = 0; i < newestFirst.length; i++) {
+        const current = parseLogLine(newestFirst[i]);
+        const previous = parseLogLine(newestFirst[i + 1]);
+        const duration = previous && current ? formatDuration(current.date - previous.date) : "current";
+        const item = document.createElement("div");
+        item.className = "history-item";
+        item.innerHTML = `
+          <span>${escapeHTML(current?.stamp || newestFirst[i])}</span>
+          <strong>${escapeHTML(current?.ip || "")}</strong>
+          <span>${escapeHTML(duration)}</span>
+        `;
+        list.appendChild(item);
+      }
+    }
+
+    function renderSettings() {
+      const list = $("#settings-list");
+      list.innerHTML = "";
+      loadedConfig.settings.forEach((setting, index) => {
+        const node = document.importNode($("#setting-template").content, true);
+        const article = node.querySelector(".setting");
+        article.dataset.index = String(index);
+        node.querySelector(".setting-title").textContent = setting.domain || `Entry ${index + 1}`;
+        node.querySelector(".add-field").addEventListener("click", () => {
+          setting[""] = "";
+          renderSettings();
+        });
+        node.querySelector(".delete-entry").addEventListener("click", () => {
+          loadedConfig.settings.splice(index, 1);
+          renderSettings();
+        });
+        const fields = node.querySelector(".fields");
+        const orderedKeys = Object.keys(setting).sort(sortConfigKeys);
+        for (const key of orderedKeys) {
+          fields.appendChild(makeField(setting, key));
+        }
+        list.appendChild(node);
+      });
+    }
+
+    function makeField(setting, key) {
+      const node = document.importNode($("#field-template").content, true);
+      const row = node.querySelector(".field-row");
+      const keyInput = node.querySelector(".field-key");
+      const valueInput = node.querySelector(".field-value");
+      let currentKey = key;
+      keyInput.value = key;
+      valueInput.value = setting[key] ?? "";
+      valueInput.type = secretKeys.some((secret) => key.toLowerCase().includes(secret)) ? "password" : "text";
+      if (key === "provider") {
+        const select = document.createElement("select");
+        select.className = "field-value";
+        for (const provider of providerChoices) {
+          const option = document.createElement("option");
+          option.value = provider;
+          option.textContent = provider;
+          select.appendChild(option);
+        }
+        select.value = setting[key] || "netcup";
+        valueInput.replaceWith(select);
+        select.addEventListener("change", () => setting[currentKey] = select.value);
+      } else {
+        valueInput.addEventListener("input", () => setting[currentKey] = valueInput.value);
+      }
+      keyInput.addEventListener("input", () => {
+        const newKey = keyInput.value;
+        if (currentKey === newKey) return;
+        setting[newKey] = setting[currentKey];
+        delete setting[currentKey];
+        currentKey = newKey;
+      });
+      row.querySelector(".delete-field").addEventListener("click", () => {
+        delete setting[currentKey];
+        renderSettings();
+      });
+      return node;
+    }
+
+    function addSetting(setting) {
+      loadedConfig.settings.push(setting);
+      renderSettings();
+      showView("config");
+    }
+
+    async function saveConfig() {
+      if (savingDisabled) return;
+      const response = await fetch("api/config", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(loadedConfig)
+      });
+      if (!response.ok) {
+        $("#config-warning").classList.remove("hidden");
+        $("#config-warning").textContent = await response.text();
+        return;
+      }
+      await loadConfig();
+      $("#config-warning").classList.remove("hidden");
+      $("#config-warning").textContent = "Saved. Restart the container so the updater reloads the edited config.";
+    }
+
+    async function forceUpdate() {
+      $("#force-button").disabled = true;
+      try {
+        const response = await fetch("update", { method: "POST" });
+        if (!response.ok) throw new Error(await response.text());
+        await loadStatus();
+      } finally {
+        $("#force-button").disabled = false;
+      }
+    }
+
+    function showView(name) {
+      document.querySelectorAll(".tab").forEach((tab) => tab.classList.toggle("active", tab.dataset.view === name));
+      document.querySelectorAll(".view").forEach((view) => view.classList.remove("active"));
+      $("#" + name + "-view").classList.add("active");
+    }
+
+    function sortConfigKeys(a, b) {
+      const order = ["provider", "domain", "owner", "ip_version", "ipv6_suffix"];
+      const ai = order.indexOf(a);
+      const bi = order.indexOf(b);
+      if (ai !== -1 || bi !== -1) return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
+      return a.localeCompare(b);
+    }
+
+    function statusClass(status) {
+      return String(status).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    }
+
+    function parseLogLine(line) {
+      const [stamp, ip] = line.trim().split(/\s+/);
+      const match = /^(\d{4})(\d{2})(\d{2})-(\d{2})(\d{2})$/.exec(stamp || "");
+      if (!match) return null;
+      const [, year, month, day, hour, minute] = match;
+      return {
+        stamp,
+        ip,
+        date: new Date(Number(year), Number(month) - 1, Number(day), Number(hour), Number(minute))
+      };
+    }
+
+    function formatDate(value) {
+      return new Date(value).toLocaleString();
+    }
+
+    function durationSince(value) {
+      return formatDuration(Date.now() - new Date(value).getTime());
+    }
+
+    function formatDuration(ms) {
+      if (!Number.isFinite(ms) || ms < 0) return "N/A";
+      const minutes = Math.floor(ms / 60000);
+      if (minutes < 1) return "less than 1 min";
+      if (minutes < 60) return `${minutes} min`;
+      const hours = Math.floor(minutes / 60);
+      if (hours < 48) return `${hours} h`;
+      return `${Math.floor(hours / 24)} d`;
+    }
+
+    function escapeHTML(value) {
+      return String(value).replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "\"": "&quot;",
+        "'": "&#39;"
+      }[char]));
+    }
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,73 @@
+package server
+
+import (
+	"context"
+	"embed"
+	"io/fs"
+	"net/http"
+	"path/filepath"
+	"strings"
+	"text/template"
+	"time"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
+)
+
+type handlers struct {
+	ctx context.Context //nolint:containedctx
+	// Objects
+	db            Database
+	runner        UpdateForcer
+	indexTemplate *template.Template
+	configPath    string
+	publicIPLog   string
+	// Mockable functions
+	timeNow func() time.Time
+}
+
+//go:embed ui/*
+var uiFS embed.FS
+
+func newHandler(ctx context.Context, rootURL string,
+	db Database, runner UpdateForcer, configPath, dataDir string,
+) http.Handler {
+	indexTemplate := template.Must(template.ParseFS(uiFS, "ui/index.html"))
+
+	staticFolder, err := fs.Sub(uiFS, "ui/static")
+	if err != nil {
+		panic(err)
+	}
+
+	handlers := &handlers{
+		ctx:           ctx,
+		db:            db,
+		indexTemplate: indexTemplate,
+		configPath:    configPath,
+		publicIPLog:   filepath.Join(dataDir, "public-ip.log"),
+		// TODO build information
+		timeNow: time.Now,
+		runner:  runner,
+	}
+
+	router := chi.NewRouter()
+
+	router.Use(middleware.RealIP)
+	router.Use(middleware.Logger)
+	rootURL = strings.TrimSuffix(rootURL, "/")
+
+	if rootURL != "" {
+		router.Handle(rootURL, http.RedirectHandler(rootURL+"/", http.StatusPermanentRedirect))
+	}
+	router.Get(rootURL+"/", handlers.index)
+
+	router.Get(rootURL+"/update", handlers.update)
+	router.Post(rootURL+"/update", handlers.update)
+	router.Get(rootURL+"/api/status", handlers.status)
+	router.Get(rootURL+"/api/config", handlers.getConfig)
+	router.Put(rootURL+"/api/config", handlers.putConfig)
+
+	router.Handle(rootURL+"/static/*", http.StripPrefix(rootURL+"/static/", http.FileServerFS(staticFolder)))
+
+	return router
+}

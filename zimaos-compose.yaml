@@ -1,0 +1,48 @@
+name: ddns-updater
+services:
+  ddns-updater:
+    image: ghcr.io/maroishiku/ish-ddns:latest
+    container_name: ddns-updater
+    hostname: ddns-updater
+    restart: unless-stopped
+    ports:
+      - target: 8000
+        published: "8004"
+        protocol: tcp
+    environment:
+      - BACKUP_DIRECTORY=/updater/data
+      - BACKUP_PERIOD=0
+      - HTTP_TIMEOUT=10s
+      - LISTENING_ADDRESS=:8000
+      - LOG_CALLER=hidden
+      - LOG_LEVEL=info
+      - PERIOD=5m
+      - PUBLICIP_DNS_PROVIDERS=all
+      - PUBLICIP_DNS_TIMEOUT=3s
+      - PUBLICIP_FETCHERS=all
+      - PUBLICIP_HTTP_PROVIDERS=all
+      - PUBLICIPV4_HTTP_PROVIDERS=all
+      - PUBLICIPV6_HTTP_PROVIDERS=all
+      - ROOT_URL=/
+      - UPDATE_COOLDOWN_PERIOD=5m
+      - TZ=Europe/Berlin
+    volumes:
+      - type: bind
+        source: /DATA/AppData/ddns-updater/data
+        target: /updater/data
+    labels:
+      icon: https://raw.githubusercontent.com/qdm12/ddns-updater/master/internal/server/ui/static/favicon.svg
+      title.en_us: DDNS Updater
+x-casaos:
+  author: self
+  category: self
+  hostname: ""
+  icon: https://raw.githubusercontent.com/qdm12/ddns-updater/master/internal/server/ui/static/favicon.svg
+  index: /
+  is_uncontrolled: false
+  port_map: "8004"
+  scheme: http
+  store_app_id: ddns-updater
+  title:
+    custom: DDNS Updater
+    en_us: ddns-updater
