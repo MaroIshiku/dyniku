@@ -110,6 +110,65 @@
       "ovh", "porkbun", "route53", "scaleway", "selfhost.de", "servercow",
       "spaceship", "spdyn", "strato", "variomedia", "vercel", "vultr", "zoneedit"
     ];
+    const providerSchemas = {
+      "aliyun": { required: ["provider", "domain", "access_key_id", "access_secret"], optional: ["ip_version", "ipv6_suffix", "region"] },
+      "allinkl": { required: ["provider", "domain", "username", "password"], optional: ["ip_version", "ipv6_suffix"] },
+      "changeip": { required: ["provider", "domain", "username", "password"], optional: ["ip_version", "ipv6_suffix"] },
+      "cloudflare": { required: ["provider", "domain", "zone_identifier", "ttl", "token"], optional: ["email", "key", "user_service_key", "proxied", "ip_version", "ipv6_suffix"] },
+      "custom": { required: ["provider", "domain", "url", "ipv4key", "ipv6key", "success_regex"], optional: ["ip_version", "ipv6_suffix"] },
+      "dd24": { required: ["provider", "domain", "password"], optional: ["ip_version", "ipv6_suffix"] },
+      "ddnss": { required: ["provider", "domain", "username", "password"], optional: ["dual_stack", "ip_version", "ipv6_suffix"] },
+      "desec": { required: ["provider", "domain", "token"], optional: ["ip_version", "ipv6_suffix"] },
+      "digitalocean": { required: ["provider", "domain", "token"], optional: ["ip_version", "ipv6_suffix"] },
+      "dnsomatic": { required: ["provider", "domain", "username", "password"], optional: ["ip_version", "ipv6_suffix"] },
+      "dnspod": { required: ["provider", "domain", "token"], optional: ["ip_version", "ipv6_suffix"] },
+      "domeneshop": { required: ["provider", "domain", "token", "secret"], optional: ["ip_version", "ipv6_suffix"] },
+      "dondominio": { required: ["provider", "domain", "username", "password"], optional: ["ip_version", "ipv6_suffix"] },
+      "dreamhost": { required: ["provider", "domain", "key"], optional: ["ip_version", "ipv6_suffix"] },
+      "duckdns": { required: ["provider", "domain", "token"], optional: ["ip_version", "ipv6_suffix"] },
+      "dyn": { required: ["provider", "domain", "username", "client_key"], optional: ["password", "ip_version", "ipv6_suffix"] },
+      "dynu": { required: ["provider", "domain", "username", "password"], optional: ["group", "ip_version", "ipv6_suffix"] },
+      "dynv6": { required: ["provider", "domain", "token"], optional: ["ip_version", "ipv6_suffix"] },
+      "easydns": { required: ["provider", "domain", "username", "token"], optional: ["ip_version", "ipv6_suffix"] },
+      "example": { required: ["provider", "domain", "username", "password"], optional: ["ip_version", "ipv6_suffix"] },
+      "freedns": { required: ["provider", "domain", "token"], optional: ["ip_version", "ipv6_suffix"] },
+      "gandi": { required: ["provider", "domain", "personal_access_token"], optional: ["ttl", "ip_version", "ipv6_suffix"] },
+      "gcp": { required: ["provider", "domain", "project", "zone", "credentials"], optional: ["ip_version", "ipv6_suffix"] },
+      "godaddy": { required: ["provider", "domain", "key", "secret"], optional: ["ip_version", "ipv6_suffix"] },
+      "goip": { required: ["provider", "domain", "username", "password"], optional: ["ip_version", "ipv6_suffix"] },
+      "he": { required: ["provider", "domain", "password"], optional: ["ip_version", "ipv6_suffix"] },
+      "hetzner": { required: ["provider", "domain", "zone_identifier", "token"], optional: ["ttl", "ip_version", "ipv6_suffix"] },
+      "hetznercloud": { required: ["provider", "domain", "token"], optional: ["ttl", "ip_version", "ipv6_suffix"] },
+      "infomaniak": { required: ["provider", "domain", "username", "password"], optional: ["ip_version", "ipv6_suffix"] },
+      "inwx": { required: ["provider", "domain", "username", "password"], optional: ["ip_version", "ipv6_suffix"] },
+      "ionos": { required: ["provider", "domain", "api_key"], optional: ["ip_version", "ipv6_suffix"] },
+      "ipv64": { required: ["provider", "domain", "key"], optional: ["ip_version", "ipv6_suffix"] },
+      "linode": { required: ["provider", "domain", "token"], optional: ["ip_version", "ipv6_suffix"] },
+      "loopia": { required: ["provider", "domain", "username", "password"], optional: ["ip_version", "ipv6_suffix"] },
+      "luadns": { required: ["provider", "domain", "email", "token"], optional: ["ip_version", "ipv6_suffix"] },
+      "myaddr": { required: ["provider", "domain", "key"], optional: ["ip_version", "ipv6_suffix"] },
+      "name.com": { required: ["provider", "domain", "username", "token"], optional: ["ttl", "ip_version", "ipv6_suffix"] },
+      "namecheap": { required: ["provider", "domain", "password"], optional: [] },
+      "namesilo": { required: ["provider", "domain", "key"], optional: ["ttl", "ip_version", "ipv6_suffix"] },
+      "netcup": { required: ["provider", "domain", "api_key", "password", "customer_number"], optional: ["ip_version", "ipv6_suffix"] },
+      "njalla": { required: ["provider", "domain", "key"], optional: ["ip_version", "ipv6_suffix"] },
+      "noip": { required: ["provider", "domain", "username", "password"], optional: ["ip_version", "ipv6_suffix"] },
+      "nowdns": { required: ["provider", "domain", "username", "password"], optional: ["ip_version", "ipv6_suffix"] },
+      "opendns": { required: ["provider", "domain", "username", "password"], optional: ["ip_version", "ipv6_suffix"] },
+      "ovh": { required: ["provider", "domain", "username", "password"], optional: ["mode", "api_endpoint", "app_key", "app_secret", "consumer_key", "ip_version", "ipv6_suffix"] },
+      "porkbun": { required: ["provider", "domain", "api_key", "secret_api_key"], optional: ["ttl", "ip_version", "ipv6_suffix"] },
+      "route53": { required: ["provider", "domain", "access_key", "secret_key", "zone_id"], optional: ["ttl", "ip_version", "ipv6_suffix"] },
+      "scaleway": { required: ["provider", "domain", "secret_key"], optional: ["ttl", "ip_version", "ipv6_suffix"] },
+      "selfhost.de": { required: ["provider", "domain", "username", "password"], optional: ["ip_version", "ipv6_suffix"] },
+      "servercow": { required: ["provider", "domain", "username", "password"], optional: ["ttl", "ip_version", "ipv6_suffix"] },
+      "spaceship": { required: ["provider", "domain", "api_key", "api_secret"], optional: ["ttl", "ip_version", "ipv6_suffix"] },
+      "spdyn": { required: ["provider", "domain", "token"], optional: ["user", "password", "ip_version", "ipv6_suffix"] },
+      "strato": { required: ["provider", "domain", "password"], optional: ["ip_version", "ipv6_suffix"] },
+      "variomedia": { required: ["provider", "domain", "email", "password"], optional: ["ip_version", "ipv6_suffix"] },
+      "vercel": { required: ["provider", "domain", "token"], optional: ["team_id", "ttl", "ip_version", "ipv6_suffix"] },
+      "vultr": { required: ["provider", "domain", "apikey"], optional: ["ttl", "ip_version", "ipv6_suffix"] },
+      "zoneedit": { required: ["provider", "domain", "username", "token"], optional: ["ip_version", "ipv6_suffix"] }
+    };
     const secretKeys = ["api_key", "key", "password", "secret", "token", "username"];
     let loadedConfig = { settings: [] };
     let savingDisabled = false;
@@ -124,16 +183,8 @@
       });
       $("#refresh-button").addEventListener("click", loadAll);
       $("#force-button").addEventListener("click", forceUpdate);
-      $("#add-entry-button").addEventListener("click", () => addSetting({ provider: "netcup", domain: "", ip_version: "ipv4" }));
-      $("#add-netcup-button").addEventListener("click", () => addSetting({
-        provider: "netcup",
-        domain: "",
-        api_key: "",
-        password: "",
-        customer_number: "",
-        ip_version: "ipv4",
-        ipv6_suffix: ""
-      }));
+      $("#add-entry-button").addEventListener("click", () => addSetting(newSettingForProvider("netcup")));
+      $("#add-netcup-button").addEventListener("click", () => addSetting(newSettingForProvider("netcup")));
       $("#save-config-button").addEventListener("click", saveConfig);
       loadAll();
       window.setInterval(loadStatus, 30000);
@@ -156,13 +207,17 @@
       const result = await response.json();
       loadedConfig = result.config || { settings: [] };
       if (!Array.isArray(loadedConfig.settings)) loadedConfig.settings = [];
+      for (const setting of loadedConfig.settings) {
+        if (!setting.provider) setting.provider = "netcup";
+      }
       savingDisabled = result.env_config;
       $("#config-path").textContent = result.path || "";
       $("#save-config-button").disabled = savingDisabled;
       $("#config-warning").classList.toggle("hidden", !savingDisabled);
+      const warningText = (result.warnings || []).join(" ");
       $("#config-warning").textContent = savingDisabled
         ? "CONFIG environment variable is active. File editing is disabled because it would be overwritten on restart."
-        : result.restart_hint;
+        : [result.restart_hint, warningText].filter(Boolean).join(" ");
       renderSettings();
     }
 
@@ -234,9 +289,20 @@
           renderSettings();
         });
         const fields = node.querySelector(".fields");
-        const orderedKeys = Object.keys(setting).sort(sortConfigKeys);
+        const orderedKeys = orderedConfigKeys(setting);
         for (const key of orderedKeys) {
           fields.appendChild(makeField(setting, key));
+        }
+        const missingOptional = schemaFields(setting.provider).optional.filter((key) => !(key in setting));
+        if (missingOptional.length > 0) {
+          const addOptional = document.createElement("button");
+          addOptional.type = "button";
+          addOptional.textContent = "Add optional fields";
+          addOptional.addEventListener("click", () => {
+            for (const key of missingOptional) setting[key] = defaultValueForField(key);
+            renderSettings();
+          });
+          fields.appendChild(addOptional);
         }
         list.appendChild(node);
       });
@@ -248,6 +314,11 @@
       const keyInput = node.querySelector(".field-key");
       const valueInput = node.querySelector(".field-value");
       let currentKey = key;
+      const schema = schemaFields(setting.provider);
+      const badge = document.createElement("span");
+      badge.className = "field-badge";
+      badge.textContent = schema.required.includes(key) ? "required" : schema.optional.includes(key) ? "optional" : "custom";
+      row.appendChild(badge);
       keyInput.value = key;
       valueInput.value = setting[key] ?? "";
       valueInput.type = secretKeys.some((secret) => key.toLowerCase().includes(secret)) ? "password" : "text";
@@ -262,7 +333,35 @@
         }
         select.value = setting[key] || "netcup";
         valueInput.replaceWith(select);
+        select.addEventListener("change", () => {
+          setting[currentKey] = select.value;
+          addProviderDefaults(setting, select.value);
+          renderSettings();
+        });
+      } else if (key === "ip_version") {
+        const select = document.createElement("select");
+        select.className = "field-value";
+        for (const value of ["ipv4", "ipv6", "ipv4 or ipv6"]) {
+          const option = document.createElement("option");
+          option.value = value;
+          option.textContent = value;
+          select.appendChild(option);
+        }
+        select.value = setting[key] || "ipv4";
+        valueInput.replaceWith(select);
         select.addEventListener("change", () => setting[currentKey] = select.value);
+      } else if (typeof setting[key] === "boolean") {
+        const select = document.createElement("select");
+        select.className = "field-value";
+        for (const value of ["false", "true"]) {
+          const option = document.createElement("option");
+          option.value = value;
+          option.textContent = value;
+          select.appendChild(option);
+        }
+        select.value = String(setting[key]);
+        valueInput.replaceWith(select);
+        select.addEventListener("change", () => setting[currentKey] = select.value === "true");
       } else {
         valueInput.addEventListener("input", () => setting[currentKey] = valueInput.value);
       }
@@ -286,6 +385,38 @@
       showView("config");
     }
 
+    function newSettingForProvider(provider) {
+      const setting = { provider };
+      addProviderDefaults(setting, provider);
+      return setting;
+    }
+
+    function addProviderDefaults(setting, provider) {
+      const schema = schemaFields(provider);
+      for (const key of schema.required) {
+        if (!(key in setting)) setting[key] = defaultValueForField(key, provider);
+      }
+      if (!("ip_version" in setting) && schema.optional.includes("ip_version")) {
+        setting.ip_version = "ipv4";
+      }
+    }
+
+    function defaultValueForField(key, provider) {
+      switch (key) {
+        case "provider":
+          return provider || "netcup";
+        case "ip_version":
+          return "ipv4";
+        case "ttl":
+          return 600;
+        case "proxied":
+        case "dual_stack":
+          return false;
+        default:
+          return "";
+      }
+    }
+
     async function saveConfig() {
       if (savingDisabled) return;
       const response = await fetch("api/config", {
@@ -298,9 +429,12 @@
         $("#config-warning").textContent = await response.text();
         return;
       }
-      await loadConfig();
+      const result = await response.json();
+      loadedConfig = result.config || loadedConfig;
+      renderSettings();
       $("#config-warning").classList.remove("hidden");
-      $("#config-warning").textContent = "Saved. Restart the container so the updater reloads the edited config.";
+      const warningText = (result.warnings || []).join(" ");
+      $("#config-warning").textContent = ["Saved. Restart the container so the updater reloads the edited config.", warningText].filter(Boolean).join(" ");
     }
 
     async function forceUpdate() {
@@ -320,8 +454,22 @@
       $("#" + name + "-view").classList.add("active");
     }
 
-    function sortConfigKeys(a, b) {
-      const order = ["provider", "domain", "owner", "ip_version", "ipv6_suffix"];
+    function orderedConfigKeys(setting) {
+      const schema = schemaFields(setting.provider);
+      const known = [...schema.required, ...schema.optional];
+      const keys = new Set(Object.keys(setting));
+      const ordered = known.filter((key) => keys.has(key));
+      const extra = [...keys].filter((key) => !known.includes(key)).sort((a, b) => a.localeCompare(b));
+      return [...ordered, ...extra];
+    }
+
+    function schemaFields(provider) {
+      return providerSchemas[provider] || { required: ["provider", "domain"], optional: ["ip_version", "ipv6_suffix"] };
+    }
+
+    function sortConfigKeys(a, b, provider) {
+      const schema = schemaFields(provider);
+      const order = [...schema.required, ...schema.optional];
       const ai = order.indexOf(a);
       const bi = order.indexOf(b);
       if (ai !== -1 || bi !== -1) return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);

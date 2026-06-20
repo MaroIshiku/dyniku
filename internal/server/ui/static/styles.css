@@ -286,9 +286,19 @@ tbody tr:last-child td {
 
 .field-row {
   display: grid;
-  grid-template-columns: minmax(130px, 0.55fr) minmax(180px, 1fr) auto;
+  grid-template-columns: minmax(130px, 0.5fr) minmax(180px, 1fr) auto auto;
   gap: 8px;
   align-items: center;
+}
+
+.field-badge {
+  justify-self: start;
+  border-radius: 999px;
+  padding: 5px 9px;
+  background: var(--surface-soft);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
 }
 
 input,

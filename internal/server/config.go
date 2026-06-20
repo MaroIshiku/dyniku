@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+
+	jsonparams "github.com/qdm12/ddns-updater/internal/params"
 )
 
 const maxConfigBytes = 1024 * 1024
@@ -17,6 +19,7 @@ type configResponse struct {
 	EnvConfig   bool            `json:"env_config"`
 	Config      json.RawMessage `json:"config"`
 	RestartHint string          `json:"restart_hint"`
+	Warnings    []string        `json:"warnings,omitempty"`
 }
 
 func (h *handlers) getConfig(w http.ResponseWriter, _ *http.Request) {
@@ -35,12 +38,14 @@ func (h *handlers) getConfig(w http.ResponseWriter, _ *http.Request) {
 		httpError(w, http.StatusInternalServerError, "config is not valid JSON: "+err.Error())
 		return
 	}
+	warnings, validationErr := jsonparams.ValidateJSON(normalized)
 
 	writeJSON(w, http.StatusOK, configResponse{
 		Path:        h.configPath,
 		EnvConfig:   os.Getenv("CONFIG") != "",
 		Config:      normalized,
 		RestartHint: "Restart the container after saving so the updater reloads data/config.json.",
+		Warnings:    appendValidationWarning(warnings, validationErr),
 	})
 }
 
@@ -66,6 +71,11 @@ func (h *handlers) putConfig(w http.ResponseWriter, r *http.Request) {
 		httpError(w, http.StatusBadRequest, "invalid JSON: "+err.Error())
 		return
 	}
+	warnings, err := jsonparams.ValidateJSON(normalized)
+	if err != nil {
+		httpError(w, http.StatusBadRequest, "config validation failed: "+err.Error())
+		return
+	}
 
 	err = os.MkdirAll(filepath.Dir(h.configPath), os.FileMode(0o777))
 	if err != nil {
@@ -88,6 +98,7 @@ func (h *handlers) putConfig(w http.ResponseWriter, r *http.Request) {
 		EnvConfig:   false,
 		Config:      normalized,
 		RestartHint: "Restart the container after saving so the updater reloads data/config.json.",
+		Warnings:    warnings,
 	})
 }
 
@@ -102,6 +113,11 @@ func normalizeJSON(data []byte) (json.RawMessage, error) {
 	if _, ok := decoded["settings"]; !ok {
 		decoded["settings"] = []any{}
 	}
+	settings, ok := decoded["settings"].([]any)
+	if !ok {
+		return nil, errors.New(`"settings" must be an array`)
+	}
+	decoded["settings"] = settings
 
 	buffer := bytes.NewBuffer(nil)
 	encoder := json.NewEncoder(buffer)
@@ -110,4 +126,11 @@ func normalizeJSON(data []byte) (json.RawMessage, error) {
 		return nil, err
 	}
 	return bytes.TrimSpace(buffer.Bytes()), nil
+}
+
+func appendValidationWarning(warnings []string, err error) []string {
+	if err == nil {
+		return warnings
+	}
+	return append(warnings, "Current config validation failed: "+err.Error())
 }

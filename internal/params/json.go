@@ -146,6 +146,11 @@ func extractAllSettings(jsonBytes []byte) (
 	return allProviders, warnings, nil
 }
 
+func ValidateJSON(jsonBytes []byte) (warnings []string, err error) {
+	_, warnings, err = extractAllSettings(jsonBytes)
+	return warnings, err
+}
+
 var (
 	ErrProviderNoLongerSupported = errors.New("provider no longer supported")
 	ErrProviderMultipleDomains   = errors.New("provider does not support multiple domains")
