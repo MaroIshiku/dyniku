@@ -1,91 +1,218 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="lavender" data-mode="system" data-resolved-mode="light">
 
 <head>
-  <title>DDNS Updater</title>
+  <title>Dyniku</title>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" href="static/favicon.svg" sizes="any" type="image/svg+xml">
-  <link rel="icon" href="static/favicon.ico" type="image/x-icon">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="application-name" content="Dyniku">
+  <meta name="apple-mobile-web-app-title" content="Dyniku">
+  <meta name="theme-color" content="#FAFAFF">
+  <link rel="icon" href="static/dyniku-logo.png" type="image/png">
   <link rel="stylesheet" href="static/styles.css" type="text/css">
+  <script type="application/json" data-psu-app-config>
+    {
+      "app_id": "dyniku",
+      "app_name": "Dyniku",
+      "app_subtitle": "DDNS-Updater Web GUI",
+      "app_symbol": "dns",
+      "default_theme": "lavender",
+      "default_mode": "system",
+      "app_logo": {
+        "src": "static/dyniku-logo.png",
+        "favicon": "static/dyniku-logo.png",
+        "alt": "",
+        "use_as_favicon": true
+      }
+    }
+  </script>
 </head>
 
 <body>
-  <header class="topbar">
-    <div>
-      <p class="eyebrow">DDNS Updater</p>
-      <h1 id="current-ip">N/A</h1>
-      <p id="current-since" class="muted">Waiting for the first successful update</p>
-    </div>
-    <div class="toolbar">
-      <button id="refresh-button" type="button" title="Refresh">Refresh</button>
-      <button id="force-button" type="button" class="primary" title="Force update">Update now</button>
-    </div>
-  </header>
+  <svg xmlns="http://www.w3.org/2000/svg" class="icon-sprite" aria-hidden="true">
+    <symbol id="psu-icon-dns" viewBox="0 0 24 24"><path fill="currentColor" d="M4 21q-.82 0-1.41-.59Q2 19.83 2 19V5q0-.82.59-1.41Q3.18 3 4 3h16q.83 0 1.41.59Q22 4.18 22 5v14q0 .83-.59 1.41Q20.83 21 20 21H4Zm0-2h16V5H4v14Zm2-2h12v-2H6v2Zm0-4h12v-2H6v2Zm0-4h12V7H6v2Z"/></symbol>
+    <symbol id="psu-icon-settings" viewBox="0 0 24 24"><path fill="currentColor" d="M10.9 22q-.45 0-.78-.3-.34-.3-.4-.75l-.25-1.85q-.5-.2-.98-.47-.47-.28-.9-.6l-1.72.73q-.42.18-.84.02-.42-.15-.65-.55l-1.1-1.9q-.22-.4-.14-.85.08-.44.45-.72l1.48-1.12Q5 13.38 5 13v-2q0-.38.07-.75L3.6 9.13q-.37-.28-.45-.72-.08-.45.14-.85l1.1-1.9q.23-.4.65-.55.42-.16.84.02l1.72.73q.43-.32.9-.6.48-.27.98-.47l.25-1.85q.06-.45.4-.75.33-.3.78-.3h2.2q.45 0 .78.3.34.3.4.75l.25 1.85q.5.2.98.47.47.28.9.6l1.72-.73q.42-.18.84-.02.42.15.65.55l1.1 1.9q.22.4.14.85-.08.44-.45.72l-1.48 1.12q.07.37.07.75v2q0 .38-.07.75l1.48 1.12q.37.28.45.72.08.45-.14.85l-1.1 1.9q-.23.4-.65.55-.42.16-.84-.02l-1.72-.73q-.43.32-.9.6-.48.27-.98.47l-.25 1.85q-.06.45-.4.75-.33.3-.78.3h-2.2ZM12 15q1.25 0 2.13-.88.87-.87.87-2.12t-.87-2.12Q13.25 9 12 9t-2.13.88Q9 10.75 9 12t.87 2.12Q10.75 15 12 15Z"/></symbol>
+    <symbol id="psu-icon-close" viewBox="0 0 24 24"><path fill="currentColor" d="M12 13.4 7.1 18.3q-.28.28-.7.28-.43 0-.7-.28-.28-.27-.28-.7 0-.42.28-.7l4.9-4.9-4.9-4.9q-.28-.28-.28-.7 0-.43.28-.7.27-.28.7-.28.42 0 .7.28l4.9 4.9 4.9-4.9q.28-.28.7-.28.43 0 .7.28.28.27.28.7 0 .42-.28.7L13.4 12l4.9 4.9q.28.28.28.7 0 .43-.28.7-.27.28-.7.28-.42 0-.7-.28L12 13.4Z"/></symbol>
+  </svg>
 
-  <main>
-    <nav class="tabs" aria-label="Views">
-      <button class="tab active" type="button" data-view="records">Records</button>
-      <button class="tab" type="button" data-view="config">Config</button>
-      <button class="tab" type="button" data-view="history">IP Log</button>
-    </nav>
-
-    <section id="records-view" class="view active">
-      <div class="section-head">
-        <h2>Records</h2>
-        <span id="record-count" class="pill">0</span>
+  <div class="psu-app-shell app-shell">
+    <header class="psu-app-header" data-psu-app-header>
+      <div class="psu-app-header__inner">
+        <div class="psu-app-symbol" aria-hidden="true">
+          <img data-psu-app-logo src="static/dyniku-logo.png" alt="">
+          <svg data-psu-fallback-symbol viewBox="0 0 24 24"><use href="#psu-icon-dns"></use></svg>
+        </div>
+        <div class="psu-app-title-stack">
+          <h1 class="psu-app-title" data-psu-app-name>Dyniku</h1>
+          <p class="psu-app-subtitle" data-psu-app-subtitle>DDNS-Updater Web GUI</p>
+        </div>
+        <div class="psu-spacer"></div>
+        <button class="psu-icon-button" id="open-settings-button" type="button" data-psu-open="#settings-sheet" aria-label="Open settings" title="Settings">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#psu-icon-settings"></use></svg>
+        </button>
       </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Owner</th>
-              <th>Domain</th>
-              <th>Provider</th>
-              <th>IP Version</th>
-              <th>Status</th>
-              <th>Current IP</th>
-              <th>Since</th>
-              <th>Log</th>
-            </tr>
-          </thead>
-          <tbody id="records-body"></tbody>
-        </table>
-      </div>
-    </section>
+    </header>
 
-    <section id="config-view" class="view">
-      <div class="section-head">
+    <main class="psu-main app-main">
+      <section class="psu-hero-card status-hero" aria-labelledby="current-ip-label">
+        <div class="hero-copy">
+          <p class="section-kicker">Current public IP</p>
+          <h2 id="current-ip" class="hero-ip">N/A</h2>
+          <p id="current-since" class="hero-subtext">Waiting for the first successful update</p>
+        </div>
+        <div class="hero-actions" aria-label="Updater actions">
+          <button id="refresh-button" type="button" class="psu-button psu-button--tonal">
+            <span aria-hidden="true">Refresh</span>
+          </button>
+          <button id="force-button" type="button" class="psu-button psu-button--filled">
+            <span aria-hidden="true">Update now</span>
+          </button>
+        </div>
+      </section>
+
+      <section class="metrics-grid" aria-label="Overview">
+        <article class="metric-card">
+          <span class="metric-label">Records</span>
+          <strong id="record-count">0</strong>
+        </article>
+        <article class="metric-card">
+          <span class="metric-label">Healthy</span>
+          <strong id="healthy-count">0</strong>
+        </article>
+        <article class="metric-card">
+          <span class="metric-label">Attention</span>
+          <strong id="attention-count">0</strong>
+        </article>
+      </section>
+
+      <nav class="psu-segmented-control view-tabs" aria-label="Views">
+        <button type="button" aria-selected="true" data-view="records">Records</button>
+        <button type="button" aria-selected="false" data-view="config">Config</button>
+        <button type="button" aria-selected="false" data-view="history">IP Log</button>
+      </nav>
+
+      <section id="records-view" class="view active" aria-labelledby="records-title">
+        <div class="section-head">
+          <div>
+            <p class="section-kicker">DNS records</p>
+            <h2 id="records-title">Update status</h2>
+          </div>
+          <input id="record-search" class="psu-search-field compact-search" type="search" placeholder="Filter records" autocomplete="off">
+        </div>
+        <div id="records-empty" class="empty-state" hidden>
+          <img src="static/dyniku-logo.png" alt="">
+          <strong>No records configured</strong>
+          <span>Add a provider entry in Config to start tracking DDNS updates.</span>
+        </div>
+        <div class="records-table-wrap" id="records-table-wrap">
+          <table class="records-table">
+            <thead>
+              <tr>
+                <th>Owner</th>
+                <th>Domain</th>
+                <th>Provider</th>
+                <th>IP Version</th>
+                <th>Status</th>
+                <th>Current IP</th>
+                <th>Since</th>
+                <th>Log</th>
+              </tr>
+            </thead>
+            <tbody id="records-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="config-view" class="view" aria-labelledby="config-title">
+        <div class="section-head">
+          <div>
+            <p class="section-kicker">Provider config</p>
+            <h2 id="config-title">Entries</h2>
+            <p id="config-path" class="support-text"></p>
+          </div>
+          <div class="action-row">
+            <button id="add-entry-button" type="button" class="psu-button psu-button--tonal">Add entry</button>
+            <button id="save-config-button" type="button" class="psu-button psu-button--filled">Save config</button>
+          </div>
+        </div>
+        <p id="config-warning" class="inline-notice" hidden></p>
+        <div id="settings-list" class="settings-list"></div>
+      </section>
+
+      <section id="history-view" class="view" aria-labelledby="history-title">
+        <div class="section-head">
+          <div>
+            <p class="section-kicker">Public IP changes</p>
+            <h2 id="history-title">History</h2>
+          </div>
+          <span id="history-count" class="count-pill">0</span>
+        </div>
+        <div id="history-list" class="history-list"></div>
+      </section>
+    </main>
+  </div>
+
+  <div id="settings-sheet" class="psu-backdrop" hidden>
+    <section class="psu-sheet settings-sheet" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <div class="psu-sheet-header">
+        <span></span>
+        <h2 id="settings-title" class="psu-sheet-title">Settings</h2>
+        <button class="psu-icon-button" type="button" data-psu-close aria-label="Close settings" title="Close">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#psu-icon-close"></use></svg>
+        </button>
+      </div>
+      <div class="about-card">
+        <div class="psu-logo-frame">
+          <img data-psu-app-logo src="static/dyniku-logo.png" alt="">
+          <svg data-psu-fallback-symbol viewBox="0 0 24 24"><use href="#psu-icon-dns"></use></svg>
+        </div>
         <div>
-          <h2>Config</h2>
-          <p id="config-path" class="muted"></p>
-        </div>
-        <div class="toolbar">
-          <button id="add-netcup-button" type="button">Netcup entry</button>
-          <button id="add-entry-button" type="button">Add entry</button>
-          <button id="save-config-button" type="button" class="primary">Save</button>
+          <strong data-psu-app-name>Dyniku</strong>
+          <span data-psu-app-subtitle>DDNS-Updater Web GUI</span>
         </div>
       </div>
-      <p id="config-warning" class="notice hidden"></p>
-      <div id="settings-list" class="settings-list"></div>
-    </section>
-
-    <section id="history-view" class="view">
-      <div class="section-head">
-        <h2>IP Log</h2>
-        <span id="history-count" class="pill">0</span>
+      <div class="settings-group">
+        <h3>Appearance</h3>
+        <div class="theme-grid" id="theme-picker" aria-label="Theme"></div>
+        <div class="psu-segmented-control mode-picker" id="mode-picker" aria-label="Mode">
+          <button type="button" data-mode="system">System</button>
+          <button type="button" data-mode="light">Light</button>
+          <button type="button" data-mode="dark">Dark</button>
+        </div>
       </div>
-      <div id="history-list" class="history-list"></div>
+      <div class="psu-technical-card">
+        <strong>Runtime</strong>
+        <p class="psu-technical-value" id="runtime-info">API: ready after first load</p>
+      </div>
     </section>
-  </main>
+  </div>
 
-  <template id="setting-template">
-    <article class="setting">
-      <div class="setting-head">
-        <strong class="setting-title"></strong>
-        <div class="toolbar">
-          <button class="add-field" type="button">Field</button>
-          <button class="delete-entry danger" type="button">Delete</button>
+  <div id="toast-host" class="toast-host" aria-live="polite" aria-atomic="true"></div>
+
+  <template id="setting-summary-template">
+    <article class="config-card">
+      <div class="config-summary-main">
+        <span class="provider-mark"></span>
+        <div>
+          <strong class="config-title"></strong>
+          <span class="config-meta"></span>
+        </div>
+      </div>
+      <button class="psu-button psu-button--outlined edit-entry" type="button">Edit</button>
+    </article>
+  </template>
+
+  <template id="setting-edit-template">
+    <article class="config-card config-card-editing">
+      <div class="config-edit-head">
+        <div>
+          <strong class="config-title"></strong>
+          <span class="config-meta"></span>
+        </div>
+        <div class="action-row">
+          <button class="psu-button psu-button--tonal add-field" type="button">Field</button>
+          <button class="psu-button psu-button--danger delete-entry" type="button">Delete</button>
+          <button class="psu-button psu-button--outlined close-entry" type="button">Done</button>
         </div>
       </div>
       <div class="fields"></div>
@@ -94,517 +221,22 @@
 
   <template id="field-template">
     <div class="field-row">
-      <input class="field-key" type="text" placeholder="field">
-      <input class="field-value" type="text" placeholder="value">
-      <button class="delete-field danger" type="button" title="Delete field">Delete</button>
+      <label class="psu-field">
+        <span class="psu-label">Field</span>
+        <input class="psu-input field-key" type="text" autocomplete="off">
+      </label>
+      <label class="psu-field field-value-shell">
+        <span class="psu-label">Value</span>
+        <input class="psu-input field-value" type="text" autocomplete="off">
+      </label>
+      <span class="field-badge"></span>
+      <button class="psu-icon-button delete-field" type="button" aria-label="Delete field" title="Delete field">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#psu-icon-close"></use></svg>
+      </button>
     </div>
   </template>
 
-  <script>
-    const providerChoices = [
-      "aliyun", "allinkl", "changeip", "cloudflare", "custom", "dd24", "ddnss", "desec",
-      "digitalocean", "dnsomatic", "dnspod", "domeneshop", "dondominio", "dreamhost",
-      "duckdns", "dyn", "dynu", "dynv6", "easydns", "freedns", "gandi", "gcp",
-      "godaddy", "goip", "he", "hetzner", "hetznercloud", "infomaniak", "inwx",
-      "ionos", "ipv64", "linode", "loopia", "luadns", "myaddr", "namecheap",
-      "name.com", "namesilo", "netcup", "njalla", "noip", "nowdns", "opendns",
-      "ovh", "porkbun", "route53", "scaleway", "selfhost.de", "servercow",
-      "spaceship", "spdyn", "strato", "variomedia", "vercel", "vultr", "zoneedit"
-    ];
-    const providerSchemas = {
-      "aliyun": { required: ["provider", "domain", "access_key_id", "access_secret"], optional: ["ip_version", "ipv6_suffix", "region"] },
-      "allinkl": { required: ["provider", "domain", "username", "password"], optional: ["ip_version", "ipv6_suffix"] },
-      "changeip": { required: ["provider", "domain", "username", "password"], optional: ["ip_version", "ipv6_suffix"] },
-      "cloudflare": { required: ["provider", "domain", "zone_identifier", "ttl", "token"], optional: ["email", "key", "user_service_key", "proxied", "ip_version", "ipv6_suffix"] },
-      "custom": { required: ["provider", "domain", "url", "ipv4key", "ipv6key", "success_regex"], optional: ["ip_version", "ipv6_suffix"] },
-      "dd24": { required: ["provider", "domain", "password"], optional: ["ip_version", "ipv6_suffix"] },
-      "ddnss": { required: ["provider", "domain", "username", "password"], optional: ["dual_stack", "ip_version", "ipv6_suffix"] },
-      "desec": { required: ["provider", "domain", "token"], optional: ["ip_version", "ipv6_suffix"] },
-      "digitalocean": { required: ["provider", "domain", "token"], optional: ["ip_version", "ipv6_suffix"] },
-      "dnsomatic": { required: ["provider", "domain", "username", "password"], optional: ["ip_version", "ipv6_suffix"] },
-      "dnspod": { required: ["provider", "domain", "token"], optional: ["ip_version", "ipv6_suffix"] },
-      "domeneshop": { required: ["provider", "domain", "token", "secret"], optional: ["ip_version", "ipv6_suffix"] },
-      "dondominio": { required: ["provider", "domain", "username", "password"], optional: ["ip_version", "ipv6_suffix"] },
-      "dreamhost": { required: ["provider", "domain", "key"], optional: ["ip_version", "ipv6_suffix"] },
-      "duckdns": { required: ["provider", "domain", "token"], optional: ["ip_version", "ipv6_suffix"] },
-      "dyn": { required: ["provider", "domain", "username", "client_key"], optional: ["password", "ip_version", "ipv6_suffix"] },
-      "dynu": { required: ["provider", "domain", "username", "password"], optional: ["group", "ip_version", "ipv6_suffix"] },
-      "dynv6": { required: ["provider", "domain", "token"], optional: ["ip_version", "ipv6_suffix"] },
-      "easydns": { required: ["provider", "domain", "username", "token"], optional: ["ip_version", "ipv6_suffix"] },
-      "example": { required: ["provider", "domain", "username", "password"], optional: ["ip_version", "ipv6_suffix"] },
-      "freedns": { required: ["provider", "domain", "token"], optional: ["ip_version", "ipv6_suffix"] },
-      "gandi": { required: ["provider", "domain", "personal_access_token"], optional: ["ttl", "ip_version", "ipv6_suffix"] },
-      "gcp": { required: ["provider", "domain", "project", "zone", "credentials"], optional: ["ip_version", "ipv6_suffix"] },
-      "godaddy": { required: ["provider", "domain", "key", "secret"], optional: ["ip_version", "ipv6_suffix"] },
-      "goip": { required: ["provider", "domain", "username", "password"], optional: ["ip_version", "ipv6_suffix"] },
-      "he": { required: ["provider", "domain", "password"], optional: ["ip_version", "ipv6_suffix"] },
-      "hetzner": { required: ["provider", "domain", "zone_identifier", "token"], optional: ["ttl", "ip_version", "ipv6_suffix"] },
-      "hetznercloud": { required: ["provider", "domain", "token"], optional: ["ttl", "ip_version", "ipv6_suffix"] },
-      "infomaniak": { required: ["provider", "domain", "username", "password"], optional: ["ip_version", "ipv6_suffix"] },
-      "inwx": { required: ["provider", "domain", "username", "password"], optional: ["ip_version", "ipv6_suffix"] },
-      "ionos": { required: ["provider", "domain", "api_key"], optional: ["ip_version", "ipv6_suffix"] },
-      "ipv64": { required: ["provider", "domain", "key"], optional: ["ip_version", "ipv6_suffix"] },
-      "linode": { required: ["provider", "domain", "token"], optional: ["ip_version", "ipv6_suffix"] },
-      "loopia": { required: ["provider", "domain", "username", "password"], optional: ["ip_version", "ipv6_suffix"] },
-      "luadns": { required: ["provider", "domain", "email", "token"], optional: ["ip_version", "ipv6_suffix"] },
-      "myaddr": { required: ["provider", "domain", "key"], optional: ["ip_version", "ipv6_suffix"] },
-      "name.com": { required: ["provider", "domain", "username", "token"], optional: ["ttl", "ip_version", "ipv6_suffix"] },
-      "namecheap": { required: ["provider", "domain", "password"], optional: [] },
-      "namesilo": { required: ["provider", "domain", "key"], optional: ["ttl", "ip_version", "ipv6_suffix"] },
-      "netcup": { required: ["provider", "domain", "api_key", "password", "customer_number"], optional: ["ip_version", "ipv6_suffix"] },
-      "njalla": { required: ["provider", "domain", "key"], optional: ["ip_version", "ipv6_suffix"] },
-      "noip": { required: ["provider", "domain", "username", "password"], optional: ["ip_version", "ipv6_suffix"] },
-      "nowdns": { required: ["provider", "domain", "username", "password"], optional: ["ip_version", "ipv6_suffix"] },
-      "opendns": { required: ["provider", "domain", "username", "password"], optional: ["ip_version", "ipv6_suffix"] },
-      "ovh": { required: ["provider", "domain", "username", "password"], optional: ["mode", "api_endpoint", "app_key", "app_secret", "consumer_key", "ip_version", "ipv6_suffix"] },
-      "porkbun": { required: ["provider", "domain", "api_key", "secret_api_key"], optional: ["ttl", "ip_version", "ipv6_suffix"] },
-      "route53": { required: ["provider", "domain", "access_key", "secret_key", "zone_id"], optional: ["ttl", "ip_version", "ipv6_suffix"] },
-      "scaleway": { required: ["provider", "domain", "secret_key"], optional: ["ttl", "ip_version", "ipv6_suffix"] },
-      "selfhost.de": { required: ["provider", "domain", "username", "password"], optional: ["ip_version", "ipv6_suffix"] },
-      "servercow": { required: ["provider", "domain", "username", "password"], optional: ["ttl", "ip_version", "ipv6_suffix"] },
-      "spaceship": { required: ["provider", "domain", "api_key", "api_secret"], optional: ["ttl", "ip_version", "ipv6_suffix"] },
-      "spdyn": { required: ["provider", "domain", "token"], optional: ["user", "password", "ip_version", "ipv6_suffix"] },
-      "strato": { required: ["provider", "domain", "password"], optional: ["ip_version", "ipv6_suffix"] },
-      "variomedia": { required: ["provider", "domain", "email", "password"], optional: ["ip_version", "ipv6_suffix"] },
-      "vercel": { required: ["provider", "domain", "token"], optional: ["team_id", "ttl", "ip_version", "ipv6_suffix"] },
-      "vultr": { required: ["provider", "domain", "apikey"], optional: ["ttl", "ip_version", "ipv6_suffix"] },
-      "zoneedit": { required: ["provider", "domain", "username", "token"], optional: ["ip_version", "ipv6_suffix"] }
-    };
-    const secretKeys = ["api_key", "key", "password", "secret", "token", "username"];
-    let loadedConfig = { settings: [] };
-    let savingDisabled = false;
-    let editingSettingIndex = null;
-
-    const $ = (selector) => document.querySelector(selector);
-
-    document.addEventListener("DOMContentLoaded", () => {
-      $(".tabs").addEventListener("click", (event) => {
-        const button = event.target.closest("[data-view]");
-        if (!button) return;
-        showView(button.dataset.view);
-      });
-      $("#refresh-button").addEventListener("click", loadAll);
-      $("#force-button").addEventListener("click", forceUpdate);
-      $("#add-entry-button").addEventListener("click", () => addSetting(newSettingForProvider("netcup")));
-      $("#add-netcup-button").addEventListener("click", () => addSetting(newSettingForProvider("netcup")));
-      $("#save-config-button").addEventListener("click", saveConfig);
-      loadAll();
-      window.setInterval(loadStatus, 30000);
-    });
-
-    async function loadAll() {
-      await Promise.all([loadStatus(), loadConfig()]);
-    }
-
-    async function loadStatus() {
-      const response = await fetch("api/status");
-      if (!response.ok) throw new Error(await response.text());
-      const status = await response.json();
-      renderStatus(status);
-    }
-
-    async function loadConfig() {
-      const response = await fetch("api/config");
-      if (!response.ok) throw new Error(await response.text());
-      const result = await response.json();
-      loadedConfig = result.config || { settings: [] };
-      if (!Array.isArray(loadedConfig.settings)) loadedConfig.settings = [];
-      for (const setting of loadedConfig.settings) {
-        if (!setting.provider) setting.provider = "netcup";
-      }
-      editingSettingIndex = null;
-      savingDisabled = result.env_config;
-      $("#config-path").textContent = result.path || "";
-      $("#save-config-button").disabled = savingDisabled;
-      $("#config-warning").classList.toggle("hidden", !savingDisabled);
-      const warningText = (result.warnings || []).join(" ");
-      $("#config-warning").textContent = savingDisabled
-        ? "CONFIG environment variable is active. File editing is disabled because it would be overwritten on restart."
-        : [result.restart_hint, warningText].filter(Boolean).join(" ");
-      renderSettings();
-    }
-
-    function renderStatus(status) {
-      $("#current-ip").textContent = status.current_ip || "N/A";
-      $("#current-since").textContent = status.current_since
-        ? "Since " + formatDate(status.current_since) + " (" + durationSince(status.current_since) + ")"
-        : "Waiting for the first successful update";
-
-      $("#record-count").textContent = String(status.records?.length || 0);
-      const body = $("#records-body");
-      body.innerHTML = "";
-      for (let index = 0; index < (status.records || []).length; index++) {
-        const record = status.records[index];
-        const row = document.createElement("tr");
-        const statusClassName = statusClass(record.status || "unset");
-        row.innerHTML = `
-          <td data-label="Owner">${escapeHTML(record.owner || "")}</td>
-          <td data-label="Domain">${escapeHTML(record.domain || "")}</td>
-          <td data-label="Provider">${escapeHTML(record.provider || "")}</td>
-          <td data-label="IP Version">${escapeHTML(record.ip_version || "")}</td>
-          <td data-label="Status"><span class="status ${statusClassName}">${escapeHTML(record.status || "unset")}</span></td>
-          <td data-label="Current IP">${escapeHTML(record.current_ip || "N/A")}</td>
-          <td data-label="Since">${record.since ? escapeHTML(durationSince(record.since)) : "N/A"}</td>
-          <td data-label="Log"><button class="icon-button log-toggle" type="button" aria-expanded="false" aria-controls="record-log-${index}" aria-label="Show update log" title="Show update log">${logIcon()}</button></td>
-        `;
-        body.appendChild(row);
-        const logRow = document.createElement("tr");
-        logRow.className = "record-log-row hidden";
-        logRow.id = `record-log-${index}`;
-        logRow.innerHTML = `<td colspan="8">${renderRecordLog(record.history || [])}</td>`;
-        body.appendChild(logRow);
-        row.querySelector(".log-toggle").addEventListener("click", (event) => {
-          const expanded = event.currentTarget.getAttribute("aria-expanded") === "true";
-          event.currentTarget.setAttribute("aria-expanded", String(!expanded));
-          event.currentTarget.classList.toggle("open", !expanded);
-          logRow.classList.toggle("hidden", expanded);
-        });
-      }
-
-      renderHistory(status.history_log || []);
-    }
-
-    function renderHistory(lines) {
-      $("#history-count").textContent = String(lines.length);
-      const list = $("#history-list");
-      list.innerHTML = "";
-      if (lines.length === 0) {
-        list.innerHTML = `<p class="empty">No public IP changes logged yet.</p>`;
-        return;
-      }
-      const newestFirst = [...lines].reverse();
-      for (let i = 0; i < newestFirst.length; i++) {
-        const current = parseLogLine(newestFirst[i]);
-        const previous = parseLogLine(newestFirst[i + 1]);
-        const duration = previous && current ? formatDuration(current.date - previous.date) : "current";
-        const item = document.createElement("div");
-        item.className = "history-item";
-        item.innerHTML = `
-          <span>${escapeHTML(current?.stamp || newestFirst[i])}</span>
-          <strong>${escapeHTML(current?.ip || "")}</strong>
-          <span>${escapeHTML(duration)}</span>
-        `;
-        list.appendChild(item);
-      }
-    }
-
-    function renderSettings() {
-      const list = $("#settings-list");
-      list.innerHTML = "";
-      loadedConfig.settings.forEach((setting, index) => {
-        if (editingSettingIndex !== index) {
-          list.appendChild(makeSettingSummary(setting, index));
-          return;
-        }
-
-        const node = document.importNode($("#setting-template").content, true);
-        const article = node.querySelector(".setting");
-        article.dataset.index = String(index);
-        node.querySelector(".setting-title").textContent = setting.domain || `Entry ${index + 1}`;
-        const closeButton = document.createElement("button");
-        closeButton.type = "button";
-        closeButton.textContent = "Done";
-        closeButton.addEventListener("click", () => {
-          editingSettingIndex = null;
-          renderSettings();
-        });
-        node.querySelector(".setting-head .toolbar").prepend(closeButton);
-        node.querySelector(".add-field").addEventListener("click", () => {
-          setting[""] = "";
-          renderSettings();
-        });
-        node.querySelector(".delete-entry").addEventListener("click", () => {
-          loadedConfig.settings.splice(index, 1);
-          renderSettings();
-        });
-        const fields = node.querySelector(".fields");
-        const orderedKeys = orderedConfigKeys(setting);
-        for (const key of orderedKeys) {
-          fields.appendChild(makeField(setting, key));
-        }
-        const missingOptional = schemaFields(setting.provider).optional.filter((key) => !(key in setting));
-        if (missingOptional.length > 0) {
-          const addOptional = document.createElement("button");
-          addOptional.type = "button";
-          addOptional.textContent = "Add optional fields";
-          addOptional.addEventListener("click", () => {
-            for (const key of missingOptional) setting[key] = defaultValueForField(key);
-            renderSettings();
-          });
-          fields.appendChild(addOptional);
-        }
-        list.appendChild(node);
-      });
-    }
-
-    function makeSettingSummary(setting, index) {
-      const article = document.createElement("article");
-      article.className = "setting setting-summary";
-      const title = document.createElement("div");
-      title.className = "summary-main";
-      title.innerHTML = `
-        <strong>${escapeHTML(setting.provider || "unknown")}</strong>
-        <span>${escapeHTML(setting.owner || setting.host || "@")} / ${escapeHTML(setting.domain || "No domain")}</span>
-        <span>${escapeHTML(setting.ip_version || "default IP")}</span>
-      `;
-
-      const editButton = document.createElement("button");
-      editButton.type = "button";
-      editButton.className = "icon-button";
-      editButton.title = "Edit entry";
-      editButton.setAttribute("aria-label", "Edit entry");
-      editButton.innerHTML = editIcon();
-      editButton.addEventListener("click", () => {
-        editingSettingIndex = index;
-        renderSettings();
-      });
-
-      article.appendChild(title);
-      article.appendChild(editButton);
-      return article;
-    }
-
-    function makeField(setting, key) {
-      const node = document.importNode($("#field-template").content, true);
-      const row = node.querySelector(".field-row");
-      const keyInput = node.querySelector(".field-key");
-      const valueInput = node.querySelector(".field-value");
-      let currentKey = key;
-      const schema = schemaFields(setting.provider);
-      const badge = document.createElement("span");
-      badge.className = "field-badge";
-      badge.textContent = schema.required.includes(key) ? "required" : schema.optional.includes(key) ? "optional" : "custom";
-      row.appendChild(badge);
-      keyInput.value = key;
-      valueInput.value = setting[key] ?? "";
-      valueInput.type = secretKeys.some((secret) => key.toLowerCase().includes(secret)) ? "password" : "text";
-      if (key === "provider") {
-        const select = document.createElement("select");
-        select.className = "field-value";
-        for (const provider of providerChoices) {
-          const option = document.createElement("option");
-          option.value = provider;
-          option.textContent = provider;
-          select.appendChild(option);
-        }
-        select.value = setting[key] || "netcup";
-        valueInput.replaceWith(select);
-        select.addEventListener("change", () => {
-          setting[currentKey] = select.value;
-          pruneSettingForProvider(setting, select.value);
-          addProviderDefaults(setting, select.value);
-          renderSettings();
-        });
-      } else if (key === "ip_version") {
-        const select = document.createElement("select");
-        select.className = "field-value";
-        for (const value of ["ipv4", "ipv6", "ipv4 or ipv6"]) {
-          const option = document.createElement("option");
-          option.value = value;
-          option.textContent = value;
-          select.appendChild(option);
-        }
-        select.value = setting[key] || "ipv4";
-        valueInput.replaceWith(select);
-        select.addEventListener("change", () => setting[currentKey] = select.value);
-      } else if (typeof setting[key] === "boolean") {
-        const select = document.createElement("select");
-        select.className = "field-value";
-        for (const value of ["false", "true"]) {
-          const option = document.createElement("option");
-          option.value = value;
-          option.textContent = value;
-          select.appendChild(option);
-        }
-        select.value = String(setting[key]);
-        valueInput.replaceWith(select);
-        select.addEventListener("change", () => setting[currentKey] = select.value === "true");
-      } else {
-        valueInput.addEventListener("input", () => setting[currentKey] = valueInput.value);
-      }
-      keyInput.addEventListener("input", () => {
-        const newKey = keyInput.value;
-        if (currentKey === newKey) return;
-        setting[newKey] = setting[currentKey];
-        delete setting[currentKey];
-        currentKey = newKey;
-      });
-      row.querySelector(".delete-field").addEventListener("click", () => {
-        delete setting[currentKey];
-        renderSettings();
-      });
-      return node;
-    }
-
-    function addSetting(setting) {
-      loadedConfig.settings.push(setting);
-      editingSettingIndex = loadedConfig.settings.length - 1;
-      renderSettings();
-      showView("config");
-    }
-
-    function newSettingForProvider(provider) {
-      const setting = { provider };
-      addProviderDefaults(setting, provider);
-      return setting;
-    }
-
-    function addProviderDefaults(setting, provider) {
-      const schema = schemaFields(provider);
-      for (const key of schema.required) {
-        if (!(key in setting)) setting[key] = defaultValueForField(key, provider);
-      }
-      if (!("ip_version" in setting) && schema.optional.includes("ip_version")) {
-        setting.ip_version = "ipv4";
-      }
-    }
-
-    function pruneSettingForProvider(setting, provider) {
-      const schema = schemaFields(provider);
-      const allowed = new Set([...schema.required, ...schema.optional, "owner", "host"]);
-      for (const key of Object.keys(setting)) {
-        if (!allowed.has(key)) delete setting[key];
-      }
-      setting.provider = provider;
-    }
-
-    function defaultValueForField(key, provider) {
-      switch (key) {
-        case "provider":
-          return provider || "netcup";
-        case "ip_version":
-          return "ipv4";
-        case "ttl":
-          return 600;
-        case "proxied":
-        case "dual_stack":
-          return false;
-        default:
-          return "";
-      }
-    }
-
-    async function saveConfig() {
-      if (savingDisabled) return;
-      const response = await fetch("api/config", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(loadedConfig)
-      });
-      if (!response.ok) {
-        $("#config-warning").classList.remove("hidden");
-        $("#config-warning").textContent = await response.text();
-        return;
-      }
-      const result = await response.json();
-      loadedConfig = result.config || loadedConfig;
-      editingSettingIndex = null;
-      renderSettings();
-      $("#config-warning").classList.remove("hidden");
-      const warningText = (result.warnings || []).join(" ");
-      $("#config-warning").textContent = ["Saved. Restart the container so the updater reloads the edited config.", warningText].filter(Boolean).join(" ");
-    }
-
-    async function forceUpdate() {
-      $("#force-button").disabled = true;
-      try {
-        const response = await fetch("update", { method: "POST" });
-        if (!response.ok) throw new Error(await response.text());
-        await loadStatus();
-      } finally {
-        $("#force-button").disabled = false;
-      }
-    }
-
-    function showView(name) {
-      document.querySelectorAll(".tab").forEach((tab) => tab.classList.toggle("active", tab.dataset.view === name));
-      document.querySelectorAll(".view").forEach((view) => view.classList.remove("active"));
-      $("#" + name + "-view").classList.add("active");
-    }
-
-    function orderedConfigKeys(setting) {
-      const schema = schemaFields(setting.provider);
-      const known = [...schema.required, ...schema.optional];
-      const keys = new Set(Object.keys(setting));
-      const ordered = known.filter((key) => keys.has(key));
-      const extra = [...keys].filter((key) => !known.includes(key)).sort((a, b) => a.localeCompare(b));
-      return [...ordered, ...extra];
-    }
-
-    function schemaFields(provider) {
-      return providerSchemas[provider] || { required: ["provider", "domain"], optional: ["ip_version", "ipv6_suffix"] };
-    }
-
-    function statusClass(status) {
-      return String(status).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-    }
-
-    function editIcon() {
-      return `<svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 20h9"></path>
-        <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path>
-      </svg>`;
-    }
-
-    function logIcon() {
-      return `<svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 5v14"></path>
-        <path d="m19 12-7 7-7-7"></path>
-      </svg>`;
-    }
-
-    function renderRecordLog(events) {
-      if (events.length === 0) {
-        return `<div class="record-log"><p class="empty">No updates logged for this record yet.</p></div>`;
-      }
-      return `<div class="record-log">${events.map((event) => `
-        <div class="record-log-item">
-          <span>${escapeHTML(formatDate(event.time))}</span>
-          <strong>${escapeHTML(event.ip || "")}</strong>
-        </div>
-      `).join("")}</div>`;
-    }
-
-    function parseLogLine(line) {
-      const [stamp, ip] = line.trim().split(/\s+/);
-      const match = /^(\d{4})(\d{2})(\d{2})-(\d{2})(\d{2})$/.exec(stamp || "");
-      if (!match) return null;
-      const [, year, month, day, hour, minute] = match;
-      return {
-        stamp,
-        ip,
-        date: new Date(Number(year), Number(month) - 1, Number(day), Number(hour), Number(minute))
-      };
-    }
-
-    function formatDate(value) {
-      return new Date(value).toLocaleString();
-    }
-
-    function durationSince(value) {
-      return formatDuration(Date.now() - new Date(value).getTime());
-    }
-
-    function formatDuration(ms) {
-      if (!Number.isFinite(ms) || ms < 0) return "N/A";
-      const minutes = Math.floor(ms / 60000);
-      if (minutes < 1) return "less than 1 min";
-      if (minutes < 60) return `${minutes} min`;
-      const hours = Math.floor(minutes / 60);
-      if (hours < 48) return `${hours} h`;
-      return `${Math.floor(hours / 24)} d`;
-    }
-
-    function escapeHTML(value) {
-      return String(value).replace(/[&<>"']/g, (char) => ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        "\"": "&quot;",
-        "'": "&#39;"
-      }[char]));
-    }
-  </script>
+  <script type="module" src="static/app.js"></script>
 </body>
 
 </html>
