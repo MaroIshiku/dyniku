@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"net/netip"
 
-	"github.com/qdm12/ddns-updater/internal/provider/constants"
+	"github.com/MaroIshiku/dyniku/internal/provider/constants"
 )
 
 // setRecord updates an existing DNS record using the set_records action.

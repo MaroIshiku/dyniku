@@ -61,13 +61,13 @@ RUN GOARCH="$(xcputranslate translate -targetplatform ${TARGETPLATFORM} -field a
     -X 'main.version=$VERSION' \
     -X 'main.date=$CREATED' \
     -X 'main.commit=$COMMIT' \
-    " -o app cmd/ddns-updater/main.go
+    " -o app cmd/dyniku/main.go
 
 FROM scratch
 EXPOSE 8507
 HEALTHCHECK --interval=60s --timeout=5s --start-period=10s --retries=2 CMD ["/updater/dyniku", "healthcheck"]
-ARG UID=1000
-ARG GID=1000
+ARG UID=0
+ARG GID=0
 USER ${UID}:${GID}
 WORKDIR /updater
 ENTRYPOINT ["/updater/dyniku"]
@@ -110,7 +110,7 @@ ARG VERSION=unknown
 ARG CREATED="an unknown date"
 ARG COMMIT=unknown
 LABEL \
-    org.opencontainers.image.authors="quentin.mcgaw@gmail.com" \
+    org.opencontainers.image.authors="MaroIshiku" \
     org.opencontainers.image.version=$VERSION \
     org.opencontainers.image.created=$CREATED \
     org.opencontainers.image.revision=$COMMIT \

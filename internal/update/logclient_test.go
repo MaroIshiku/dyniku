@@ -8,7 +8,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/qdm12/ddns-updater/internal/update/mock_update"
+	"github.com/MaroIshiku/dyniku/internal/update/mock_update"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"

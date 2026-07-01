@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/MaroIshiku/dyniku/pkg/publicip/dns/mock_dns"
 	"github.com/miekg/dns"
-	"github.com/qdm12/ddns-updater/pkg/publicip/dns/mock_dns"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"

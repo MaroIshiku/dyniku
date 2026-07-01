@@ -24,7 +24,7 @@
 
 - `"zone_identifier"` is the Zone ID of your site, from the domain overview page written as *Zone ID*
 - `"domain"` is the domain to update. It can be `example.com` (root domain), `sub.example.com` (subdomain of `example.com`) or `*.example.com` for the wildcard.
-See [this issue comment for context](https://github.com/qdm12/ddns-updater/issues/243#issuecomment-928313949). This is left as is for compatibility.
+See [this issue comment for context](https://github.com/MaroIshiku/dyniku/issues/243#issuecomment-928313949). This is left as is for compatibility.
 - `"ttl"` integer value for record TTL in seconds (specify 1 for automatic)
 - One of the following ([how to find API keys](https://developers.cloudflare.com/fundamentals/api/get-started/)):
   - Email `"email"` and Global API Key `"key"`

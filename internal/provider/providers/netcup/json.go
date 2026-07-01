@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/qdm12/ddns-updater/internal/provider/errors"
-	"github.com/qdm12/ddns-updater/internal/provider/headers"
+	"github.com/MaroIshiku/dyniku/internal/provider/errors"
+	"github.com/MaroIshiku/dyniku/internal/provider/headers"
 )
 
 func doJSONHTTP(ctx context.Context, client *http.Client,

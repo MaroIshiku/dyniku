@@ -7,9 +7,9 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/qdm12/ddns-updater/internal/provider/errors"
-	"github.com/qdm12/ddns-updater/internal/provider/headers"
-	"github.com/qdm12/ddns-updater/internal/provider/utils"
+	"github.com/MaroIshiku/dyniku/internal/provider/errors"
+	"github.com/MaroIshiku/dyniku/internal/provider/headers"
+	"github.com/MaroIshiku/dyniku/internal/provider/utils"
 )
 
 func (p *Provider) setHeaders(request *http.Request) {

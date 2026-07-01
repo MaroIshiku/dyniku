@@ -4,7 +4,7 @@ import (
 	"encoding/xml"
 	"net/netip"
 
-	"github.com/qdm12/ddns-updater/internal/provider/constants"
+	"github.com/MaroIshiku/dyniku/internal/provider/constants"
 )
 
 // See https://docs.aws.amazon.com/Route53/latest/APIReference/API_ChangeResourceRecordSets.html#API_ChangeResourceRecordSets_RequestSyntax

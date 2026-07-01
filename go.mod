@@ -1,4 +1,4 @@
-module github.com/qdm12/ddns-updater
+module github.com/MaroIshiku/dyniku
 
 go 1.26.0
 
@@ -9,7 +9,6 @@ require (
 	github.com/miekg/dns v1.1.72
 	github.com/qdm12/goservices v0.1.0
 	github.com/qdm12/gosettings v0.4.4
-	github.com/qdm12/gosplash v0.2.0
 	github.com/qdm12/gotree v0.3.0
 	github.com/qdm12/log v0.1.0
 	github.com/stretchr/testify v1.11.1

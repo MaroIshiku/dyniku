@@ -57,5 +57,5 @@ In this example, the key is `dLP4WKz5PdkS_GuUDNigHcLQFpw4CWNwAQ5` and the secret
     [![GoDaddy DNS management](../readme/godaddydnsmanagement.png)](https://dcc.godaddy.com/manage/)
 
 1. Change the IP address to `127.0.0.1`
-1. Run the ddns-updater
+1. Run the dyniku
 1. Refresh the Godaddy webpage to check the update occurred.

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/qdm12/ddns-updater/internal/provider/errors"
+	"github.com/MaroIshiku/dyniku/internal/provider/errors"
 )
 
 func (p *Provider) login(ctx context.Context, client *http.Client) (

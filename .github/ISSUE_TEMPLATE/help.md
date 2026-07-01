@@ -10,7 +10,7 @@ labels:
 
 HAVE A CHAT FIRST!
 
-https://github.com/qdm12/ddns-updater/discussions
+https://github.com/MaroIshiku/dyniku/discussions
 
 -->
 

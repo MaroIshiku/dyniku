@@ -11,27 +11,26 @@ import (
 	"time"
 	_ "time/tzdata"
 
+	"github.com/MaroIshiku/dyniku/internal/backup"
+	"github.com/MaroIshiku/dyniku/internal/config"
+	"github.com/MaroIshiku/dyniku/internal/data"
+	"github.com/MaroIshiku/dyniku/internal/health"
+	"github.com/MaroIshiku/dyniku/internal/healthchecksio"
+	"github.com/MaroIshiku/dyniku/internal/models"
+	"github.com/MaroIshiku/dyniku/internal/noop"
+	jsonparams "github.com/MaroIshiku/dyniku/internal/params"
+	persistence "github.com/MaroIshiku/dyniku/internal/persistence/json"
+	"github.com/MaroIshiku/dyniku/internal/provider"
+	recordslib "github.com/MaroIshiku/dyniku/internal/records"
+	"github.com/MaroIshiku/dyniku/internal/resolver"
+	"github.com/MaroIshiku/dyniku/internal/server"
+	"github.com/MaroIshiku/dyniku/internal/shoutrrr"
+	"github.com/MaroIshiku/dyniku/internal/system"
+	"github.com/MaroIshiku/dyniku/internal/update"
+	"github.com/MaroIshiku/dyniku/pkg/publicip"
 	_ "github.com/breml/rootcerts"
-	"github.com/qdm12/ddns-updater/internal/backup"
-	"github.com/qdm12/ddns-updater/internal/config"
-	"github.com/qdm12/ddns-updater/internal/data"
-	"github.com/qdm12/ddns-updater/internal/health"
-	"github.com/qdm12/ddns-updater/internal/healthchecksio"
-	"github.com/qdm12/ddns-updater/internal/models"
-	"github.com/qdm12/ddns-updater/internal/noop"
-	jsonparams "github.com/qdm12/ddns-updater/internal/params"
-	persistence "github.com/qdm12/ddns-updater/internal/persistence/json"
-	"github.com/qdm12/ddns-updater/internal/provider"
-	recordslib "github.com/qdm12/ddns-updater/internal/records"
-	"github.com/qdm12/ddns-updater/internal/resolver"
-	"github.com/qdm12/ddns-updater/internal/server"
-	"github.com/qdm12/ddns-updater/internal/shoutrrr"
-	"github.com/qdm12/ddns-updater/internal/system"
-	"github.com/qdm12/ddns-updater/internal/update"
-	"github.com/qdm12/ddns-updater/pkg/publicip"
 	"github.com/qdm12/goservices"
 	"github.com/qdm12/gosettings/reader"
-	"github.com/qdm12/gosplash"
 	"github.com/qdm12/log"
 )
 
@@ -269,24 +268,22 @@ func _main(ctx context.Context, reader *reader.Reader, args []string, logger log
 }
 
 func printSplash(buildInfo models.BuildInformation) {
-	announcementExp, err := time.Parse(time.RFC3339, "2024-10-15T00:00:00Z")
-	if err != nil {
-		panic(err)
+	lines := []string{
+		"========================================",
+		"========================================",
+		"================ Dyniku ===============",
+		"========================================",
+		"======== DDNS-Updater Web GUI =========",
+		"======= https://github.com/MaroIshiku =======",
+		"========================================",
+		"========================================",
+		"",
+		"Running version " + buildInfo.Version + " built on " + buildInfo.Created + " (commit " + buildInfo.Commit + ")",
+		"",
+		"Need help? Discussion? https://github.com/MaroIshiku/dyniku/discussions/new/choose",
+		"Bug? New feature? https://github.com/MaroIshiku/dyniku/issues/new/choose",
 	}
-	splashSettings := gosplash.Settings{
-		User:         "qdm12",
-		Repository:   "ddns-updater",
-		Emails:       []string{"quentin.mcgaw@gmail.com"},
-		Version:      buildInfo.Version,
-		Commit:       buildInfo.Commit,
-		Created:      buildInfo.Created,
-		Announcement: "Public IP http provider GOOGLE is no longer working",
-		AnnounceExp:  announcementExp,
-		// Sponsor information
-		PaypalUser:    "qmcgaw",
-		GithubSponsor: "qdm12",
-	}
-	for _, line := range gosplash.MakeLines(splashSettings) {
+	for _, line := range lines {
 		fmt.Println(line)
 	}
 }

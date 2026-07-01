@@ -9,8 +9,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/qdm12/ddns-updater/internal/models"
-	"github.com/qdm12/ddns-updater/pkg/publicip/ipversion"
+	"github.com/MaroIshiku/dyniku/internal/models"
+	"github.com/MaroIshiku/dyniku/pkg/publicip/ipversion"
+)
+
+const (
+	publicIPLogDirPerm  = os.FileMode(0o777)
+	publicIPLogFilePerm = os.FileMode(0o666)
+	historyLineFields   = 2
 )
 
 // StoreNewIP stores a new IP address for a certain domain and owner.
@@ -74,13 +80,13 @@ func (db *Database) writePublicIPLog(ip netip.Addr, t time.Time) error {
 		return nil
 	}
 
-	err = os.MkdirAll(filepath.Dir(db.publicIPLogPath), os.FileMode(0o777))
+	err = os.MkdirAll(filepath.Dir(db.publicIPLogPath), publicIPLogDirPerm)
 	if err != nil {
 		return fmt.Errorf("creating public IP log directory: %w", err)
 	}
 
-	line := t.Local().Format("20060102-1504") + " " + ip.String() + "\n"
-	file, err := os.OpenFile(db.publicIPLogPath, os.O_CREATE|os.O_APPEND|os.O_WRONLY, os.FileMode(0o666))
+	line := t.UTC().Format("20060102-1504") + " " + ip.String() + "\n"
+	file, err := os.OpenFile(db.publicIPLogPath, os.O_CREATE|os.O_APPEND|os.O_WRONLY, publicIPLogFilePerm)
 	if err != nil {
 		return fmt.Errorf("opening public IP log: %w", err)
 	}
@@ -110,7 +116,7 @@ func lastLoggedIP(path string) (string, error) {
 	}
 
 	fields := strings.Fields(lines[len(lines)-1])
-	if len(fields) < 2 {
+	if len(fields) < historyLineFields {
 		return "", nil
 	}
 	return fields[1], nil

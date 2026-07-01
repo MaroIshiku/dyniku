@@ -3,7 +3,7 @@ package headers
 import "net/http"
 
 func SetUserAgent(request *http.Request) {
-	request.Header.Set("User-Agent", "DDNS-Updater quentin.mcgaw@gmail.com")
+	request.Header.Set("User-Agent", "DDNS-Updater ")
 }
 
 func SetContentType(request *http.Request, contentType string) {

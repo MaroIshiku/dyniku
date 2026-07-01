@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/qdm12/ddns-updater/internal/records"
+	"github.com/MaroIshiku/dyniku/internal/records"
 )
 
 var ErrRecordNotFound = errors.New("record not found")

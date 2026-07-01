@@ -11,12 +11,12 @@ import (
 	"net/url"
 	"regexp"
 
-	"github.com/qdm12/ddns-updater/internal/models"
-	"github.com/qdm12/ddns-updater/internal/provider/constants"
-	"github.com/qdm12/ddns-updater/internal/provider/errors"
-	"github.com/qdm12/ddns-updater/internal/provider/headers"
-	"github.com/qdm12/ddns-updater/internal/provider/utils"
-	"github.com/qdm12/ddns-updater/pkg/publicip/ipversion"
+	"github.com/MaroIshiku/dyniku/internal/models"
+	"github.com/MaroIshiku/dyniku/internal/provider/constants"
+	"github.com/MaroIshiku/dyniku/internal/provider/errors"
+	"github.com/MaroIshiku/dyniku/internal/provider/headers"
+	"github.com/MaroIshiku/dyniku/internal/provider/utils"
+	"github.com/MaroIshiku/dyniku/pkg/publicip/ipversion"
 )
 
 type Provider struct {
@@ -173,7 +173,7 @@ func (p *Provider) Update(ctx context.Context, client *http.Client, ip netip.Add
 	if response.StatusCode == http.StatusForbidden &&
 		parsedJSON.Message == "Authenticated user is not allowed access" {
 		err = fmt.Errorf("%w - "+
-			"See https://github.com/qdm12/ddns-updater/issues/707#issuecomment-2089632215",
+			"See https://github.com/MaroIshiku/dyniku/issues/707#issuecomment-2089632215",
 			err)
 	}
 

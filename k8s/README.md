@@ -2,7 +2,7 @@
 
 This directory has example plain Kubernetes manifests for running DDNS-updater in Kubernetes.
 
-The Manifests have additional [Kustomize](https://kustomize.io/) overlays, which can be used to add an [ingress-route](https://kubernetes.io/docs/concepts/services-networking/ingress/) to ddns-updater.
+The Manifests have additional [Kustomize](https://kustomize.io/) overlays, which can be used to add an [ingress-route](https://kubernetes.io/docs/concepts/services-networking/ingress/) to dyniku.
 
 1. Download the template files from the [`base` directory](base). For example with:
 

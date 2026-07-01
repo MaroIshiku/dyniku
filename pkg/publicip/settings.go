@@ -3,8 +3,8 @@ package publicip
 import (
 	"net/http"
 
-	"github.com/qdm12/ddns-updater/pkg/publicip/dns"
-	iphttp "github.com/qdm12/ddns-updater/pkg/publicip/http"
+	"github.com/MaroIshiku/dyniku/pkg/publicip/dns"
+	iphttp "github.com/MaroIshiku/dyniku/pkg/publicip/http"
 )
 
 type settings struct {

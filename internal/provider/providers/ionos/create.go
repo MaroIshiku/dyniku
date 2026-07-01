@@ -9,9 +9,9 @@ import (
 	"net/netip"
 	"net/url"
 
-	"github.com/qdm12/ddns-updater/internal/provider/constants"
-	"github.com/qdm12/ddns-updater/internal/provider/errors"
-	"github.com/qdm12/ddns-updater/internal/provider/utils"
+	"github.com/MaroIshiku/dyniku/internal/provider/constants"
+	"github.com/MaroIshiku/dyniku/internal/provider/errors"
+	"github.com/MaroIshiku/dyniku/internal/provider/utils"
 )
 
 func (p *Provider) createRecord(ctx context.Context, client *http.Client,

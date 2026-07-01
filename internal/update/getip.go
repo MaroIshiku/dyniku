@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/qdm12/ddns-updater/pkg/publicip/ipversion"
+	"github.com/MaroIshiku/dyniku/pkg/publicip/ipversion"
 )
 
 type getIPFunc func(ctx context.Context) (ip netip.Addr, err error)

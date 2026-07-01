@@ -42,11 +42,11 @@
 
 In case you don't have an A or AAAA record for your host and domain combination, it will be created by DDNS-Updater.
 
-Porkbun creates default DNS entries for new domains, which can conflict with creating a root or wildcard A/AAAA record. Therefore, ddns-updater automatically removes any conflicting default record before creating records, as described in the table below:
+Porkbun creates default DNS entries for new domains, which can conflict with creating a root or wildcard A/AAAA record. Therefore, dyniku automatically removes any conflicting default record before creating records, as described in the table below:
 
 | Record type | Owner | Record value | Situation requiring a removal |
 | --- | --- | --- | --- |
 | `ALIAS` | `@` | pixie.porkbun.com | Creating A or AAAA record for the root domain **or** wildcard domain |
 | `CNAME` | `*` | pixie.porkbun.com | Creating A or AAAA record for the wildcard domain |
 
-More details is in [this comment by @everydaycombat](https://github.com/qdm12/ddns-updater/issues/546#issuecomment-1773960193).
+More details is in [this comment by @everydaycombat](https://github.com/MaroIshiku/dyniku/issues/546#issuecomment-1773960193).

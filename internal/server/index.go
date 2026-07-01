@@ -3,7 +3,7 @@ package server
 import (
 	"net/http"
 
-	"github.com/qdm12/ddns-updater/internal/models"
+	"github.com/MaroIshiku/dyniku/internal/models"
 )
 
 func (h *handlers) index(w http.ResponseWriter, _ *http.Request) {

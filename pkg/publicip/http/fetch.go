@@ -9,8 +9,8 @@ import (
 	"net/netip"
 	"strings"
 
-	"github.com/qdm12/ddns-updater/pkg/ipextract"
-	"github.com/qdm12/ddns-updater/pkg/publicip/ipversion"
+	"github.com/MaroIshiku/dyniku/pkg/ipextract"
+	"github.com/MaroIshiku/dyniku/pkg/publicip/ipversion"
 )
 
 var (

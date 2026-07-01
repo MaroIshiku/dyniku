@@ -3,7 +3,7 @@ package dnsomatic
 import (
 	"testing"
 
-	"github.com/qdm12/ddns-updater/internal/provider/errors"
+	"github.com/MaroIshiku/dyniku/internal/provider/errors"
 	"github.com/stretchr/testify/assert"
 )
 

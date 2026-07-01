@@ -7,12 +7,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/qdm12/ddns-updater/internal/records"
+	"github.com/MaroIshiku/dyniku/internal/records"
 )
 
 type statusResponse struct {
 	CurrentIP    string         `json:"current_ip,omitempty"`
-	CurrentSince time.Time      `json:"current_since,omitempty"`
+	CurrentSince time.Time      `json:"current_since,omitzero"`
 	Records      []StatusRecord `json:"records"`
 	HistoryLog   []string       `json:"history_log"`
 }

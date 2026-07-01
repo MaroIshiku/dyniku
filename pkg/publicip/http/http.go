@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/qdm12/ddns-updater/pkg/publicip/ipversion"
+	"github.com/MaroIshiku/dyniku/pkg/publicip/ipversion"
 )
 
 type Fetcher struct {

@@ -5,7 +5,7 @@ import "testing"
 func TestValidateJSONAcceptsQDM12CompatibleConfigs(t *testing.T) {
 	t.Parallel()
 
-	testCases := map[string]string{
+	testCases := map[string]string{ //nolint:gosec
 		"netcup": `{
 			"settings": [{
 				"provider": "netcup",

@@ -7,9 +7,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/qdm12/ddns-updater/internal/models"
-	"github.com/qdm12/ddns-updater/internal/records"
-	"github.com/qdm12/ddns-updater/pkg/publicip/ipversion"
+	"github.com/MaroIshiku/dyniku/internal/models"
+	"github.com/MaroIshiku/dyniku/internal/records"
+	"github.com/MaroIshiku/dyniku/pkg/publicip/ipversion"
 )
 
 type historyProvider struct{}
@@ -20,18 +20,23 @@ func (historyProvider) Owner() string  { return "@" }
 func (historyProvider) BuildDomainName() string {
 	return "example.com"
 }
+
 func (historyProvider) HTML() models.HTMLRow {
 	return models.HTMLRow{}
 }
+
 func (historyProvider) Proxied() bool {
 	return false
 }
+
 func (historyProvider) IPVersion() ipversion.IPVersion {
 	return ipversion.IP4
 }
+
 func (historyProvider) IPv6Suffix() netip.Prefix {
 	return netip.Prefix{}
 }
+
 func (historyProvider) Update(context.Context, *http.Client, netip.Addr) (netip.Addr, error) {
 	return netip.Addr{}, nil
 }

@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"net/netip"
 
-	"github.com/qdm12/ddns-updater/internal/provider/constants"
+	"github.com/MaroIshiku/dyniku/internal/provider/constants"
 )
 
 // createRRSet creates a new RRSet with an A or AAAA record.

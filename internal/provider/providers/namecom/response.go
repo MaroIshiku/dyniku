@@ -8,7 +8,7 @@ import (
 	"net/netip"
 	"strings"
 
-	"github.com/qdm12/ddns-updater/internal/provider/errors"
+	"github.com/MaroIshiku/dyniku/internal/provider/errors"
 )
 
 func parseErrorResponse(response *http.Response) (err error) {

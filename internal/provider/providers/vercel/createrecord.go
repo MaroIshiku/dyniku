@@ -8,9 +8,9 @@ import (
 	"net/http"
 	"net/netip"
 
-	"github.com/qdm12/ddns-updater/internal/provider/constants"
-	"github.com/qdm12/ddns-updater/internal/provider/errors"
-	"github.com/qdm12/ddns-updater/internal/provider/utils"
+	"github.com/MaroIshiku/dyniku/internal/provider/constants"
+	"github.com/MaroIshiku/dyniku/internal/provider/errors"
+	"github.com/MaroIshiku/dyniku/internal/provider/utils"
 )
 
 // See https://vercel.com/docs/rest-api/dns/create-a-dns-record

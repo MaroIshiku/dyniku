@@ -9,10 +9,16 @@ import (
 	"os"
 	"path/filepath"
 
-	jsonparams "github.com/qdm12/ddns-updater/internal/params"
+	jsonparams "github.com/MaroIshiku/dyniku/internal/params"
 )
 
-const maxConfigBytes = 1024 * 1024
+const (
+	maxConfigBytes = 1024 * 1024
+	dirPerm        = os.FileMode(0o777)
+	filePerm       = os.FileMode(0o666)
+)
+
+var errSettingsNotArray = errors.New(`"settings" must be an array`)
 
 type configResponse struct {
 	Path        string          `json:"path"`
@@ -77,17 +83,17 @@ func (h *handlers) putConfig(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = os.MkdirAll(filepath.Dir(h.configPath), os.FileMode(0o777))
+	err = os.MkdirAll(filepath.Dir(h.configPath), dirPerm)
 	if err != nil {
 		httpError(w, http.StatusInternalServerError, "creating config directory: "+err.Error())
 		return
 	}
 
 	if existing, readErr := os.ReadFile(h.configPath); readErr == nil {
-		_ = os.WriteFile(h.configPath+".bak", existing, os.FileMode(0o666))
+		_ = os.WriteFile(h.configPath+".bak", existing, filePerm) //nolint:gosec
 	}
 
-	err = os.WriteFile(h.configPath, append(normalized, '\n'), os.FileMode(0o666))
+	err = os.WriteFile(h.configPath, append(normalized, '\n'), filePerm)
 	if err != nil {
 		httpError(w, http.StatusInternalServerError, "writing config: "+err.Error())
 		return
@@ -117,7 +123,7 @@ func normalizeJSON(data []byte) (json.RawMessage, error) {
 	}
 	settings, ok := decoded["settings"].([]any)
 	if !ok {
-		return nil, errors.New(`"settings" must be an array`)
+		return nil, errSettingsNotArray
 	}
 	decoded["settings"] = settings
 

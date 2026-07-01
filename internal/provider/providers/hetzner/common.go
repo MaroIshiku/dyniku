@@ -3,7 +3,7 @@ package hetzner
 import (
 	"net/http"
 
-	"github.com/qdm12/ddns-updater/internal/provider/headers"
+	"github.com/MaroIshiku/dyniku/internal/provider/headers"
 )
 
 func (p *Provider) setHeaders(request *http.Request) {

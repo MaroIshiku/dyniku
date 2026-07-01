@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/qdm12/ddns-updater/internal/records"
+	"github.com/MaroIshiku/dyniku/internal/records"
 )
 
 type testDB struct{}
@@ -31,7 +31,7 @@ func TestConfigAPIValidatesBeforeWriting(t *testing.T) {
 	}
 
 	handler := newHandler(context.Background(), "", testDB{}, testRunner{}, configPath, dataDir)
-	request := httptest.NewRequest(http.MethodPut, "/api/config", strings.NewReader(`{
+	request := httptest.NewRequestWithContext(context.Background(), http.MethodPut, "/api/config", strings.NewReader(`{
 		"settings": [{
 			"provider": "netcup",
 			"domain": "sub.example.com",
@@ -70,7 +70,7 @@ func TestConfigAPIRejectsInvalidProviderConfig(t *testing.T) {
 	}
 
 	handler := newHandler(context.Background(), "", testDB{}, testRunner{}, configPath, dataDir)
-	request := httptest.NewRequest(http.MethodPut, "/api/config", strings.NewReader(`{
+	request := httptest.NewRequestWithContext(context.Background(), http.MethodPut, "/api/config", strings.NewReader(`{
 		"settings": [{
 			"provider": "netcup",
 			"domain": "sub.example.com",

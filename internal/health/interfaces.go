@@ -4,7 +4,7 @@ import (
 	"context"
 	"net"
 
-	"github.com/qdm12/ddns-updater/internal/records"
+	"github.com/MaroIshiku/dyniku/internal/records"
 )
 
 type AllSelecter interface {

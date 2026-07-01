@@ -10,7 +10,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/qdm12/ddns-updater/internal/provider/errors"
+	"github.com/MaroIshiku/dyniku/internal/provider/errors"
 )
 
 func (p *Provider) getZones(ctx context.Context, client *http.Client) (

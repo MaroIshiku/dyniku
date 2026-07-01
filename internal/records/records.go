@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/qdm12/ddns-updater/internal/constants"
-	"github.com/qdm12/ddns-updater/internal/models"
-	"github.com/qdm12/ddns-updater/internal/provider"
+	"github.com/MaroIshiku/dyniku/internal/constants"
+	"github.com/MaroIshiku/dyniku/internal/models"
+	"github.com/MaroIshiku/dyniku/internal/provider"
 )
 
 // Record contains all the information to update and display a DNS record.

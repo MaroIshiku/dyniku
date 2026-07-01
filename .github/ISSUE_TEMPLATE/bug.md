@@ -10,7 +10,7 @@ labels:
 
 YOU CAN CHAT THERE EVENTUALLY:
 
-https://github.com/qdm12/ddns-updater/discussions
+https://github.com/MaroIshiku/dyniku/discussions
 
 -->
 

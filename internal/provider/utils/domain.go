@@ -6,7 +6,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	ddnserrors "github.com/qdm12/ddns-updater/internal/provider/errors"
+	ddnserrors "github.com/MaroIshiku/dyniku/internal/provider/errors"
 )
 
 func BuildDomainName(owner, domain string) string {

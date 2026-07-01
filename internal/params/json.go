@@ -8,13 +8,14 @@ import (
 	"io/fs"
 	"net/netip"
 	"os"
+	"path/filepath"
 	"strings"
 
-	"github.com/qdm12/ddns-updater/internal/models"
-	"github.com/qdm12/ddns-updater/internal/provider"
-	"github.com/qdm12/ddns-updater/internal/provider/constants"
-	"github.com/qdm12/ddns-updater/internal/provider/utils"
-	"github.com/qdm12/ddns-updater/pkg/publicip/ipversion"
+	"github.com/MaroIshiku/dyniku/internal/models"
+	"github.com/MaroIshiku/dyniku/internal/provider"
+	"github.com/MaroIshiku/dyniku/internal/provider/constants"
+	"github.com/MaroIshiku/dyniku/internal/provider/utils"
+	"github.com/MaroIshiku/dyniku/pkg/publicip/ipversion"
 	"golang.org/x/net/publicsuffix"
 )
 
@@ -60,6 +61,12 @@ func (r *Reader) getProvidersFromFile(filePath string) (
 
 		r.logger.Info("file not found, creating an empty settings file")
 
+		const dirPerm = fs.FileMode(0o777)
+		err = os.MkdirAll(filepath.Dir(filePath), dirPerm)
+		if err != nil {
+			return nil, nil, fmt.Errorf("creating configuration directory: %w", err)
+		}
+
 		const filePerm = fs.FileMode(0o666)
 		err = r.writeFile(filePath, []byte(`{}`), filePerm)
 		if err != nil {
@@ -96,6 +103,13 @@ func (r *Reader) getProvidersFromEnv(filePath string) (
 	if err != nil {
 		return providers, warnings, fmt.Errorf("%w: %w", errWriteConfigToFile, err)
 	}
+
+	const dirPerm = fs.FileMode(0o777)
+	err = os.MkdirAll(filepath.Dir(filePath), dirPerm)
+	if err != nil {
+		return providers, warnings, fmt.Errorf("creating configuration directory: %w", err)
+	}
+
 	const filePerm = fs.FileMode(0o666)
 	err = r.writeFile(filePath, buffer.Bytes(), filePerm)
 	if err != nil {

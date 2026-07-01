@@ -9,11 +9,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/qdm12/ddns-updater/internal/constants"
-	"github.com/qdm12/ddns-updater/internal/healthchecksio"
-	"github.com/qdm12/ddns-updater/internal/models"
-	librecords "github.com/qdm12/ddns-updater/internal/records"
-	"github.com/qdm12/ddns-updater/pkg/publicip/ipversion"
+	"github.com/MaroIshiku/dyniku/internal/constants"
+	"github.com/MaroIshiku/dyniku/internal/healthchecksio"
+	"github.com/MaroIshiku/dyniku/internal/models"
+	librecords "github.com/MaroIshiku/dyniku/internal/records"
+	"github.com/MaroIshiku/dyniku/pkg/publicip/ipversion"
 )
 
 type Service struct {
@@ -173,7 +173,8 @@ func (s *Service) shouldUpdateRecord(ctx context.Context, record librecords.Reco
 	if isWithinCooldown {
 		s.logger.Debug(fmt.Sprintf(
 			"record %s is within cooldown period of %s, skipping update",
-			recordToLogString(record), s.cooldown))
+			recordToLogString(record), s.cooldown,
+		))
 		return false
 	}
 
@@ -182,7 +183,8 @@ func (s *Service) shouldUpdateRecord(ctx context.Context, record librecords.Reco
 	if isWithinBanPeriod {
 		s.logger.Info(fmt.Sprintf(
 			"record %s is within ban period of %s started at %s, skipping update",
-			recordToLogString(record), banPeriod, *record.LastBan))
+			recordToLogString(record), banPeriod, *record.LastBan,
+		))
 		return false
 	}
 

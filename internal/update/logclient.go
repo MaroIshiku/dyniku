@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/qdm12/ddns-updater/internal/provider/utils"
+	"github.com/MaroIshiku/dyniku/internal/provider/utils"
 )
 
 //go:generate mockgen -destination=mock_$GOPACKAGE/$GOFILE . DebugLogger

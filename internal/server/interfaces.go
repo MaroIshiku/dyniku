@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/qdm12/ddns-updater/internal/records"
+	"github.com/MaroIshiku/dyniku/internal/records"
 )
 
 type Database interface {
@@ -29,8 +29,8 @@ type StatusRecord struct {
 	Status    string    `json:"status"`
 	Message   string    `json:"message,omitempty"`
 	CurrentIP string    `json:"current_ip,omitempty"`
-	Since     time.Time `json:"since,omitempty"`
-	CheckedAt time.Time `json:"checked_at,omitempty"`
+	Since     time.Time `json:"since,omitzero"`
+	CheckedAt time.Time `json:"checked_at,omitzero"`
 	History   []IPEvent `json:"history,omitempty"`
 }
 

@@ -7,7 +7,7 @@ import (
 	"net/netip"
 	"strings"
 
-	"github.com/qdm12/ddns-updater/internal/constants"
+	"github.com/MaroIshiku/dyniku/internal/constants"
 )
 
 func MakeIsHealthy(db AllSelecter, resolver LookupIPer) func(ctx context.Context) error {

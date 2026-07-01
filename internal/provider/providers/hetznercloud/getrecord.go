@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"net/netip"
 
-	"github.com/qdm12/ddns-updater/internal/provider/constants"
+	"github.com/MaroIshiku/dyniku/internal/provider/constants"
 )
 
 // getRecord checks if the record exists and if it is already up to date

@@ -5,8 +5,8 @@ import (
 	"errors"
 	"net/netip"
 
-	"github.com/qdm12/ddns-updater/pkg/publicip/dns"
-	"github.com/qdm12/ddns-updater/pkg/publicip/http"
+	"github.com/MaroIshiku/dyniku/pkg/publicip/dns"
+	"github.com/MaroIshiku/dyniku/pkg/publicip/http"
 )
 
 type ipFetcher interface {

@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/qdm12/ddns-updater/internal/provider/errors"
+	"github.com/MaroIshiku/dyniku/internal/provider/errors"
 )
 
 func (p *Provider) waitAction(ctx context.Context, client *http.Client, id uint64) (err error) {

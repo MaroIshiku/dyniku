@@ -3,7 +3,7 @@ package data
 import (
 	"fmt"
 
-	"github.com/qdm12/ddns-updater/internal/records"
+	"github.com/MaroIshiku/dyniku/internal/records"
 )
 
 func (db *Database) Update(id uint, record records.Record) (err error) {

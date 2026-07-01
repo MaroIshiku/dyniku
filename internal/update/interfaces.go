@@ -4,8 +4,8 @@ import (
 	"context"
 	"net/netip"
 
-	"github.com/qdm12/ddns-updater/internal/healthchecksio"
-	"github.com/qdm12/ddns-updater/internal/records"
+	"github.com/MaroIshiku/dyniku/internal/healthchecksio"
+	"github.com/MaroIshiku/dyniku/internal/records"
 )
 
 type PublicIPFetcher interface {

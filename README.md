@@ -4,25 +4,25 @@ Program to keep DNS A and/or AAAA records updated for multiple DNS providers
 
 <img height="200" alt="Dyniku logo" src="internal/server/ui/static/dyniku-logo.png">
 
-[![Build status](https://github.com/qdm12/ddns-updater/actions/workflows/build.yml/badge.svg)](https://github.com/qdm12/ddns-updater/actions/workflows/build.yml)
+[![Build status](https://github.com/MaroIshiku/dyniku/actions/workflows/build.yml/badge.svg)](https://github.com/MaroIshiku/dyniku/actions/workflows/build.yml)
 
-![Last release](https://img.shields.io/github/release/qdm12/ddns-updater?label=Last%20release)
-![Last Docker tag](https://img.shields.io/github/v/release/qdm12/ddns-updater?sort=semver&label=Last%20Docker%20tag)
-![GitHub last release date](https://img.shields.io/github/release-date/qdm12/ddns-updater?label=Last%20release%20date)
-![Commits since release](https://img.shields.io/github/commits-since/qdm12/ddns-updater/latest?sort=semver)
+![Last release](https://img.shields.io/github/release/MaroIshiku/dyniku?label=Last%20release)
+![Last Docker tag](https://img.shields.io/github/v/release/MaroIshiku/dyniku?sort=semver&label=Last%20Docker%20tag)
+![GitHub last release date](https://img.shields.io/github/release-date/MaroIshiku/dyniku?label=Last%20release%20date)
+![Commits since release](https://img.shields.io/github/commits-since/MaroIshiku/dyniku/latest?sort=semver)
 
-[![GitHub last commit](https://img.shields.io/github/last-commit/qdm12/ddns-updater.svg)](https://github.com/qdm12/ddns-updater/commits/main)
-[![GitHub commit activity](https://img.shields.io/github/commit-activity/y/qdm12/ddns-updater.svg)](https://github.com/qdm12/ddns-updater/graphs/contributors)
-[![GitHub closed PRs](https://img.shields.io/github/issues-pr-closed/qdm12/ddns-updater.svg)](https://github.com/qdm12/ddns-updater/pulls?q=is%3Apr+is%3Aclosed)
-[![GitHub issues](https://img.shields.io/github/issues/qdm12/ddns-updater.svg)](https://github.com/qdm12/ddns-updater/issues)
-[![GitHub closed issues](https://img.shields.io/github/issues-closed/qdm12/ddns-updater.svg)](https://github.com/qdm12/ddns-updater/issues?q=is%3Aissue+is%3Aclosed)
+[![GitHub last commit](https://img.shields.io/github/last-commit/MaroIshiku/dyniku.svg)](https://github.com/MaroIshiku/dyniku/commits/main)
+[![GitHub commit activity](https://img.shields.io/github/commit-activity/y/MaroIshiku/dyniku.svg)](https://github.com/MaroIshiku/dyniku/graphs/contributors)
+[![GitHub closed PRs](https://img.shields.io/github/issues-pr-closed/MaroIshiku/dyniku.svg)](https://github.com/MaroIshiku/dyniku/pulls?q=is%3Apr+is%3Aclosed)
+[![GitHub issues](https://img.shields.io/github/issues/MaroIshiku/dyniku.svg)](https://github.com/MaroIshiku/dyniku/issues)
+[![GitHub closed issues](https://img.shields.io/github/issues-closed/MaroIshiku/dyniku.svg)](https://github.com/MaroIshiku/dyniku/issues?q=is%3Aissue+is%3Aclosed)
 
-![Code size](https://img.shields.io/github/languages/code-size/qdm12/ddns-updater)
-![GitHub repo size](https://img.shields.io/github/repo-size/qdm12/ddns-updater)
-![Go version](https://img.shields.io/github/go-mod/go-version/qdm12/ddns-updater)
+![Code size](https://img.shields.io/github/languages/code-size/MaroIshiku/dyniku)
+![GitHub repo size](https://img.shields.io/github/repo-size/MaroIshiku/dyniku)
+![Go version](https://img.shields.io/github/go-mod/go-version/MaroIshiku/dyniku)
 
-[![MIT](https://img.shields.io/github/license/qdm12/ddns-updater)](LICENSE)
-![Visitors count](https://visitor-badge.laobi.icu/badge?page_id=ddns-updater.readme)
+[![MIT](https://img.shields.io/github/license/MaroIshiku/dyniku)](LICENSE)
+![Visitors count](https://visitor-badge.laobi.icu/badge?page_id=dyniku.readme)
 
 ## Versioned documentation
 
@@ -30,17 +30,17 @@ This readme and the [docs/](docs/) directory are **versioned** to match the prog
 
 | Version | Readme link | Docs link |
 | --- | --- | --- |
-| Latest | [README](https://github.com/qdm12/ddns-updater/blob/master/README.md) | [docs/](https://github.com/qdm12/ddns-updater/tree/master/docs) |
-| `v2.8` | [README](https://github.com/qdm12/ddns-updater/blob/v2.8.0/README.md) | [docs/](https://github.com/qdm12/ddns-updater/blob/v2.8.0/docs) |
-| `v2.7` | [README](https://github.com/qdm12/ddns-updater/blob/v2.7.1/README.md) | [docs/](https://github.com/qdm12/ddns-updater/blob/v2.7.1/docs) |
-| `v2.6` | [README](https://github.com/qdm12/ddns-updater/blob/v2.6.1/README.md) | [docs/](https://github.com/qdm12/ddns-updater/blob/v2.6.1/docs) |
-| `v2.5` | [README](https://github.com/qdm12/ddns-updater/blob/v2.5.0/README.md) | [docs/](https://github.com/qdm12/ddns-updater/blob/v2.5.0/docs) |
+| Latest | [README](https://github.com/MaroIshiku/dyniku/blob/main/README.md) | [docs/](https://github.com/MaroIshiku/dyniku/tree/main/docs) |
+| `v2.8` | [README](https://github.com/MaroIshiku/dyniku/blob/v2.8.0/README.md) | [docs/](https://github.com/MaroIshiku/dyniku/blob/v2.8.0/docs) |
+| `v2.7` | [README](https://github.com/MaroIshiku/dyniku/blob/v2.7.1/README.md) | [docs/](https://github.com/MaroIshiku/dyniku/blob/v2.7.1/docs) |
+| `v2.6` | [README](https://github.com/MaroIshiku/dyniku/blob/v2.6.1/README.md) | [docs/](https://github.com/MaroIshiku/dyniku/blob/v2.6.1/docs) |
+| `v2.5` | [README](https://github.com/MaroIshiku/dyniku/blob/v2.5.0/README.md) | [docs/](https://github.com/MaroIshiku/dyniku/blob/v2.5.0/docs) |
 
 ## Features
 
 - Available as a Docker image [`ghcr.io/maroishiku/dyniku`](https://github.com/MaroIshiku/dyniku/pkgs/container/dyniku)
-- Available as [zero-dependency binaries for Linux, Windows and MacOS](https://github.com/qdm12/ddns-updater/releases)
-- 🆕 Available in the AUR as [`ddns-updater`](https://aur.archlinux.org/packages/ddns-updater) - see [#808](https://github.com/qdm12/ddns-updater/discussions/808)
+- Available as [zero-dependency binaries for Linux, Windows and MacOS](https://github.com/MaroIshiku/dyniku/releases)
+- 🆕 Available in the AUR as [`dyniku`](https://aur.archlinux.org/packages/dyniku) - see [#808](https://github.com/MaroIshiku/dyniku/discussions/808)
 - Updates periodically A records for different DNS providers:
   - Aliyun
   - AllInkl
@@ -96,7 +96,7 @@ This readme and the [docs/](docs/) directory are **versioned** to match the prog
   - Variomedia.de
   - Vultr
   - Zoneedit
-  - **Want more?** [Create an issue for it](https://github.com/qdm12/ddns-updater/issues/new/choose)!
+  - **Want more?** [Create an issue for it](https://github.com/MaroIshiku/dyniku/issues/new/choose)!
 - Web user interface (Desktop)
 
     ![Web UI](readme/webui-desktop.gif)
@@ -116,8 +116,8 @@ This readme and the [docs/](docs/) directory are **versioned** to match the prog
 
 ### Binary programs
 
-1. Download the pre-built program for your platform from the assets of a release in the [releases page](https://github.com/qdm12/ddns-updater/releases). You can alternatively download, build and install the latest version of the program by installing [Go](https://golang.org/doc/install) and then run `go install github.com/qdm12/ddns-updater/cmd/ddns-updater@latest`.
-1. For Linux and MacOS, make the program executable with `chmod +x ddns-updater`.
+1. Download the pre-built program for your platform from the assets of a release in the [releases page](https://github.com/MaroIshiku/dyniku/releases). You can alternatively download, build and install the latest version of the program by installing [Go](https://golang.org/doc/install) and then run `go install github.com/MaroIshiku/dyniku/cmd/dyniku@latest`.
+1. For Linux and MacOS, make the program executable with `chmod +x dyniku`.
 1. In the directory where the program is saved, create a directory `data`.
 1. Write a JSON configuration in `data/config.json`, for example:
 
@@ -134,16 +134,16 @@ This readme and the [docs/](docs/) directory are **versioned** to match the prog
     ```
 
     You can find more information in the [configuration section](#configuration) to customize it.
-1. Run the program with `./ddns-updater` (`./ddns-updater.exe` on Windows) or by double-clicking on it.
+1. Run the program with `./dyniku` (`./dyniku.exe` on Windows) or by double-clicking on it.
 1. The following is **optional**.
     - You can customize the program behavior using either [environment variables](#environment-variables) or flags. For flags, there is a flag corresponding to each environment variable, where it's all lowercase and underscores are replaced with dashes. For example the environment variable `LOG_LEVEL` translates into `--log-level`.
 
 ### Container
 
-[➡️ Qnap guide by @Araminta](https://github.com/qdm12/ddns-updater/issues/708)
+[➡️ Qnap guide by @Araminta](https://github.com/MaroIshiku/dyniku/issues/708)
 
 1. Create a directory, for example, *data* which is:
-    - owned by user id `1000`, which is the built-in user ID of the ddns-updater container
+    - writable by the Dyniku container user
     - has user read+write+execute permissions
 
     ```sh
@@ -152,7 +152,7 @@ This readme and the [docs/](docs/) directory are **versioned** to match the prog
     chmod u+r+w+x data
     ```
 
-    If you want to use another user ID, [build the image yourself](#build-the-image) with `--build-arg UID=<your-uid>`. You could also just run the container as root with `--user="0"` but this is not advised security wise.
+    Dyniku runs as root by default for better compatibility with NAS and ZimaOS bind mounts. If you want to use another user ID, [build the image yourself](#build-the-image) with `--build-arg UID=<your-uid> --build-arg GID=<your-gid>`.
 
 1. Similarly, create a *data/config.json* file which is:
     - owned by user id `1000`
@@ -300,7 +300,7 @@ Note that:
 | `CONFIG_FILEPATH` | `/updater/data/config.json` | Path to the JSON configuration file |
 | `BACKUP_PERIOD` | `0` | Set to a period (i.e. `72h15m`) to enable zip backups of data/config.json and data/updates.json in a zip file |
 | `BACKUP_DIRECTORY` | `/updater/data` | Directory to write backup zip files to if `BACKUP_PERIOD` is not `0`. |
-| `RESOLVER_ADDRESS` | Your network DNS | A plaintext DNS address to use to resolve your domain names defined in your settings only. For example it can be `1.1.1.1:53`. This is useful for split dns, see [#389](https://github.com/qdm12/ddns-updater/issues/389) |
+| `RESOLVER_ADDRESS` | Your network DNS | A plaintext DNS address to use to resolve your domain names defined in your settings only. For example it can be `1.1.1.1:53`. This is useful for split dns, see [#389](https://github.com/MaroIshiku/dyniku/issues/389) |
 | `LOG_LEVEL` | `info` | Level of logging, `debug`, `info`, `warning` or `error` |
 | `LOG_CALLER` | `hidden` | Show caller per log line, `hidden` or `short` |
 | `SHOUTRRR_ADDRESSES` | | (optional) Comma separated list of [Shoutrrr addresses](https://containrrr.dev/shoutrrr/v0.8/services/overview/) (notification services) |
@@ -349,7 +349,7 @@ You can otherwise customize it with the following:
   - `wtfismyip` using [https://ipv6.wtfismyip.com/text](https://ipv6.wtfismyip.com/text)
   - `seeip` using [https://ipv6.seeip.org](https://ipv6.seeip.org)
   - You can also specify an HTTPS URL with prefix `url:` for example `url:https://ipinfo.io/ip`
-- `PUBLICIP_DNS_PROVIDERS` gets your public IPv4 address only or IPv6 address only or one of them (see [#136](https://github.com/qdm12/ddns-updater/issues/136)). It can be one or more of the following:
+- `PUBLICIP_DNS_PROVIDERS` gets your public IPv4 address only or IPv6 address only or one of them (see [#136](https://github.com/MaroIshiku/dyniku/issues/136)). It can be one or more of the following:
   - `cloudflare`
   - `opendns`
 
@@ -416,8 +416,8 @@ You can use optional build arguments with `--build-arg KEY=VALUE` from the table
 
 | Build argument | Default | Description |
 | --- | --- | --- |
-| `UID` | `1000` | User ID running the container |
-| `GID` | `1000` | User group ID running the container |
+| `UID` | `0` | User ID running the container |
+| `GID` | `0` | User group ID running the container |
 | `VERSION` | `unknown` | Version of the program and Docker image |
 | `CREATED` | `an unknown date` | Build date of the program and Docker image |
 | `COMMIT` | `unknown` | Commit hash of the program and Docker image |
@@ -425,8 +425,8 @@ You can use optional build arguments with `--build-arg KEY=VALUE` from the table
 ## Development and contributing
 
 - [Contribute with code](.github/CONTRIBUTING.md)
-- [Github workflows to know what's building](https://github.com/qdm12/ddns-updater/actions)
-- [List of issues and feature requests](https://github.com/qdm12/ddns-updater/issues)
+- [Github workflows to know what's building](https://github.com/MaroIshiku/dyniku/actions)
+- [List of issues and feature requests](https://github.com/MaroIshiku/dyniku/issues)
 
 ## License
 
@@ -438,6 +438,6 @@ This repository is under an [MIT license](LICENSE)
 
 ## Support
 
-Sponsor me on [Github](https://github.com/sponsors/qdm12) or donate to [paypal.me/qmcgaw](https://www.paypal.me/qmcgaw)
+Dyniku is maintained at [github.com/MaroIshiku/dyniku](https://github.com/MaroIshiku/dyniku).
 
 Many thanks to J. Famiglietti for supporting me financially 🥇👍

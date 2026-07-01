@@ -5,8 +5,8 @@ import (
 	"net/netip"
 	"strings"
 
-	"github.com/qdm12/ddns-updater/internal/records"
-	"github.com/qdm12/ddns-updater/pkg/publicip/ipversion"
+	"github.com/MaroIshiku/dyniku/internal/records"
+	"github.com/MaroIshiku/dyniku/pkg/publicip/ipversion"
 )
 
 func ipVersionToIPKind(version ipversion.IPVersion) (kind string) {

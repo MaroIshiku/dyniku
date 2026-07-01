@@ -3,7 +3,7 @@ package namecom
 import (
 	"net/http"
 
-	"github.com/qdm12/ddns-updater/internal/provider/headers"
+	"github.com/MaroIshiku/dyniku/internal/provider/headers"
 )
 
 func setHeaders(request *http.Request) {

@@ -7,9 +7,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/qdm12/ddns-updater/pkg/publicip/dns"
-	"github.com/qdm12/ddns-updater/pkg/publicip/http"
-	"github.com/qdm12/ddns-updater/pkg/publicip/ipversion"
+	"github.com/MaroIshiku/dyniku/pkg/publicip/dns"
+	"github.com/MaroIshiku/dyniku/pkg/publicip/http"
+	"github.com/MaroIshiku/dyniku/pkg/publicip/ipversion"
 	"github.com/qdm12/gosettings"
 	"github.com/qdm12/gosettings/reader"
 	"github.com/qdm12/gosettings/validate"
@@ -281,7 +281,7 @@ func (p *PubIP) read(r *reader.Reader, warner Warner) (err error) {
 		if provider == "google" {
 			warner.Warnf("dns provider google will be ignored " +
 				"since it is no longer supported, " +
-				"see https://github.com/qdm12/ddns-updater/issues/492")
+				"see https://github.com/MaroIshiku/dyniku/issues/492")
 			p.DNSProviders[i] = p.DNSProviders[len(p.DNSProviders)-1]
 			p.DNSProviders = p.DNSProviders[:len(p.DNSProviders)-1]
 		}
@@ -318,7 +318,8 @@ func getFetchers(reader *reader.Reader) (http, dns *bool, err error) {
 		default:
 			return nil, nil, fmt.Errorf(
 				"%w: %q at position %d of %d",
-				ErrFetcherNotValid, field, i+1, len(fields))
+				ErrFetcherNotValid, field, i+1, len(fields),
+			)
 		}
 	}
 

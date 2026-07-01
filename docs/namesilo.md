@@ -47,5 +47,5 @@
     [![Manage DNS for this domain](../readme/namesilo3.jpg)](https://www.namesilo.com/account_domains.php)
 
 1. Change the IP address of the host to `127.0.0.1`.
-1. Run the ddns-updater.
+1. Run the dyniku.
 1. Refresh the Namesilo webpage to check the update occurred.

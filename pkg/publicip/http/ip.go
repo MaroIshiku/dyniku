@@ -7,7 +7,7 @@ import (
 	"net/netip"
 	"strings"
 
-	"github.com/qdm12/ddns-updater/pkg/publicip/ipversion"
+	"github.com/MaroIshiku/dyniku/pkg/publicip/ipversion"
 )
 
 func (f *Fetcher) IP(ctx context.Context) (publicIP netip.Addr, err error) {

@@ -35,7 +35,7 @@ func (s *Service) String() string {
 }
 
 func makeZipFileName() string {
-	return "ddns-updater-backup-" + strconv.Itoa(int(time.Now().UnixNano())) + ".zip"
+	return "dyniku-backup-" + strconv.Itoa(int(time.Now().UnixNano())) + ".zip"
 }
 
 func (s *Service) Start(ctx context.Context) (runError <-chan error, startErr error) {

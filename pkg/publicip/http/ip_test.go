@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/qdm12/ddns-updater/pkg/publicip/ipversion"
+	"github.com/MaroIshiku/dyniku/pkg/publicip/ipversion"
 	"github.com/stretchr/testify/assert"
 )
 

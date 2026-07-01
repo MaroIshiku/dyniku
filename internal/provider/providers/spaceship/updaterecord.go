@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"net/netip"
 
-	"github.com/qdm12/ddns-updater/internal/provider/constants"
+	"github.com/MaroIshiku/dyniku/internal/provider/constants"
 )
 
 func (p *Provider) Update(ctx context.Context, client *http.Client, ip netip.Addr) (newIP netip.Addr, err error) {
