@@ -1,0 +1,46 @@
+{
+  "app_id": "dyniku",
+  "app_name": "Dyniku",
+  "app_subtitle": "DDNS-Updater Web GUI",
+  "app_symbol": "dns",
+  "primary_purpose": "Self-hosted Web GUI zum Verwalten und Ueberwachen dynamischer DNS-Updates.",
+  "main_sections": [
+    {
+      "id": "records",
+      "label": "Records"
+    },
+    {
+      "id": "config",
+      "label": "Config"
+    },
+    {
+      "id": "history",
+      "label": "IP Log"
+    }
+  ],
+  "default_theme": "lavender",
+  "default_mode": "system",
+  "app_logo": {
+    "src": "internal/server/ui/static/dyniku-logo.png",
+    "favicon": "internal/server/ui/static/dyniku-logo.png",
+    "alt": "",
+    "use_as_favicon": true,
+    "use_in_header": true,
+    "use_in_about": true,
+    "use_in_profile": true,
+    "use_in_empty_states": true
+  },
+  "first_run_setup": {
+    "enabled": true,
+    "secret_file_env": "ISHIKU_SETUP_SECRET_FILE",
+    "secret_file_default": "/run/secrets/ishiku_setup_secret",
+    "secret_env_fallback": "ISHIKU_SETUP_SECRET"
+  },
+  "readme_profile": {
+    "owner": "MaroIshiku",
+    "repository": "dyniku",
+    "docker_image": "ghcr.io/maroishiku/dyniku:latest",
+    "public": true,
+    "codex_notice": true
+  }
+}

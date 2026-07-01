@@ -71,7 +71,7 @@ ARG GID=0
 USER ${UID}:${GID}
 WORKDIR /updater
 ENTRYPOINT ["/updater/dyniku"]
-COPY --from=build --chown=${UID}:${GID} /tmp/data /updater/data
+COPY --from=build --chown=${UID}:${GID} /tmp/data /data
 ENV \
     # Core
     CONFIG= \
@@ -84,8 +84,13 @@ ENV \
     PUBLICIP_DNS_PROVIDERS=all \
     PUBLICIP_DNS_TIMEOUT=3s \
     HTTP_TIMEOUT=10s \
-    DATADIR=/updater/data \
-    CONFIG_FILEPATH=/updater/data/config.json \
+    ISHIKU_DATA_DIR=/data \
+    ISHIKU_CONFIG_FILE=/data/config.json \
+    ISHIKU_BASE_PATH=/ \
+    ISHIKU_LOG_LEVEL=info \
+    ISHIKU_SETUP_SECRET_FILE=/run/secrets/ishiku_setup_secret \
+    DATADIR=/data \
+    CONFIG_FILEPATH=/data/config.json \
     RESOLVER_ADDRESS= \
     RESOLVER_TIMEOUT=5s \
     # Web UI
@@ -94,7 +99,8 @@ ENV \
     ROOT_URL=/ \
     # Backup
     BACKUP_PERIOD=0 \
-    BACKUP_DIRECTORY=/updater/data \
+    ISHIKU_BACKUP_DIRECTORY=/data \
+    BACKUP_DIRECTORY=/data \
     # Other
     LOG_LEVEL=info \
     LOG_CALLER=hidden \

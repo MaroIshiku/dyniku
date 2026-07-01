@@ -10,9 +10,15 @@ services:
         published: "8507"
         protocol: tcp
     environment:
-      - BACKUP_DIRECTORY=/updater/data
+      - BACKUP_DIRECTORY=/data
       - BACKUP_PERIOD=0
       - HTTP_TIMEOUT=10s
+      - ISHIKU_BACKUP_DIRECTORY=/data
+      - ISHIKU_BASE_PATH=/
+      - ISHIKU_CONFIG_FILE=/data/config.json
+      - ISHIKU_DATA_DIR=/data
+      - ISHIKU_LOG_LEVEL=info
+      - ISHIKU_SETUP_SECRET_FILE=/run/secrets/ishiku_setup_secret
       - LISTENING_ADDRESS=:8507
       - LOG_CALLER=hidden
       - LOG_LEVEL=info
@@ -29,7 +35,11 @@ services:
     volumes:
       - type: bind
         source: /DATA/AppData/dyniku/data
-        target: /updater/data
+        target: /data
+      - type: bind
+        source: /DATA/AppData/dyniku/secrets/setup_secret.txt
+        target: /run/secrets/ishiku_setup_secret
+        read_only: true
     labels:
       icon: https://raw.githubusercontent.com/MaroIshiku/dyniku/main/internal/server/ui/static/dyniku-logo.png
       title.en_us: Dyniku

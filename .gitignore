@@ -1,2 +1,4 @@
 /data
 /.tools
+/.env
+/secrets/setup_secret.txt

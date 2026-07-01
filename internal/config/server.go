@@ -53,7 +53,10 @@ func (s *Server) read(reader *reader.Reader, warner Warner) (err error) {
 		return err
 	}
 
-	s.RootURL = reader.String("ROOT_URL")
+	s.RootURL = reader.String("ISHIKU_BASE_PATH")
+	if s.RootURL == "" {
+		s.RootURL = reader.String("ROOT_URL")
+	}
 
 	// Retro-compatibility
 	port, err := reader.Uint16Ptr("LISTENING_PORT") // TODO change to address
@@ -64,7 +67,10 @@ func (s *Server) read(reader *reader.Reader, warner Warner) (err error) {
 		s.ListeningAddress = fmt.Sprintf(":%d", *port)
 	}
 
-	s.ListeningAddress = reader.String("LISTENING_ADDRESS")
+	s.ListeningAddress = reader.String("ISHIKU_LISTENING_ADDRESS")
+	if s.ListeningAddress == "" {
+		s.ListeningAddress = reader.String("LISTENING_ADDRESS")
+	}
 
 	return err
 }

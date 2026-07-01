@@ -66,3 +66,13 @@ func TestMakeStatusRecordIncludesHistoryNewestFirst(t *testing.T) {
 		t.Fatalf("expected older IP second, got %s", statusRecord.History[1].IP)
 	}
 }
+
+func TestProviderDisplayNameRemovesRecordDetails(t *testing.T) {
+	t.Parallel()
+
+	got := providerDisplayName("domain: ishi.de | owner: pipapo | provider: netcup | ip: ipv4")
+
+	if got != "netcup" {
+		t.Fatalf("expected provider name netcup, got %q", got)
+	}
+}

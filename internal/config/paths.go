@@ -48,8 +48,14 @@ func (p Paths) toLinesNode() *gotree.Node {
 }
 
 func (p *Paths) read(reader *reader.Reader) (err error) {
-	p.DataDir = reader.Get("DATADIR")
-	p.Config = reader.Get("CONFIG_FILEPATH")
+	p.DataDir = reader.Get("ISHIKU_DATA_DIR")
+	if p.DataDir == nil {
+		p.DataDir = reader.Get("DATADIR")
+	}
+	p.Config = reader.Get("ISHIKU_CONFIG_FILE")
+	if p.Config == nil {
+		p.Config = reader.Get("CONFIG_FILEPATH")
+	}
 
 	umaskString := reader.String("UMASK")
 	if umaskString != "" {

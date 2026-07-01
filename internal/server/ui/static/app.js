@@ -1,4 +1,5 @@
 import { initPixelSoftUtilityApp } from "./design-system/app-shell.js";
+import { bindRegisterWindow } from "./design-system/setup-flow.js";
 import { PSU_THEMES, PSU_MODES, setPixelSoftUtilityMode, setPixelSoftUtilityTheme } from "./design-system/theme-controller.js";
 
 const appConfig = JSON.parse(document.querySelector("[data-psu-app-config]").textContent);
@@ -89,14 +90,17 @@ let loadedConfig = { settings: [] };
 let savingDisabled = false;
 let editingSettingIndex = null;
 let lastStatus = { records: [], history_log: [] };
+let currentUser = null;
+let adminInfo = null;
+let refreshTimer = null;
 
 const $ = (selector) => document.querySelector(selector);
 
 document.addEventListener("DOMContentLoaded", () => {
   bindStaticActions();
+  bindAuthActions();
   buildAppearanceControls();
-  loadAll();
-  window.setInterval(loadStatus, 30000);
+  bootstrapAuth();
 });
 
 function bindStaticActions() {
@@ -111,6 +115,149 @@ function bindStaticActions() {
   $("#add-entry-button").addEventListener("click", () => addSetting(newSettingForProvider("netcup")));
   $("#save-config-button").addEventListener("click", saveConfig);
   $("#record-search").addEventListener("input", () => renderRecords(lastStatus.records || []));
+  $("#copy-debug-button").addEventListener("click", copyDebugDetails);
+}
+
+function bindAuthActions() {
+  bindRegisterWindow($("#register-form"), {
+    appId: appConfig.app_id,
+    appName: appConfig.app_name,
+    async onSubmit(formData, form) {
+      await submitSetup(formData, form);
+    }
+  });
+
+  $("#login-form").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    await submitLogin({
+      username: data.get("username"),
+      password: data.get("password")
+    });
+  });
+
+  $("#logout-button").addEventListener("click", logout);
+}
+
+async function bootstrapAuth() {
+  try {
+    const state = await fetchJSON("api/auth/state");
+    applyAuthState(state);
+  } catch (error) {
+    showAuthGate("error");
+    $("#setup-error-message").textContent = `Auth-Status konnte nicht geladen werden: ${error.message}`;
+  }
+}
+
+function applyAuthState(state) {
+  currentUser = state.user || null;
+  adminInfo = state.admin_info || null;
+  renderUser();
+  renderAdminInfo();
+
+  if (state.setup_required) {
+    if (state.setup_configured) {
+      showAuthGate("setup");
+    } else {
+      showAuthGate("error");
+      $("#setup-error-message").textContent = state.message || "Setup-Secret fehlt.";
+    }
+    return;
+  }
+
+  if (!state.authenticated) {
+    showAuthGate("login");
+    return;
+  }
+
+  showApp();
+}
+
+function showAuthGate(mode) {
+  stopRefreshTimer();
+  $("[data-app-content]").hidden = true;
+  $("#auth-gate").hidden = false;
+  $("#setup-error-window").hidden = mode !== "error";
+  $("#register-form").hidden = mode !== "setup";
+  $("#login-form").hidden = mode !== "login";
+
+  const focusTarget = {
+    setup: "#register-form [name='setup_secret']",
+    login: "#login-form [name='username']"
+  }[mode];
+  if (focusTarget) requestAnimationFrame(() => $(focusTarget)?.focus());
+}
+
+function showApp() {
+  $("#auth-gate").hidden = true;
+  $("[data-app-content]").hidden = false;
+  loadAll();
+  startRefreshTimer();
+}
+
+function startRefreshTimer() {
+  if (refreshTimer) return;
+  refreshTimer = window.setInterval(loadStatus, 30000);
+}
+
+function stopRefreshTimer() {
+  if (!refreshTimer) return;
+  window.clearInterval(refreshTimer);
+  refreshTimer = null;
+}
+
+async function submitSetup(formData, form) {
+  const button = form.querySelector("button[type='submit']");
+  button.disabled = true;
+  try {
+    const result = await fetchJSON("api/setup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({
+        setup_secret: formData.get("setup_secret"),
+        admin_display_name: formData.get("admin_display_name"),
+        admin_username: formData.get("admin_username"),
+        admin_email: formData.get("admin_email"),
+        admin_password: formData.get("admin_password"),
+        admin_password_confirm: formData.get("admin_password_confirm")
+      })
+    });
+    currentUser = result.user || null;
+    showToast("Adminaccount erstellt");
+    await bootstrapAuth();
+  } catch (error) {
+    showToast(error.message);
+  } finally {
+    button.disabled = false;
+  }
+}
+
+async function submitLogin(credentials) {
+  $("#login-error").hidden = true;
+  try {
+    const result = await fetchJSON("api/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify(credentials)
+    });
+    currentUser = result.user || null;
+    showToast("Angemeldet");
+    await bootstrapAuth();
+  } catch (error) {
+    $("#login-error").hidden = false;
+    $("#login-error").textContent = error.message;
+  }
+}
+
+async function logout() {
+  try {
+    await fetchJSON("api/logout", { method: "POST" });
+  } finally {
+    currentUser = null;
+    adminInfo = null;
+    document.querySelectorAll(".psu-backdrop:not([hidden])").forEach((element) => element.setAttribute("hidden", ""));
+    showAuthGate("login");
+  }
 }
 
 function buildAppearanceControls() {
@@ -156,12 +303,11 @@ async function loadAll() {
 
 async function loadStatus() {
   try {
-    const response = await fetch("api/status", { headers: { Accept: "application/json" } });
-    if (!response.ok) throw new Error(await response.text());
-    lastStatus = await response.json();
+    lastStatus = await fetchJSON("api/status", { headers: { Accept: "application/json" } });
     renderStatus(lastStatus);
-    $("#runtime-info").textContent = "API: connected";
+    $("#runtime-info").textContent = "API: verbunden";
   } catch (error) {
+    if (await handleAuthError(error)) return;
     showToast("Could not load status");
     $("#runtime-info").textContent = `API: ${error.message}`;
   }
@@ -169,9 +315,7 @@ async function loadStatus() {
 
 async function loadConfig() {
   try {
-    const response = await fetch("api/config", { headers: { Accept: "application/json" } });
-    if (!response.ok) throw new Error(await response.text());
-    const result = await response.json();
+    const result = await fetchJSON("api/config", { headers: { Accept: "application/json" } });
     loadedConfig = result.config || { settings: [] };
     if (!Array.isArray(loadedConfig.settings)) loadedConfig.settings = [];
     for (const setting of loadedConfig.settings) {
@@ -184,6 +328,7 @@ async function loadConfig() {
     renderConfigNotice(result);
     renderSettings();
   } catch (error) {
+    if (await handleAuthError(error)) return;
     showConfigWarning(`Could not load config: ${error.message}`);
   }
 }
@@ -297,6 +442,7 @@ function renderSettings() {
     }
     list.append(makeSettingSummary(setting, index));
   });
+  renderDuplicateWarnings();
 }
 
 function makeSettingSummary(setting, index) {
@@ -305,6 +451,7 @@ function makeSettingSummary(setting, index) {
   node.querySelector(".provider-mark").textContent = providerInitials(setting.provider);
   node.querySelector(".config-title").textContent = setting.domain || `Entry ${index + 1}`;
   node.querySelector(".config-meta").textContent = `${setting.provider || "unknown"} · ${setting.owner || setting.host || "@"} · ${setting.ip_version || "default IP"}`;
+  node.querySelector(".duplicate-entry").addEventListener("click", () => duplicateSetting(index));
   node.querySelector(".edit-entry").addEventListener("click", () => {
     editingSettingIndex = index;
     renderSettings();
@@ -325,6 +472,7 @@ function makeSettingEditor(setting, index) {
     setting[""] = "";
     renderSettings();
   });
+  node.querySelector(".duplicate-entry").addEventListener("click", () => duplicateSetting(index));
   node.querySelector(".delete-entry").addEventListener("click", () => {
     loadedConfig.settings.splice(index, 1);
     editingSettingIndex = null;
@@ -350,6 +498,17 @@ function makeSettingEditor(setting, index) {
   }
 
   return article;
+}
+
+function duplicateSetting(index) {
+  const original = loadedConfig.settings[index];
+  if (!original) return;
+  const clone = JSON.parse(JSON.stringify(original));
+  loadedConfig.settings.splice(index + 1, 0, clone);
+  editingSettingIndex = index + 1;
+  renderSettings();
+  showView("config");
+  showToast("Eintrag dupliziert");
 }
 
 function makeField(setting, key) {
@@ -393,6 +552,7 @@ function makeField(setting, key) {
   } else {
     valueInput.addEventListener("input", () => {
       setting[currentKey] = coerceFieldValue(currentKey, valueInput.value);
+      renderDuplicateWarnings();
     });
   }
 
@@ -403,6 +563,7 @@ function makeField(setting, key) {
     delete setting[currentKey];
     currentKey = newKey;
     badge.textContent = "custom";
+    renderDuplicateWarnings();
   });
 
   row.querySelector(".delete-field").addEventListener("click", () => {
@@ -411,6 +572,41 @@ function makeField(setting, key) {
   });
 
   return row;
+}
+
+function renderDuplicateWarnings() {
+  document.querySelectorAll(".duplicate-domain-warning").forEach((warning) => {
+    const card = warning.closest(".config-card");
+    const index = Array.from(document.querySelectorAll(".config-card")).indexOf(card);
+    const setting = loadedConfig.settings[index];
+    const duplicates = duplicateDomainTargets(setting, index);
+    if (duplicates.length === 0) {
+      warning.hidden = true;
+      warning.textContent = "";
+      return;
+    }
+    warning.hidden = false;
+    warning.textContent = `Warnung: Dieser Domain/Subdomain-Eintrag existiert bereits in Eintrag ${duplicates.join(", ")}. Du kannst trotzdem speichern.`;
+  });
+}
+
+function duplicateDomainTargets(setting, currentIndex) {
+  const current = domainTarget(setting);
+  if (!current) return [];
+  return loadedConfig.settings
+    .map((candidate, index) => ({ index, target: domainTarget(candidate) }))
+    .filter((candidate) => candidate.index !== currentIndex && candidate.target === current)
+    .map((candidate) => String(candidate.index + 1));
+}
+
+function domainTarget(setting) {
+  if (!setting) return "";
+  const domain = String(setting.domain || "").trim().toLowerCase();
+  if (!domain) return "";
+  const owner = String(setting.owner || setting.host || "").trim().toLowerCase();
+  if (!owner || owner === "@") return domain;
+  if (domain === owner || domain.startsWith(`${owner}.`)) return domain;
+  return `${owner}.${domain}`;
 }
 
 function replaceValueWithSelect(input, values, selectedValue, onChange) {
@@ -479,19 +675,18 @@ async function saveConfig() {
   if (savingDisabled) return;
   $("#save-config-button").disabled = true;
   try {
-    const response = await fetch("api/config", {
+    const result = await fetchJSON("api/config", {
       method: "PUT",
       headers: { "Content-Type": "application/json", Accept: "application/json" },
       body: JSON.stringify(loadedConfig)
     });
-    if (!response.ok) throw new Error(await response.text());
-    const result = await response.json();
     loadedConfig = result.config || loadedConfig;
     editingSettingIndex = null;
     renderSettings();
     renderConfigNotice(result);
     showToast("Config saved");
   } catch (error) {
+    if (await handleAuthError(error)) return;
     showConfigWarning(error.message);
   } finally {
     $("#save-config-button").disabled = savingDisabled;
@@ -502,14 +697,84 @@ async function forceUpdate() {
   $("#force-button").disabled = true;
   try {
     const response = await fetch("update", { method: "POST" });
-    if (!response.ok) throw new Error(await response.text());
+    if (!response.ok) throw await makeFetchError(response);
     await loadStatus();
     showToast("Update triggered");
   } catch (error) {
+    if (await handleAuthError(error)) return;
     showToast(`Update failed: ${error.message}`);
   } finally {
     $("#force-button").disabled = false;
   }
+}
+
+async function fetchJSON(url, options = {}) {
+  const response = await fetch(url, {
+    ...options,
+    headers: { Accept: "application/json", ...(options.headers || {}) }
+  });
+  if (!response.ok) throw await makeFetchError(response);
+  if (response.status === 204) return null;
+  return response.json();
+}
+
+async function makeFetchError(response) {
+  let message = response.statusText;
+  try {
+    const data = await response.clone().json();
+    message = data.error || (Array.isArray(data.errors) ? data.errors.join(" ") : message);
+  } catch {
+    message = await response.text();
+  }
+  const error = new Error(message || response.statusText);
+  error.status = response.status;
+  return error;
+}
+
+async function handleAuthError(error) {
+  if (![401, 423].includes(error.status)) return false;
+  await bootstrapAuth();
+  return true;
+}
+
+function renderUser() {
+  const initials = currentUser?.initials || "D";
+  const displayName = currentUser?.display_name || "Dyniku Admin";
+  const username = currentUser?.username || "admin";
+  $("#avatar-initials").textContent = initials;
+  $("#profile-avatar").textContent = initials;
+  $("#profile-name").textContent = displayName;
+  $("#profile-username").textContent = `@${username}`;
+}
+
+function renderAdminInfo() {
+  const info = adminInfo || {};
+  $("#admin-version").textContent = info.app_version || "unknown";
+  $("#admin-build-date").textContent = info.build_date || "unknown";
+  $("#admin-sha").textContent = info.github_sha || "unknown";
+  $("#admin-data-dir").textContent = info.data_directory || "unknown";
+  $("#admin-config-path").textContent = info.config_path || "unknown";
+  $("#admin-database").textContent = info.database_status || "unknown";
+  $("#admin-setup").textContent = info.setup_state || "unknown";
+  $("#admin-health").textContent = info.health_status || "unknown";
+  $("#admin-log-level").textContent = info.log_level || "unknown";
+}
+
+async function copyDebugDetails() {
+  const info = adminInfo || {};
+  const lines = [
+    `App Version: ${info.app_version || "unknown"}`,
+    `Build Date: ${info.build_date || "unknown"}`,
+    `GitHub SHA: ${info.github_sha || "unknown"}`,
+    `Data Directory: ${info.data_directory || "unknown"}`,
+    `Config Path: ${info.config_path || "unknown"}`,
+    `Database: ${info.database_status || "unknown"}`,
+    `Setup: ${info.setup_state || "unknown"}`,
+    `Health: ${info.health_status || "unknown"}`,
+    `Log Level: ${info.log_level || "unknown"}`
+  ].join("\n");
+  await navigator.clipboard.writeText(lines);
+  showToast("Debugdetails kopiert");
 }
 
 function showView(name) {

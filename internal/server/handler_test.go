@@ -9,7 +9,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/MaroIshiku/dyniku/internal/models"
 	"github.com/MaroIshiku/dyniku/internal/records"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type testDB struct{}
@@ -30,7 +32,7 @@ func TestConfigAPIValidatesBeforeWriting(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	handler := newHandler(context.Background(), "", testDB{}, testRunner{}, configPath, dataDir)
+	handler := newTestHandler(t, configPath, dataDir)
 	request := httptest.NewRequestWithContext(context.Background(), http.MethodPut, "/api/config", strings.NewReader(`{
 		"settings": [{
 			"provider": "netcup",
@@ -42,6 +44,7 @@ func TestConfigAPIValidatesBeforeWriting(t *testing.T) {
 		}]
 	}`))
 	response := httptest.NewRecorder()
+	addAuthCookie(t, handler, request)
 
 	handler.ServeHTTP(response, request)
 
@@ -69,7 +72,7 @@ func TestConfigAPIRejectsInvalidProviderConfig(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	handler := newHandler(context.Background(), "", testDB{}, testRunner{}, configPath, dataDir)
+	handler := newTestHandler(t, configPath, dataDir)
 	request := httptest.NewRequestWithContext(context.Background(), http.MethodPut, "/api/config", strings.NewReader(`{
 		"settings": [{
 			"provider": "netcup",
@@ -79,6 +82,7 @@ func TestConfigAPIRejectsInvalidProviderConfig(t *testing.T) {
 		}]
 	}`))
 	response := httptest.NewRecorder()
+	addAuthCookie(t, handler, request)
 
 	handler.ServeHTTP(response, request)
 
@@ -92,5 +96,116 @@ func TestConfigAPIRejectsInvalidProviderConfig(t *testing.T) {
 	}
 	if string(configBytes) != string(original) {
 		t.Fatalf("invalid config should not replace existing config, got:\n%s", configBytes)
+	}
+}
+
+func TestProtectedAPIRequiresSetup(t *testing.T) {
+	t.Parallel()
+
+	dataDir := t.TempDir()
+	handler := newHandler(context.Background(), "", testDB{}, testRunner{},
+		filepath.Join(dataDir, "config.json"), dataDir, models.BuildInformation{})
+	request := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/api/status", nil)
+	response := httptest.NewRecorder()
+
+	handler.ServeHTTP(response, request)
+
+	if response.Code != http.StatusLocked {
+		t.Fatalf("expected status %d, got %d: %s", http.StatusLocked, response.Code, response.Body.String())
+	}
+}
+
+func TestFirstRunSetupCreatesAdminAndClosesRegistration(t *testing.T) {
+	t.Setenv("ISHIKU_SETUP_SECRET", "test-setup-secret-with-length")
+	t.Setenv("ISHIKU_SETUP_SECRET_FILE", filepath.Join(t.TempDir(), "missing-secret"))
+
+	dataDir := t.TempDir()
+	handler := newHandler(context.Background(), "", testDB{}, testRunner{},
+		filepath.Join(dataDir, "config.json"), dataDir, models.BuildInformation{})
+
+	first := httptest.NewRequestWithContext(context.Background(), http.MethodPost, "/api/setup", strings.NewReader(`{
+		"setup_secret": "test-setup-secret-with-length",
+		"admin_display_name": "Dyniku Admin",
+		"admin_username": "admin",
+		"admin_password": "CorrectHorseBatteryStaple",
+		"admin_password_confirm": "CorrectHorseBatteryStaple"
+	}`))
+	first.Header.Set("Content-Type", "application/json")
+	firstResponse := httptest.NewRecorder()
+	handler.ServeHTTP(firstResponse, first)
+	if firstResponse.Code != http.StatusCreated {
+		t.Fatalf("expected status %d, got %d: %s", http.StatusCreated, firstResponse.Code, firstResponse.Body.String())
+	}
+
+	authBytes, err := os.ReadFile(filepath.Join(dataDir, authFileName))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(string(authBytes), "CorrectHorseBatteryStaple") {
+		t.Fatal("auth file must not contain plaintext password")
+	}
+
+	second := httptest.NewRequestWithContext(context.Background(), http.MethodPost, "/api/setup", strings.NewReader(`{
+		"setup_secret": "test-setup-secret-with-length",
+		"admin_display_name": "Another Admin",
+		"admin_username": "other",
+		"admin_password": "AnotherCorrectPassword",
+		"admin_password_confirm": "AnotherCorrectPassword"
+	}`))
+	second.Header.Set("Content-Type", "application/json")
+	secondResponse := httptest.NewRecorder()
+	handler.ServeHTTP(secondResponse, second)
+	if secondResponse.Code != http.StatusConflict {
+		t.Fatalf("expected status %d, got %d: %s", http.StatusConflict, secondResponse.Code, secondResponse.Body.String())
+	}
+}
+
+func newTestHandler(t *testing.T, configPath, dataDir string) http.Handler {
+	t.Helper()
+	writeTestAuthFile(t, dataDir)
+	handler := newHandler(context.Background(), "", testDB{}, testRunner{}, configPath, dataDir,
+		models.BuildInformation{Version: "test", Commit: "test-sha", Created: "test-date"})
+	return handler
+}
+
+func addAuthCookie(t *testing.T, handler http.Handler, request *http.Request) {
+	t.Helper()
+	login := httptest.NewRequestWithContext(context.Background(), http.MethodPost, "/api/login", strings.NewReader(`{
+		"username": "admin",
+		"password": "CorrectHorseBatteryStaple"
+	}`))
+	login.Header.Set("Content-Type", "application/json")
+	response := httptest.NewRecorder()
+	handler.ServeHTTP(response, login)
+	if response.Code != http.StatusOK {
+		t.Fatalf("login failed with %d: %s", response.Code, response.Body.String())
+	}
+	for _, cookie := range response.Result().Cookies() {
+		if cookie.Name == sessionCookieName {
+			request.AddCookie(cookie)
+			return
+		}
+	}
+	t.Fatal("login response did not include a session cookie")
+}
+
+func writeTestAuthFile(t *testing.T, dataDir string) {
+	t.Helper()
+	hash, err := bcrypt.GenerateFromPassword([]byte("CorrectHorseBatteryStaple"), bcrypt.DefaultCost)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = os.WriteFile(filepath.Join(dataDir, authFileName), []byte(`{
+		"setup_completed": true,
+		"created_at": "2026-07-01T00:00:00Z",
+		"admin": {
+			"display_name": "Dyniku Admin",
+			"username": "admin",
+			"password_hash": "`+string(hash)+`",
+			"created_at": "2026-07-01T00:00:00Z"
+		}
+	}`), os.FileMode(0o600))
+	if err != nil {
+		t.Fatal(err)
 	}
 }

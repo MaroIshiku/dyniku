@@ -56,7 +56,10 @@ func (l Logger) toLinesNode() *gotree.Node {
 }
 
 func (l *Logger) read(reader *reader.Reader) {
-	l.Level = reader.String("LOG_LEVEL")
+	l.Level = reader.String("ISHIKU_LOG_LEVEL")
+	if l.Level == "" {
+		l.Level = reader.String("LOG_LEVEL")
+	}
 	// Retro compatibility
 	if strings.ToLower(l.Level) == "warning" {
 		l.Level = "warn"

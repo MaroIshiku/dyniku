@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="lavender" data-mode="system" data-resolved-mode="light">
+<html lang="de" data-theme="lavender" data-mode="system" data-resolved-mode="light">
 
 <head>
   <title>Dyniku</title>
@@ -32,10 +32,109 @@
   <svg xmlns="http://www.w3.org/2000/svg" class="icon-sprite" aria-hidden="true">
     <symbol id="psu-icon-dns" viewBox="0 0 24 24"><path fill="currentColor" d="M4 21q-.82 0-1.41-.59Q2 19.83 2 19V5q0-.82.59-1.41Q3.18 3 4 3h16q.83 0 1.41.59Q22 4.18 22 5v14q0 .83-.59 1.41Q20.83 21 20 21H4Zm0-2h16V5H4v14Zm2-2h12v-2H6v2Zm0-4h12v-2H6v2Zm0-4h12V7H6v2Z"/></symbol>
     <symbol id="psu-icon-settings" viewBox="0 0 24 24"><path fill="currentColor" d="M10.9 22q-.45 0-.78-.3-.34-.3-.4-.75l-.25-1.85q-.5-.2-.98-.47-.47-.28-.9-.6l-1.72.73q-.42.18-.84.02-.42-.15-.65-.55l-1.1-1.9q-.22-.4-.14-.85.08-.44.45-.72l1.48-1.12Q5 13.38 5 13v-2q0-.38.07-.75L3.6 9.13q-.37-.28-.45-.72-.08-.45.14-.85l1.1-1.9q.23-.4.65-.55.42-.16.84.02l1.72.73q.43-.32.9-.6.48-.27.98-.47l.25-1.85q.06-.45.4-.75.33-.3.78-.3h2.2q.45 0 .78.3.34.3.4.75l.25 1.85q.5.2.98.47.47.28.9.6l1.72-.73q.42-.18.84-.02.42.15.65.55l1.1 1.9q.22.4.14.85-.08.44-.45.72l-1.48 1.12q.07.37.07.75v2q0 .38-.07.75l1.48 1.12q.37.28.45.72.08.45-.14.85l-1.1 1.9q-.23.4-.65.55-.42.16-.84-.02l-1.72-.73q-.43.32-.9.6-.48.27-.98.47l-.25 1.85q-.06.45-.4.75-.33.3-.78.3h-2.2ZM12 15q1.25 0 2.13-.88.87-.87.87-2.12t-.87-2.12Q13.25 9 12 9t-2.13.88Q9 10.75 9 12t.87 2.12Q10.75 15 12 15Z"/></symbol>
+    <symbol id="psu-icon-user" viewBox="0 0 24 24"><path fill="currentColor" d="M12 12q-1.65 0-2.83-1.17Q8 9.65 8 8t1.17-2.83Q10.35 4 12 4t2.83 1.17Q16 6.35 16 8t-1.17 2.83Q13.65 12 12 12Zm-8 8q-.43 0-.71-.29Q3 19.43 3 19q0-1.2.62-2.18.63-.97 1.68-1.52 1.56-.78 3.22-1.04Q10.18 14 12 14t3.48.26q1.66.26 3.22 1.04 1.05.55 1.68 1.52.62.98.62 2.18 0 .43-.29.71-.28.29-.71.29H4Z"/></symbol>
+    <symbol id="psu-icon-logout" viewBox="0 0 24 24"><path fill="currentColor" d="M5 21q-.82 0-1.41-.59Q3 19.83 3 19V5q0-.82.59-1.41Q4.18 3 5 3h7q.43 0 .71.29.29.28.29.71t-.29.71Q12.43 5 12 5H5v14h7q.43 0 .71.29.29.28.29.71t-.29.71Q12.43 21 12 21H5Zm12.18-5.62q-.28.27-.7.27-.43 0-.7-.28-.28-.27-.28-.7 0-.42.28-.7L18.76 11H10q-.43 0-.71-.29Q9 10.43 9 10t.29-.71Q9.57 9 10 9h8.76l-2.98-2.98q-.28-.28-.28-.7 0-.43.28-.7.27-.28.7-.28.42 0 .7.28l4.68 4.68q.3.3.3.7t-.3.7l-4.68 4.68Z"/></symbol>
     <symbol id="psu-icon-close" viewBox="0 0 24 24"><path fill="currentColor" d="M12 13.4 7.1 18.3q-.28.28-.7.28-.43 0-.7-.28-.28-.27-.28-.7 0-.42.28-.7l4.9-4.9-4.9-4.9q-.28-.28-.28-.7 0-.43.28-.7.27-.28.7-.28.42 0 .7.28l4.9 4.9 4.9-4.9q.28-.28.7-.28.43 0 .7.28.28.27.28.7 0 .42-.28.7L13.4 12l4.9 4.9q.28.28.28.7 0 .43-.28.7-.27.28-.7.28-.42 0-.7-.28L12 13.4Z"/></symbol>
   </svg>
 
-  <div class="psu-app-shell app-shell">
+  <section id="auth-gate" class="psu-setup-screen" hidden>
+    <div id="setup-error-window" class="psu-setup-error-window" hidden>
+      <div class="psu-setup-brand">
+        <div class="psu-setup-logo">
+          <img data-psu-app-logo src="static/dyniku-logo.png" alt="">
+          <svg data-psu-fallback-symbol viewBox="0 0 24 24"><use href="#psu-icon-dns"></use></svg>
+        </div>
+        <h1 class="psu-setup-title">Setup blockiert</h1>
+        <p class="psu-setup-subtitle" id="setup-error-message">Setup-Secret fehlt.</p>
+      </div>
+      <table class="psu-env-table">
+        <tbody>
+          <tr><th>Bevorzugt</th><td><code>ISHIKU_SETUP_SECRET_FILE=/run/secrets/ishiku_setup_secret</code></td></tr>
+          <tr><th>Fallback</th><td><code>ISHIKU_SETUP_SECRET</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <form id="register-form" class="psu-register-window" data-psu-register-form hidden>
+      <div class="psu-setup-brand">
+        <div class="psu-setup-logo">
+          <img data-psu-app-logo src="static/dyniku-logo.png" alt="">
+          <svg data-psu-fallback-symbol viewBox="0 0 24 24"><use href="#psu-icon-dns"></use></svg>
+        </div>
+        <h1 class="psu-setup-title">Admin einrichten</h1>
+        <p class="psu-setup-subtitle">Erstelle den ersten Dyniku-Adminaccount.</p>
+      </div>
+      <div class="psu-form-stack">
+        <label class="psu-field">
+          <span class="psu-label">Setup-Secret</span>
+          <input class="psu-input" name="setup_secret" type="password" autocomplete="one-time-code" required autofocus>
+          <span class="psu-field-error" data-field-error="setup_secret" hidden></span>
+        </label>
+        <label class="psu-field">
+          <span class="psu-label">Admin-Benutzername</span>
+          <input class="psu-input" name="admin_username" type="text" autocomplete="username" required>
+          <span class="psu-field-error" data-field-error="admin_username" hidden></span>
+        </label>
+        <label class="psu-field">
+          <span class="psu-label">Anzeigename</span>
+          <input class="psu-input" name="admin_display_name" type="text" autocomplete="name" required>
+        </label>
+        <label class="psu-field">
+          <span class="psu-label">E-Mail optional</span>
+          <input class="psu-input" name="admin_email" type="email" autocomplete="email">
+        </label>
+        <label class="psu-field">
+          <span class="psu-label">Admin-Passwort</span>
+          <input class="psu-input" name="admin_password" type="password" autocomplete="new-password" required>
+          <span class="psu-field-error" data-field-error="admin_password" hidden></span>
+        </label>
+        <label class="psu-field">
+          <span class="psu-label">Passwort wiederholen</span>
+          <input class="psu-input" name="admin_password_confirm" type="password" autocomplete="new-password" required>
+          <span class="psu-field-error" data-field-error="admin_password_confirm" hidden></span>
+        </label>
+        <div class="psu-password-requirements">
+          Passwortregeln
+          <ul>
+            <li>mindestens 12 Zeichen</li>
+            <li>nicht identisch mit Setup-Secret, Benutzername, App-ID oder App-Name</li>
+            <li>kein Platzhalter wie admin, password, passwort oder changeme</li>
+          </ul>
+        </div>
+      </div>
+      <div class="psu-setup-actions">
+        <button class="psu-button psu-button--filled psu-button--full" type="submit">Adminaccount erstellen</button>
+      </div>
+      <p class="psu-setup-footnote">Nach dem ersten Adminaccount wird die Registrierung geschlossen.</p>
+    </form>
+
+    <form id="login-form" class="psu-auth-window" hidden>
+      <div class="psu-setup-brand">
+        <div class="psu-setup-logo">
+          <img data-psu-app-logo src="static/dyniku-logo.png" alt="">
+          <svg data-psu-fallback-symbol viewBox="0 0 24 24"><use href="#psu-icon-dns"></use></svg>
+        </div>
+        <h1 class="psu-setup-title">Anmelden</h1>
+        <p class="psu-setup-subtitle">Melde dich mit deinem Dyniku-Adminaccount an.</p>
+      </div>
+      <div class="psu-form-stack">
+        <label class="psu-field">
+          <span class="psu-label">Benutzername</span>
+          <input class="psu-input" name="username" type="text" autocomplete="username" required>
+        </label>
+        <label class="psu-field">
+          <span class="psu-label">Passwort</span>
+          <input class="psu-input" name="password" type="password" autocomplete="current-password" required>
+        </label>
+        <span class="psu-field-error" id="login-error" hidden></span>
+      </div>
+      <div class="psu-setup-actions">
+        <button class="psu-button psu-button--filled psu-button--full" type="submit">Anmelden</button>
+      </div>
+    </form>
+  </section>
+
+  <div class="psu-app-shell app-shell" data-app-content hidden>
     <header class="psu-app-header" data-psu-app-header>
       <div class="psu-app-header__inner">
         <div class="psu-app-symbol" aria-hidden="true">
@@ -47,8 +146,8 @@
           <p class="psu-app-subtitle" data-psu-app-subtitle>DDNS-Updater Web GUI</p>
         </div>
         <div class="psu-spacer"></div>
-        <button class="psu-icon-button" id="open-settings-button" type="button" data-psu-open="#settings-sheet" aria-label="Open settings" title="Settings">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#psu-icon-settings"></use></svg>
+        <button class="psu-avatar-button" id="open-profile-button" type="button" data-psu-open="#profile-sheet" aria-label="Profil öffnen" title="Profil">
+          <span id="avatar-initials">D</span>
         </button>
       </div>
     </header>
@@ -152,6 +251,43 @@
     </main>
   </div>
 
+  <div id="profile-sheet" class="psu-backdrop" hidden>
+    <section class="psu-sheet profile-sheet" role="dialog" aria-modal="true" aria-labelledby="profile-title">
+      <div class="psu-sheet-header">
+        <span></span>
+        <h2 id="profile-title" class="psu-sheet-title">Profil</h2>
+        <button class="psu-icon-button" type="button" data-psu-close aria-label="Profil schliessen" title="Schliessen">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#psu-icon-close"></use></svg>
+        </button>
+      </div>
+      <div class="psu-account-card">
+        <div class="psu-account-avatar" id="profile-avatar">D</div>
+        <div>
+          <p class="psu-account-name" id="profile-name">Dyniku Admin</p>
+          <p class="psu-account-id" id="profile-username">@admin</p>
+        </div>
+      </div>
+      <div class="psu-list">
+        <button class="psu-list-row" type="button" data-psu-open="#settings-sheet">
+          <svg class="psu-list-row__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#psu-icon-settings"></use></svg>
+          <span>
+            <span class="psu-list-row__label">Einstellungen</span>
+            <span class="psu-list-row__support">Design, About und Admin-Info</span>
+          </span>
+          <span aria-hidden="true">›</span>
+        </button>
+        <button class="psu-list-row" id="logout-button" type="button">
+          <svg class="psu-list-row__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#psu-icon-logout"></use></svg>
+          <span>
+            <span class="psu-list-row__label">Abmelden</span>
+            <span class="psu-list-row__support">Aktuelle Sitzung beenden</span>
+          </span>
+          <span aria-hidden="true"></span>
+        </button>
+      </div>
+    </section>
+  </div>
+
   <div id="settings-sheet" class="psu-backdrop" hidden>
     <section class="psu-sheet settings-sheet" role="dialog" aria-modal="true" aria-labelledby="settings-title">
       <div class="psu-sheet-header">
@@ -181,11 +317,30 @@
         </div>
       </div>
       <div class="psu-technical-card">
+        <strong>Admin Info</strong>
+        <dl class="admin-info-list">
+          <div><dt>App Version</dt><dd id="admin-version">unknown</dd></div>
+          <div><dt>Build Date</dt><dd id="admin-build-date">unknown</dd></div>
+          <div><dt>GitHub SHA</dt><dd id="admin-sha">unknown</dd></div>
+          <div><dt>Data Directory</dt><dd id="admin-data-dir">unknown</dd></div>
+          <div><dt>Config Path</dt><dd id="admin-config-path">unknown</dd></div>
+          <div><dt>Database</dt><dd id="admin-database">unknown</dd></div>
+          <div><dt>Setup</dt><dd id="admin-setup">unknown</dd></div>
+          <div><dt>Health</dt><dd id="admin-health">unknown</dd></div>
+          <div><dt>Log Level</dt><dd id="admin-log-level">unknown</dd></div>
+        </dl>
+        <div class="psu-card-actions">
+          <button class="psu-button psu-button--outlined" id="copy-debug-button" type="button">Debugdetails kopieren</button>
+        </div>
+      </div>
+      <div class="psu-technical-card">
         <strong>Runtime</strong>
-        <p class="psu-technical-value" id="runtime-info">API: ready after first load</p>
+        <p class="psu-technical-value" id="runtime-info">API: bereit nach Anmeldung</p>
       </div>
     </section>
   </div>
+
+  <div id="dialog-host" class="dialog-host" aria-live="polite"></div>
 
   <div id="toast-host" class="toast-host" aria-live="polite" aria-atomic="true"></div>
 
@@ -198,7 +353,10 @@
           <span class="config-meta"></span>
         </div>
       </div>
-      <button class="psu-button psu-button--outlined edit-entry" type="button">Edit</button>
+      <div class="action-row">
+        <button class="psu-button psu-button--tonal duplicate-entry" type="button">Duplizieren</button>
+        <button class="psu-button psu-button--outlined edit-entry" type="button">Edit</button>
+      </div>
     </article>
   </template>
 
@@ -211,10 +369,12 @@
         </div>
         <div class="action-row">
           <button class="psu-button psu-button--tonal add-field" type="button">Field</button>
+          <button class="psu-button psu-button--tonal duplicate-entry" type="button">Duplizieren</button>
           <button class="psu-button psu-button--danger delete-entry" type="button">Delete</button>
           <button class="psu-button psu-button--outlined close-entry" type="button">Done</button>
         </div>
       </div>
+      <p class="inline-notice duplicate-domain-warning" hidden></p>
       <div class="fields"></div>
     </article>
   </template>

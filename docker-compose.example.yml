@@ -9,12 +9,12 @@ services:
       - path: .env.example
       - path: .env
         required: false
+    environment:
+      ISHIKU_SETUP_SECRET_FILE: /run/secrets/ishiku_setup_secret
     volumes:
       - ./data:/data
     secrets:
       - ishiku_setup_secret
-    environment:
-      ISHIKU_SETUP_SECRET_FILE: /run/secrets/ishiku_setup_secret
     healthcheck:
       test: ["CMD", "/updater/dyniku", "healthcheck"]
       interval: 30s

@@ -42,6 +42,9 @@ func (b *Backup) read(reader *reader.Reader) (err error) {
 		return err
 	}
 
-	b.Directory = reader.Get("BACKUP_DIRECTORY")
+	b.Directory = reader.Get("ISHIKU_BACKUP_DIRECTORY")
+	if b.Directory == nil {
+		b.Directory = reader.Get("BACKUP_DIRECTORY")
+	}
 	return nil
 }

@@ -1,427 +1,199 @@
 # Dyniku
 
-Program to keep DNS A and/or AAAA records updated for multiple DNS providers
+DDNS-Updater Web GUI
 
-<img height="200" alt="Dyniku logo" src="internal/server/ui/static/dyniku-logo.png">
+> Dyniku ist eine self-hosted Weboberflaeche zum Verwalten, Speichern und Ueberwachen dynamischer DNS-Updates.
 
 [![Build status](https://github.com/MaroIshiku/dyniku/actions/workflows/build.yml/badge.svg)](https://github.com/MaroIshiku/dyniku/actions/workflows/build.yml)
-
-![Last release](https://img.shields.io/github/release/MaroIshiku/dyniku?label=Last%20release)
-![Last Docker tag](https://img.shields.io/github/v/release/MaroIshiku/dyniku?sort=semver&label=Last%20Docker%20tag)
-![GitHub last release date](https://img.shields.io/github/release-date/MaroIshiku/dyniku?label=Last%20release%20date)
-![Commits since release](https://img.shields.io/github/commits-since/MaroIshiku/dyniku/latest?sort=semver)
-
-[![GitHub last commit](https://img.shields.io/github/last-commit/MaroIshiku/dyniku.svg)](https://github.com/MaroIshiku/dyniku/commits/main)
-[![GitHub commit activity](https://img.shields.io/github/commit-activity/y/MaroIshiku/dyniku.svg)](https://github.com/MaroIshiku/dyniku/graphs/contributors)
-[![GitHub closed PRs](https://img.shields.io/github/issues-pr-closed/MaroIshiku/dyniku.svg)](https://github.com/MaroIshiku/dyniku/pulls?q=is%3Apr+is%3Aclosed)
-[![GitHub issues](https://img.shields.io/github/issues/MaroIshiku/dyniku.svg)](https://github.com/MaroIshiku/dyniku/issues)
-[![GitHub closed issues](https://img.shields.io/github/issues-closed/MaroIshiku/dyniku.svg)](https://github.com/MaroIshiku/dyniku/issues?q=is%3Aissue+is%3Aclosed)
-
-![Code size](https://img.shields.io/github/languages/code-size/MaroIshiku/dyniku)
-![GitHub repo size](https://img.shields.io/github/repo-size/MaroIshiku/dyniku)
+[![MIT](https://img.shields.io/github/license/MaroIshiku/dyniku)](LICENSE)
 ![Go version](https://img.shields.io/github/go-mod/go-version/MaroIshiku/dyniku)
 
-[![MIT](https://img.shields.io/github/license/MaroIshiku/dyniku)](LICENSE)
-![Visitors count](https://visitor-badge.laobi.icu/badge?page_id=dyniku.readme)
+<img height="160" alt="Dyniku logo" src="internal/server/ui/static/dyniku-logo.png">
 
-## Documentation
+## Kurzbeschreibung
 
-This readme and the [docs/](docs/) directory describe the current Dyniku build.
+Dyniku ist eine self-hosted Web-App aus der ishiku-Familie. Sie verbindet den bewaehrten DDNS-Updater-Kern mit einer Pixel Soft Utility Web GUI fuer Status, Konfiguration und IP-Verlauf.
 
-## Features
+Die App ist fuer private oder kleine eigene Deployments gedacht. Der erste Start ist durch ein Setup-Secret geschuetzt und legt genau einen initialen Adminaccount an.
 
-- Available as a Docker image [`ghcr.io/maroishiku/dyniku`](https://github.com/MaroIshiku/dyniku/pkgs/container/dyniku)
-- Available as [zero-dependency binaries for Linux, Windows and MacOS](https://github.com/MaroIshiku/dyniku/releases)
-- Updates periodically A records for different DNS providers:
-  - Aliyun
-  - AllInkl
-  - ChangeIP
-  - Cloudflare
-  - DD24
-  - DDNSS.de
-  - deSEC
-  - DigitalOcean
-  - Domeneshop
-  - DonDominio
-  - DNSOMatic
-  - DNSPod
-  - Dreamhost
-  - DuckDNS
-  - DynDNS
-  - Dynu
-  - DynV6
-  - EasyDNS
-  - FreeDNS
-  - Gandi
-  - GCP
-  - GoDaddy
-  - GoIP.de
-  - He.net
-  - Hetzner (legacy API)
-  - Hetzner Cloud
-  - Infomaniak
-  - INWX
-    - Ionos
-    - ipv64
-  - Linode
-  - Loopia
-  - LuaDNS
-  - Myaddr
-  - Name.com
-  - Namecheap
-  - NameSilo
-  - Netcup
-  - NoIP
-  - Now-DNS
-  - Njalla
-  - OpenDNS
-  - OVH
-  - Porkbun
-  - Route53
-  - Scaleway
-  - Selfhost.de
-  - Servercow.de
-  - Spaceship
-  - Spdyn
-  - Strato.de
-  - Variomedia.de
-  - Vultr
-  - Zoneedit
-  - **Want more?** [Create an issue for it](https://github.com/MaroIshiku/dyniku/issues/new/choose)!
-- Web user interface (Desktop)
+## Teil der ishiku-Familie
 
-    ![Web UI](readme/webui-desktop.gif)
+Dyniku verwendet die gemeinsame ishiku Oberflaeche:
 
-- Web user interface (Mobile)
+- ruhige, abgerundete Pixel-Soft-Utility-Komponenten
+- sechs gemeinsame Themes: Lavender, Mint, Sky, Amber, Rose und Graphite
+- Light, Dark und System Mode
+- einheitlicher AppHeader, Profil-, Settings-, About- und Admin-Bereiche
+- einheitliches First-Run-Setup fuer den ersten Adminaccount
 
-    ![Mobile Web UI](readme/webui-mobile.png)
+Die App soll sich bewusst wie Teil einer gemeinsamen Suite anfuehlen, nicht wie eine separate Marke mit eigener Designsprache.
 
-- Send notifications with [**Shoutrrr**](https://containrrr.dev/shoutrrr/v0.8/services/overview/) using `SHOUTRRR_ADDRESSES`
-- Container (Docker/K8s) specific features:
-  - Lightweight 12MB Docker image based on the Scratch Docker image
-  - Docker healthcheck verifying the DNS resolution of your domains
-  - Images compatible with `amd64`, `386`, `arm64`, `armv7`, `armv6`, `s390x`, `ppc64le`, `riscv64` CPU architectures
-- Persistence with a JSON file *updates.json* to store old IP addresses with change times for each record
+## Funktionen
 
-## Setup
+- Web GUI fuer DDNS-Status, Provider-Konfiguration und Public-IP-Verlauf
+- First-Run-Setup mit Setup-Secret und Adminaccount
+- Login mit HttpOnly Session-Cookie
+- Passwort-Hashing mit bcrypt, keine Klartext-Passwoerter
+- Unterstuetzung vieler DNS-Provider, unter anderem Cloudflare, DuckDNS, Dynu, Hetzner, IONOS, Netcup, OVH, Porkbun, Route53, Strato und weitere
+- Manuelles "Update now" und periodische Updates
+- JSON-Konfiguration in einem persistenten Datenordner
+- Docker-Image fuer `amd64`, `arm64` und weitere Plattformen
+- Healthcheck fuer Containerbetrieb
 
-### Binary programs
+## Tech Stack
 
-1. Download the pre-built program for your platform from the assets of a release in the [releases page](https://github.com/MaroIshiku/dyniku/releases). You can alternatively download, build and install the latest version of the program by installing [Go](https://golang.org/doc/install) and then run `go install github.com/MaroIshiku/dyniku/cmd/dyniku@latest`.
-1. For Linux and MacOS, make the program executable with `chmod +x dyniku`.
-1. In the directory where the program is saved, create a directory `data`.
-1. Write a JSON configuration in `data/config.json`, for example:
+- Frontend: Vanilla HTML, CSS und JavaScript mit Pixel Soft Utility Designsystem
+- Backend: Go
+- Datenhaltung: JSON-Dateien im persistenten Datenordner
+- Deployment: Docker / Docker Compose
 
-    ```json
-    {
-        "settings": [
-            {
-                "provider": "namecheap",
-                "domain": "sub.example.com",
-                "password": "e5322165c1d74692bfa6d807100c0310"
-            }
-        ]
-    }
-    ```
+## Installation
 
-    You can find more information in the [configuration section](#configuration) to customize it.
-1. Run the program with `./dyniku` (`./dyniku.exe` on Windows) or by double-clicking on it.
-1. The following is **optional**.
-    - You can customize the program behavior using either [environment variables](#environment-variables) or flags. For flags, there is a flag corresponding to each environment variable, where it's all lowercase and underscores are replaced with dashes. For example the environment variable `LOG_LEVEL` translates into `--log-level`.
+### Docker Compose
 
-### Container
-
-1. Create a directory, for example, *data* which is:
-    - writable by the Dyniku container user
-    - has user read+write+execute permissions
-
-    ```sh
-    mkdir data
-    chmod u+r+w+x data
-    ```
-
-    Dyniku runs as root by default for better compatibility with NAS and ZimaOS bind mounts. If you want to use another user ID, [build the image yourself](#build-the-image) with `--build-arg UID=<your-uid> --build-arg GID=<your-gid>`.
-
-1. Similarly, create a *data/config.json* file with user read and write permissions.
-
-    ```sh
-    touch data/config.json
-    chmod u+rw data/config.json
-    ```
-
-1. Edit *data/config.json*, for example:
-
-    ```json
-    {
-        "settings": [
-            {
-                "provider": "namecheap",
-                "domain": "sub.example.com",
-                "password": "e5322165c1d74692bfa6d807100c0310"
-            }
-        ]
-    }
-    ```
-
-    You can find more information in the [configuration section](#configuration) to customize it.
-
-1. Run the container with
-
-    ```sh
-    docker run -d -p 8507:8507/tcp -v "$(pwd)"/data:/updater/data ghcr.io/maroishiku/dyniku:latest
-    ```
-
-1. The following is **optional**.
-    - You can customize the program behavior using [environment variables](#environment-variables)
-    - You can use [docker-compose.yml](docker-compose.yml) with `docker-compose up -d`
-    - **Kubernetes**: check out the [k8s directory](k8s) for an installation guide and examples.
-    - Other Docker image tags are available at [ghcr.io/maroishiku/dyniku](https://github.com/MaroIshiku/dyniku/pkgs/container/dyniku)
-    - You can update the image with `docker pull ghcr.io/maroishiku/dyniku:latest`
-    - You can set your JSON configuration as a single environment variable line (i.e. `{"settings": [{"provider": "namecheap", ...}]}`), which takes precedence over config.json. Note however that if you don't bind mount the `/updater/data` directory, there won't be a persistent database file `/updater/updates.json` but it will still work.
-
-## Configuration
-
-Start by having the following content in *config.json*, or in your `CONFIG` environment variable:
-
-```json
-{
-    "settings": [
-        {
-            "provider": "",
-        },
-        {
-            "provider": "",
-        }
-    ]
-}
+```bash
+mkdir -p dyniku/secrets dyniku/data
+cd dyniku
+cp docker-compose.example.yml docker-compose.yml
+cp .env.example .env
 ```
 
-For each setting, you need to fill in parameters.
-Check the documentation for your DNS provider:
+Lege anschliessend ein langes zufaelliges Setup-Secret an:
 
-- [Aliyun](docs/aliyun.md)
-- [Allinkl](docs/allinkl.md)
-- [ChangeIP](docs/changeip.md)
-- [Cloudflare](docs/cloudflare.md)
-- [DD24](docs/dd24.md)
-- [DDNSS.de](docs/ddnss.de.md)
-- [deSEC](docs/desec.md)
-- [DigitalOcean](docs/digitalocean.md)
-- [Domeneshop](docs/domeneshop.md)
-- [DonDominio](docs/dondominio.md)
-- [DNSOMatic](docs/dnsomatic.md)
-- [DNSPod](docs/dnspod.md)
-- [Dreamhost](docs/dreamhost.md)
-- [DuckDNS](docs/duckdns.md)
-- [DynDNS](docs/dyndns.md)
-- [Dynu](docs/dynu.md)
-- [DynV6](docs/dynv6.md)
-- [EasyDNS](docs/easydns.md)
-- [FreeDNS](docs/freedns.md)
-- [Gandi](docs/gandi.md)
-- [GCP](docs/gcp.md)
-- [GoDaddy](docs/godaddy.md)
-- [GoIP.de](docs/goip.md)
-- [He.net](docs/he.net.md)
-- [Hetzner](docs/hetzner.md)
-- [HetznerCloud](docs/hetznercloud.md)
-- [Infomaniak](docs/infomaniak.md)
-- [INWX](docs/inwx.md)
-- [Ionos](docs/ionos.md)
-- [IPv64](docs/ipv64.md)
-- [Linode](docs/linode.md)
-- [Loopia](docs/loopia.md)
-- [LuaDNS](docs/luadns.md)
-- [Myaddr](docs/myaddr.md)
-- [Name.com](docs/name.com.md)
-- [Namecheap](docs/namecheap.md)
-- [NameSilo](docs/namesilo.md)
-- [Netcup](docs/netcup.md)
-- [NoIP](docs/noip.md)
-- [Now-DNS](docs/nowdns.md)
-- [Njalla](docs/njalla.md)
-- [OpenDNS](docs/opendns.md)
-- [OVH](docs/ovh.md)
-- [Porkbun](docs/porkbun.md)
-- [Route53](docs/route53.md)
-- [Scaleway](docs/scaleway.md)
-- [Selfhost.de](docs/selfhost.de.md)
-- [Servercow.de](docs/servercow.md)
-- [Spaceship](docs/spaceship.md)
-- [Spdyn](docs/spdyn.md)
-- [Strato.de](docs/strato.md)
-- [Variomedia.de](docs/variomedia.md)
-- [Vultr](docs/vultr.md)
-- [Zoneedit](docs/zoneedit.md)
-- [Custom](docs/custom.md)
-
-Note that:
-
-- you can specify multiple owners/hosts for the same domain using a comma separated list. For example with `"domain": "example.com,sub.example.com,sub2.example.com",`.
-⚠️ this is a bit different for DuckDNS and GoIP, see their respective documentation.
-
-### Environment variables
-
-🆕 There are now flags equivalent for each variable below, for example `--log-level`.
-
-| Environment variable | Default | Description |
-| --- | --- | --- |
-| `CONFIG` | | One line JSON object containing the entire config (takes precedence over config.json file) if specified |
-| `PERIOD` | `5m` | Default period of IP address check, following [this format](https://golang.org/pkg/time/#ParseDuration) |
-| `PUBLICIP_FETCHERS` | `all` | Comma separated fetcher types to obtain the public IP address from `http` and `dns` |
-| `PUBLICIP_HTTP_PROVIDERS` | `all` | Comma separated providers to obtain the public IP address (ipv4 or ipv6). See the [Public IP section](#public-ip) |
-| `PUBLICIPV4_HTTP_PROVIDERS` | `all` | Comma separated providers to obtain the public IPv4 address only. See the [Public IP section](#public-ip) |
-| `PUBLICIPV6_HTTP_PROVIDERS` | `all` | Comma separated providers to obtain the public IPv6 address only. See the [Public IP section](#public-ip) |
-| `PUBLICIP_DNS_PROVIDERS` | `all` | Comma separated providers to obtain the public IP address (IPv4 and/or IPv6). See the [Public IP section](#public-ip) |
-| `PUBLICIP_DNS_TIMEOUT` | `3s` | Public IP DNS query timeout |
-| `UPDATE_COOLDOWN_PERIOD` | `5m` | Duration to cooldown between updates for each record. This is useful to avoid being rate limited or banned. |
-| `HTTP_TIMEOUT` | `10s` | Timeout for all HTTP requests |
-| `SERVER_ENABLED` | `yes` | Enable the web server and web UI |
-| `LISTENING_ADDRESS` | `:8507` | Internal TCP listening port for the web UI |
-| `ROOT_URL` | `/` | URL path to append to all paths to the webUI (i.e. `/ddns` for accessing `https://example.com/ddns` through a proxy) |
-| `HEALTH_SERVER_ADDRESS` | `127.0.0.1:9999` | Health server listening address |
-| `HEALTH_HEALTHCHECKSIO_BASE_URL` | `https://hc-ping.com` | Base URL for the [healthchecks.io](https://healthchecks.io) server |
-| `HEALTH_HEALTHCHECKSIO_UUID` | | UUID to identify with the [healthchecks.io](https://healthchecks.io) server |
-| `DATADIR` | `/updater/data` | Directory to read and write data files from internally |
-| `CONFIG_FILEPATH` | `/updater/data/config.json` | Path to the JSON configuration file |
-| `BACKUP_PERIOD` | `0` | Set to a period (i.e. `72h15m`) to enable zip backups of data/config.json and data/updates.json in a zip file |
-| `BACKUP_DIRECTORY` | `/updater/data` | Directory to write backup zip files to if `BACKUP_PERIOD` is not `0`. |
-| `RESOLVER_ADDRESS` | Your network DNS | A plaintext DNS address to use to resolve your domain names defined in your settings only. For example it can be `1.1.1.1:53`. This is useful for split DNS setups. |
-| `LOG_LEVEL` | `info` | Level of logging, `debug`, `info`, `warning` or `error` |
-| `LOG_CALLER` | `hidden` | Show caller per log line, `hidden` or `short` |
-| `SHOUTRRR_ADDRESSES` | | (optional) Comma separated list of [Shoutrrr addresses](https://containrrr.dev/shoutrrr/v0.8/services/overview/) (notification services) |
-| `SHOUTRRR_DEFAULT_TITLE` | `Dyniku` | Default title for Shoutrrr notifications |
-| `TZ` | | Timezone to have accurate times, i.e. `America/Montreal` |
-| `UMASK` | System current umask | Umask to set for the program in octal, i.e. `0022` |
-
-#### Public IP
-
-By default, all public IP fetching types are used and cycled (over DNS and over HTTPs).
-
-On top of that, for each fetching method, all echo services available are cycled on each request.
-
-This allows you not to be blocked for making too many requests.
-
-You can otherwise customize it with the following:
-
-- `PUBLICIP_HTTP_PROVIDERS` gets your public IPv4 or IPv6 address. It can be one or more of the following:
-  - `ipify` using [https://api64.ipify.org](https://api64.ipify.org)
-  - `ifconfig` using [https://ifconfig.io/ip](https://ifconfig.io/ip)
-  - `ipinfo` using [https://ipinfo.io/ip](https://ipinfo.io/ip)
-  - `spdyn` using [https://checkip.spdyn.de](https://checkip.spdyn.de/)
-  - `ipleak` using [https://ipleak.net/json](https://ipleak.net/json)
-  - `icanhazip` using [https://icanhazip.com](https://icanhazip.com)
-  - `ident` using [https://ident.me](https://ident.me)
-  - `nnev` using [https://ip.nnev.de](https://ip.nnev.de)
-  - `wtfismyip` using [https://wtfismyip.com/text](https://wtfismyip.com/text)
-  - `seeip` using [https://api.seeip.org](https://api.seeip.org)
-  - `changeip` using [https://ip.changeip.com](https://ip.changeip.com)
-  - You can also specify an HTTPS URL with prefix `url:` for example `url:https://ipinfo.io/ip`
-- `PUBLICIPV4_HTTP_PROVIDERS` gets your public IPv4 address only. It can be one or more of the following:
-  - `ipleak` using [https://ipv4.ipleak.net/json](https://ipv4.ipleak.net/json)
-  - `ipify` using [https://api.ipify.org](https://api.ipify.org)
-  - `icanhazip` using [https://ipv4.icanhazip.com](https://ipv4.icanhazip.com)
-  - `ident` using [https://v4.ident.me](https://v4.ident.me)
-  - `nnev` using [https://ip4.nnev.de](https://ip4.nnev.de)
-  - `wtfismyip` using [https://ipv4.wtfismyip.com/text](https://ipv4.wtfismyip.com/text)
-  - `seeip` using [https://ipv4.seeip.org](https://ipv4.seeip.org)
-  - You can also specify an HTTPS URL with prefix `url:` for example `url:https://ipinfo.io/ip`
-- `PUBLICIPV6_HTTP_PROVIDERS` gets your public IPv6 address only. It can be one or more of the following:
-  - `ipleak` using [https://ipv6.ipleak.net/json](https://ipv6.ipleak.net/json)
-  - `ipify` using [https://api6.ipify.org](https://api6.ipify.org)
-  - `icanhazip` using [https://ipv6.icanhazip.com](https://ipv6.icanhazip.com)
-  - `ident` using [https://v6.ident.me](https://v6.ident.me)
-  - `nnev` using [https://ip6.nnev.de](https://ip6.nnev.de)
-  - `wtfismyip` using [https://ipv6.wtfismyip.com/text](https://ipv6.wtfismyip.com/text)
-  - `seeip` using [https://ipv6.seeip.org](https://ipv6.seeip.org)
-  - You can also specify an HTTPS URL with prefix `url:` for example `url:https://ipinfo.io/ip`
-- `PUBLICIP_DNS_PROVIDERS` gets your public IPv4 address only, IPv6 address only, or one of them. It can be one or more of the following:
-  - `cloudflare`
-  - `opendns`
-
-### Host firewall
-
-If you have a host firewall in place, this container needs the following ports:
-
-- TCP 443 outbound for outbound HTTPS
-- UDP 53 outbound for outbound DNS resolution
-- TCP 8507 inbound (or other) for the WebUI
-
-## Architecture
-
-At program start and every period (5 minutes by default):
-
-1. Fetch your public IP address
-1. For each record:
-    1. DNS resolve it to obtain its current IP address(es)
-        - If the resolution fails, update the record with your public IP address by calling the DNS provider API and finish
-    1. Check if your public IP address is within the resolved IP addresses
-        - Yes: skip the update
-        - No: update the record with your public IP address by calling the DNS provider API
-
-💡 We do DNS resolution every period so it detects a change made to the record manually, for example on the DNS provider web UI
-💡 As DNS resolutions are essentially free and without rate limiting, these are great to avoid getting banned for too many requests.
-
-### Special case: Cloudflare
-
-For Cloudflare records with the `proxied` option, the following is done.
-
-At program start and every period (5 minutes by default), for each record:
-
-1. Fetch your public IP address
-1. For each record:
-    1. Check the last IP address (persisted in `updates.json`) for that record
-        - If it doesn't exist, update the record with your public IP address by calling the DNS provider API and finish
-    1. Check if your public IP address matches the last IP address you updated the record with
-        - Yes: skip the update
-        - No: update the record with your public IP address by calling the DNS provider API
-
-This is the only way as doing a DNS resolution on the record will give the IP address of a Cloudflare server instead of your server.
-
-⚠️ This has the disadvantage that if the record is changed manually, the program will not detect it.
-We could do an API call to get the record IP address every period, but that would get you banned especially with a low period duration.
-
-## Testing
-
-- The automated healthcheck verifies all your records are up to date [using DNS lookups](internal/health/check.go#L42)
-- You can also manually check, by:
-    1. Going to your DNS management webpage
-    1. Setting your record to `127.0.0.1`
-    1. Run the container
-    1. Refresh the DNS management webpage and verify the update happened
-
-## Build the image
-
-You can build the image yourself with:
-
-```sh
-docker build -t ghcr.io/maroishiku/dyniku https://github.com/MaroIshiku/dyniku.git
+```bash
+openssl rand -base64 48 > secrets/setup_secret.txt
+chmod 600 secrets/setup_secret.txt
 ```
 
-You can use optional build arguments with `--build-arg KEY=VALUE` from the table below:
+Starte die App:
 
-| Build argument | Default | Description |
+```bash
+docker compose up -d
+```
+
+Dyniku ist danach standardmaessig unter `http://localhost:8507` erreichbar.
+
+### Erstes Starten
+
+Beim ersten Oeffnen zeigt Dyniku automatisch das Registrierungsfenster fuer den ersten Adminaccount an. Die normale App ist vorher nicht erreichbar.
+
+Die Registrierung ist nur moeglich, wenn das Setup-Secret korrekt eingegeben wird. Bevorzugt liest Dyniku das Secret aus:
+
+```txt
+/run/secrets/ishiku_setup_secret
+```
+
+### Adminaccount erstellen
+
+Im Registrierungsfenster werden benoetigt:
+
+- Setup-Secret aus `secrets/setup_secret.txt`
+- Admin-Benutzername
+- Anzeigename
+- optional E-Mail
+- Admin-Passwort
+- Passwort-Wiederholung
+
+Das Admin-Passwort muss mindestens 12 Zeichen lang sein, darf nicht mit dem Setup-Secret uebereinstimmen und darf kein Platzhalter wie `admin`, `password`, `passwort`, `changeme`, `123456` oder `ishiku` sein.
+
+Nach erfolgreicher Erstellung des ersten Adminaccounts wird die oeffentliche Registrierung geschlossen. Weitere App-Funktionen sind danach nur nach Login erreichbar.
+
+## Konfiguration
+
+### Umgebungsvariablen
+
+| Variable | Beschreibung | Standard |
 | --- | --- | --- |
-| `UID` | `0` | User ID running the container |
-| `GID` | `0` | User group ID running the container |
-| `VERSION` | `unknown` | Version of the program and Docker image |
-| `CREATED` | `an unknown date` | Build date of the program and Docker image |
-| `COMMIT` | `unknown` | Commit hash of the program and Docker image |
+| `TZ` | Zeitzone fuer Logs und Anzeige | leer |
+| `ISHIKU_BASE_PATH` | Basis-Pfad hinter Reverse Proxy | `/` |
+| `ISHIKU_DATA_DIR` | Persistenter Datenpfad im Container | `/data` |
+| `ISHIKU_CONFIG_FILE` | Pfad zur DDNS JSON-Konfiguration | `/data/config.json` |
+| `ISHIKU_LOG_LEVEL` | Log-Level | `info` |
+| `ISHIKU_SETUP_SECRET_FILE` | Pfad zum Docker Secret | `/run/secrets/ishiku_setup_secret` |
+| `ISHIKU_SETUP_SECRET` | Fallback-Secret als ENV, nur wenn kein Secret-File genutzt wird | leer |
+| `LISTENING_ADDRESS` | Interne HTTP-Adresse | `:8507` |
+| `PERIOD` | Update-Intervall | `5m` |
+| `UPDATE_COOLDOWN_PERIOD` | Cooldown zwischen Updates | `5m` |
+| `HTTP_TIMEOUT` | HTTP-Timeout fuer Provider und Public-IP-Abfragen | `10s` |
+| `BACKUP_PERIOD` | Backup-Intervall, `0` deaktiviert Backups | `0` |
+| `ISHIKU_BACKUP_DIRECTORY` | Backup-Zielordner | `/data` |
+| `SHOUTRRR_ADDRESSES` | Optionale [Shoutrrr](https://containrrr.dev/shoutrrr/v0.8/services/overview/) Notification-URLs | leer |
 
-## Development and contributing
+Legacy-Variablen wie `DATADIR`, `CONFIG_FILEPATH`, `ROOT_URL`, `LOG_LEVEL` und `BACKUP_DIRECTORY` werden weiterhin akzeptiert. Die `ISHIKU_*` Namen sind fuer neue Deployments bevorzugt.
 
-- [Contribute with code](.github/CONTRIBUTING.md)
-- [Github workflows to know what's building](https://github.com/MaroIshiku/dyniku/actions)
-- [List of issues and feature requests](https://github.com/MaroIshiku/dyniku/issues)
+### Docker Secrets
 
-## License
+Bevorzugt wird ein Docker/Compose Secret als Datei. In `docker-compose.example.yml` wird dieses Secret nach `/run/secrets/ishiku_setup_secret` gemountet.
 
-This repository is under an [MIT license](LICENSE)
+```yaml
+secrets:
+  ishiku_setup_secret:
+    file: ./secrets/setup_secret.txt
+```
 
-## Used in external projects
+### Persistente Daten
 
-- [Starttoaster/docker-traefik](https://github.com/Starttoaster/docker-traefik#home-networks-extra-credit-dynamic-dns)
+Persistente Daten liegen standardmaessig in:
 
-## Support
+```txt
+/data
+```
 
-Dyniku is maintained at [github.com/MaroIshiku/dyniku](https://github.com/MaroIshiku/dyniku).
+In diesem Ordner liegen unter anderem:
+
+- `config.json` fuer DDNS-Provider
+- `auth.json` fuer den gehashten Adminaccount
+- Update- und Verlaufdaten
+
+Sichere diesen Ordner regelmaessig, wenn Dyniku produktiv genutzt wird.
+
+## Sicherheit
+
+- Das Setup-Secret dient nur zur ersten Admin-Registrierung.
+- Setup-Versuche mit falschem Secret werden rate-limited.
+- Das Admin-Passwort darf nicht dem Setup-Secret entsprechen.
+- Passwoerter werden mit bcrypt gehasht gespeichert.
+- Sessions werden ueber HttpOnly Cookies mit SameSite=Lax verwaltet.
+- Die oeffentliche Registrierung wird nach dem ersten Adminaccount geschlossen.
+- `/healthz` und `/readyz` sind oeffentlich, App- und Config-APIs brauchen Login.
+- Secrets, `.env`, Datenbanken und Logs gehoeren nicht ins Repository.
+
+## Updates und Backup
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+Vor Updates sollte der persistente Datenordner gesichert werden:
+
+```bash
+tar -czf backup-dyniku-$(date +%Y%m%d).tar.gz data
+```
+
+## Entwicklung
+
+```bash
+go test ./...
+go run ./cmd/dyniku
+```
+
+Wichtige lokale URLs:
+
+- Web GUI: `http://localhost:8507`
+- Health: `http://localhost:8507/healthz`
+- Ready: `http://localhost:8507/readyz`
+
+Codex soll bei Aenderungen das gemeinsame Pixel Soft Utility Designsystem beibehalten und keine app-spezifischen UI-Abweichungen einfuehren.
+
+## Erstellt mit ChatGPT Codex
+
+Dieses Projekt wurde mit Unterstuetzung von ChatGPT Codex erstellt bzw. ueberarbeitet. Codex wurde verwendet, um Code, Struktur, UI-Komponenten und Dokumentation nach den Vorgaben der ishiku / Pixel Soft Utility Standards zu generieren.
+
+Die Verantwortung fuer Betrieb, Pruefung, Sicherheit und Veroeffentlichung liegt beim Repository-Betreiber.
+
+## Status und Lizenz
+
+Status: aktiv gepflegtes Self-hosted Utility.
+
+Lizenz: [MIT](LICENSE)

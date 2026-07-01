@@ -73,7 +73,7 @@ func makeStatusRecord(record records.Record) StatusRecord {
 	return StatusRecord{
 		Domain:    record.Provider.Domain(),
 		Owner:     record.Provider.Owner(),
-		Provider:  record.Provider.String(),
+		Provider:  providerDisplayName(record.Provider.String()),
 		IPVersion: record.Provider.IPVersion().String(),
 		Status:    string(record.Status),
 		Message:   record.Message,
@@ -82,6 +82,20 @@ func makeStatusRecord(record records.Record) StatusRecord {
 		CheckedAt: record.Time,
 		History:   history,
 	}
+}
+
+func providerDisplayName(providerString string) string {
+	const marker = "provider:"
+	lower := strings.ToLower(providerString)
+	index := strings.Index(lower, marker)
+	if index == -1 {
+		return providerString
+	}
+	providerName := strings.TrimSpace(providerString[index+len(marker):])
+	if separator := strings.Index(providerName, "|"); separator != -1 {
+		providerName = strings.TrimSpace(providerName[:separator])
+	}
+	return providerName
 }
 
 func readHistoryLog(path string) ([]string, error) {
