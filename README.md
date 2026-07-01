@@ -1,18 +1,15 @@
-# Lightweight universal DDNS Updater program
+# Dyniku
 
 Program to keep DNS A and/or AAAA records updated for multiple DNS providers
 
-<img height="200" alt="DDNS Updater logo" src="https://raw.githubusercontent.com/qdm12/ddns-updater/master/readme/ddnsgopher.svg">
+<img height="200" alt="Dyniku logo" src="internal/server/ui/static/dyniku-logo.png">
 
 [![Build status](https://github.com/qdm12/ddns-updater/actions/workflows/build.yml/badge.svg)](https://github.com/qdm12/ddns-updater/actions/workflows/build.yml)
 
 ![Last release](https://img.shields.io/github/release/qdm12/ddns-updater?label=Last%20release)
 ![Last Docker tag](https://img.shields.io/github/v/release/qdm12/ddns-updater?sort=semver&label=Last%20Docker%20tag)
-[![Last release size](https://img.shields.io/docker/image-size/qmcgaw/ddns-updater?sort=semver&label=Last%20released%20image)](https://hub.docker.com/r/qmcgaw/ddns-updater/tags?page=1&ordering=last_updated)
 ![GitHub last release date](https://img.shields.io/github/release-date/qdm12/ddns-updater?label=Last%20release%20date)
 ![Commits since release](https://img.shields.io/github/commits-since/qdm12/ddns-updater/latest?sort=semver)
-
-[![Latest size](https://img.shields.io/docker/image-size/qmcgaw/ddns-updater/latest?label=Latest%20image)](https://hub.docker.com/r/qmcgaw/ddns-updater/tags)
 
 [![GitHub last commit](https://img.shields.io/github/last-commit/qdm12/ddns-updater.svg)](https://github.com/qdm12/ddns-updater/commits/main)
 [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/qdm12/ddns-updater.svg)](https://github.com/qdm12/ddns-updater/graphs/contributors)
@@ -41,7 +38,7 @@ This readme and the [docs/](docs/) directory are **versioned** to match the prog
 
 ## Features
 
-- Available as a Docker image [`ghcr.io/qdm12/ddns-updater`]((https://github.com/qdm12/ddns-updater/pkgs/container/ddns-updater)) and [`qmcgaw/ddns-updater`](https://hub.docker.com/r/qmcgaw/ddns-updater)
+- Available as a Docker image [`ghcr.io/maroishiku/dyniku`](https://github.com/MaroIshiku/dyniku/pkgs/container/dyniku)
 - Available as [zero-dependency binaries for Linux, Windows and MacOS](https://github.com/qdm12/ddns-updater/releases)
 - 🆕 Available in the AUR as [`ddns-updater`](https://aur.archlinux.org/packages/ddns-updater) - see [#808](https://github.com/qdm12/ddns-updater/discussions/808)
 - Updates periodically A records for different DNS providers:
@@ -185,15 +182,15 @@ This readme and the [docs/](docs/) directory are **versioned** to match the prog
 1. Run the container with
 
     ```sh
-    docker run -d -p 8000:8000/tcp -v "$(pwd)"/data:/updater/data ghcr.io/qdm12/ddns-updater
+    docker run -d -p 8000:8000/tcp -v "$(pwd)"/data:/updater/data ghcr.io/maroishiku/dyniku:latest
     ```
 
 1. The following is **optional**.
     - You can customize the program behavior using [environment variables](#environment-variables)
     - You can use [docker-compose.yml](docker-compose.yml) with `docker-compose up -d`
     - **Kubernetes**: check out the [k8s directory](k8s) for an installation guide and examples.
-    - Other [Docker image tags are available](https://github.com/qdm12/ddns-updater/pkgs/container/ddns-updater)
-    - You can update the image with `docker pull ghcr.io/qdm12/ddns-updater`
+    - Other Docker image tags are available at [ghcr.io/maroishiku/dyniku](https://github.com/MaroIshiku/dyniku/pkgs/container/dyniku)
+    - You can update the image with `docker pull ghcr.io/maroishiku/dyniku:latest`
     - You can set your JSON configuration as a single environment variable line (i.e. `{"settings": [{"provider": "namecheap", ...}]}`), which takes precedence over config.json. Note however that if you don't bind mount the `/updater/data` directory, there won't be a persistent database file `/updater/updates.json` but it will still work.
 
 ## Configuration
@@ -307,7 +304,7 @@ Note that:
 | `LOG_LEVEL` | `info` | Level of logging, `debug`, `info`, `warning` or `error` |
 | `LOG_CALLER` | `hidden` | Show caller per log line, `hidden` or `short` |
 | `SHOUTRRR_ADDRESSES` | | (optional) Comma separated list of [Shoutrrr addresses](https://containrrr.dev/shoutrrr/v0.8/services/overview/) (notification services) |
-| `SHOUTRRR_DEFAULT_TITLE` | `DDNS Updater` | Default title for Shoutrrr notifications |
+| `SHOUTRRR_DEFAULT_TITLE` | `Dyniku` | Default title for Shoutrrr notifications |
 | `TZ` | | Timezone to have accurate times, i.e. `America/Montreal` |
 | `UMASK` | System current umask | Umask to set for the program in octal, i.e. `0022` |
 
@@ -412,7 +409,7 @@ We could do an API call to get the record IP address every period, but that woul
 You can build the image yourself with:
 
 ```sh
-docker build -t ghcr.io/qdm12/ddns-updater https://github.com/qdm12/ddns-updater.git
+docker build -t ghcr.io/maroishiku/dyniku https://github.com/MaroIshiku/dyniku.git
 ```
 
 You can use optional build arguments with `--build-arg KEY=VALUE` from the table below:

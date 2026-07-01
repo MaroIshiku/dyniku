@@ -18,7 +18,7 @@ type Shoutrrr struct {
 
 func (s *Shoutrrr) setDefaults() {
 	s.Addresses = gosettings.DefaultSlice(s.Addresses, []string{})
-	s.DefaultTitle = gosettings.DefaultComparable(s.DefaultTitle, "DDNS Updater")
+	s.DefaultTitle = gosettings.DefaultComparable(s.DefaultTitle, "Dyniku")
 }
 
 func (s Shoutrrr) Validate() (err error) {

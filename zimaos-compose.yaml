@@ -1,9 +1,9 @@
-name: ddns-updater
+name: dyniku
 services:
-  ddns-updater:
-    image: ghcr.io/maroishiku/ish-ddns:latest
-    container_name: ddns-updater
-    hostname: ddns-updater
+  dyniku:
+    image: ghcr.io/maroishiku/dyniku:latest
+    container_name: dyniku
+    hostname: dyniku
     restart: unless-stopped
     ports:
       - target: 8000
@@ -28,21 +28,21 @@ services:
       - TZ=Europe/Berlin
     volumes:
       - type: bind
-        source: /DATA/AppData/ddns-updater/data
+        source: /DATA/AppData/dyniku/data
         target: /updater/data
     labels:
-      icon: https://raw.githubusercontent.com/MaroIshiku/ish-DDNS/main/internal/server/ui/static/favicon.svg
-      title.en_us: DDNS Updater
+      icon: https://raw.githubusercontent.com/MaroIshiku/dyniku/main/internal/server/ui/static/dyniku-logo.png
+      title.en_us: Dyniku
 x-casaos:
   author: self
   category: self
   hostname: ""
-  icon: https://raw.githubusercontent.com/MaroIshiku/ish-DDNS/main/internal/server/ui/static/favicon.svg
+  icon: https://raw.githubusercontent.com/MaroIshiku/dyniku/main/internal/server/ui/static/dyniku-logo.png
   index: /
   is_uncontrolled: false
   port_map: "8004"
   scheme: http
-  store_app_id: ddns-updater
+  store_app_id: dyniku
   title:
-    custom: DDNS Updater
-    en_us: DDNS Updater
+    custom: Dyniku
+    en_us: Dyniku

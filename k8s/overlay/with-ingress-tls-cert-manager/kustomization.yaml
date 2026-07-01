@@ -15,4 +15,4 @@ patches:
         value: localhost # add your fqdn
     target:
       kind: Ingress
-      name: ddns-updater
+      name: dyniku

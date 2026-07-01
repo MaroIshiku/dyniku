@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: ddns-updater
+  name: dyniku
 spec:
   rules:
     - host: localhost
@@ -11,6 +11,6 @@ spec:
             pathType: ImplementationSpecific
             backend:
               service:
-                name: ddns-updater
+                name: dyniku
                 port:
                   name: http

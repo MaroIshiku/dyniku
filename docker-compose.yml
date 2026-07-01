@@ -1,7 +1,7 @@
 services:
-  ddns-updater:
-    image: ghcr.io/maroishiku/ish-ddns:latest
-    container_name: ddns-updater
+  dyniku:
+    image: ghcr.io/maroishiku/dyniku:latest
+    container_name: dyniku
     network_mode: bridge
     ports:
       - 8000:8000/tcp

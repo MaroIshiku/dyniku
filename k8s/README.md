@@ -7,10 +7,10 @@ The Manifests have additional [Kustomize](https://kustomize.io/) overlays, which
 1. Download the template files from the [`base` directory](base). For example with:
 
     ```sh
-    curl -O https://raw.githubusercontent.com/qdm12/ddns-updater/master/k8s/base/deployment.yaml
-    curl -O https://raw.githubusercontent.com/qdm12/ddns-updater/master/k8s/base/secret-config.yaml
-    curl -O https://raw.githubusercontent.com/qdm12/ddns-updater/master/k8s/base/service.yaml
-    curl -O https://raw.githubusercontent.com/qdm12/ddns-updater/master/k8s/base/kustomization.yaml
+    curl -O https://raw.githubusercontent.com/MaroIshiku/dyniku/main/k8s/base/deployment.yaml
+    curl -O https://raw.githubusercontent.com/MaroIshiku/dyniku/main/k8s/base/secret-config.yaml
+    curl -O https://raw.githubusercontent.com/MaroIshiku/dyniku/main/k8s/base/service.yaml
+    curl -O https://raw.githubusercontent.com/MaroIshiku/dyniku/main/k8s/base/kustomization.yaml
     ```
 
 1. Modify `secret-config.yaml` as described in the [project readme](../README.md#configuration)
@@ -23,7 +23,7 @@ The Manifests have additional [Kustomize](https://kustomize.io/) overlays, which
 1. Connect the the web UI with a [kubectl port-forward](https://kubernetes.io/docs/tasks/access-application-cluster/port-forward-access-application-cluster/)
 
     ```sh
-    kubectl port-forward svc/ddns-updater 8080:80
+    kubectl port-forward svc/dyniku 8080:80
     ```
 
 The web UI should now be available at [http://localhost:8080](http://localhost:8080).

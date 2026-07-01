@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ddns-updater
+  name: dyniku
   labels:
-    app: ddns-updater
+    app: dyniku
 spec:
   selector:
     matchLabels:
-      app: ddns-updater
+      app: dyniku
   template:
     metadata:
       labels:
-        app: ddns-updater
+        app: dyniku
     spec:
       containers:
-        - name: ddns
-          image: ghcr.io/qdm12/ddns-updater:latest
+        - name: dyniku
+          image: ghcr.io/maroishiku/dyniku:latest
           envFrom:
             - secretRef:
-                name: ddns-updater-config
+                name: dyniku-config
           ports:
             - containerPort: 8000
