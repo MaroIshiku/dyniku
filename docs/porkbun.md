@@ -40,7 +40,7 @@
 
 ## Record creation
 
-In case you don't have an A or AAAA record for your host and domain combination, it will be created by DDNS-Updater.
+In case you don't have an A or AAAA record for your host and domain combination, it will be created by Dyniku.
 
 Porkbun creates default DNS entries for new domains, which can conflict with creating a root or wildcard A/AAAA record. Therefore, dyniku automatically removes any conflicting default record before creating records, as described in the table below:
 
@@ -49,4 +49,4 @@ Porkbun creates default DNS entries for new domains, which can conflict with cre
 | `ALIAS` | `@` | pixie.porkbun.com | Creating A or AAAA record for the root domain **or** wildcard domain |
 | `CNAME` | `*` | pixie.porkbun.com | Creating A or AAAA record for the wildcard domain |
 
-More details is in [this comment by @everydaycombat](https://github.com/MaroIshiku/dyniku/issues/546#issuecomment-1773960193).
+This keeps Dyniku-created root and wildcard records from conflicting with Porkbun's default DNS entries.

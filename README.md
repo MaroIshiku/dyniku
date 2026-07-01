@@ -24,23 +24,14 @@ Program to keep DNS A and/or AAAA records updated for multiple DNS providers
 [![MIT](https://img.shields.io/github/license/MaroIshiku/dyniku)](LICENSE)
 ![Visitors count](https://visitor-badge.laobi.icu/badge?page_id=dyniku.readme)
 
-## Versioned documentation
+## Documentation
 
-This readme and the [docs/](docs/) directory are **versioned** to match the program version:
-
-| Version | Readme link | Docs link |
-| --- | --- | --- |
-| Latest | [README](https://github.com/MaroIshiku/dyniku/blob/main/README.md) | [docs/](https://github.com/MaroIshiku/dyniku/tree/main/docs) |
-| `v2.8` | [README](https://github.com/MaroIshiku/dyniku/blob/v2.8.0/README.md) | [docs/](https://github.com/MaroIshiku/dyniku/blob/v2.8.0/docs) |
-| `v2.7` | [README](https://github.com/MaroIshiku/dyniku/blob/v2.7.1/README.md) | [docs/](https://github.com/MaroIshiku/dyniku/blob/v2.7.1/docs) |
-| `v2.6` | [README](https://github.com/MaroIshiku/dyniku/blob/v2.6.1/README.md) | [docs/](https://github.com/MaroIshiku/dyniku/blob/v2.6.1/docs) |
-| `v2.5` | [README](https://github.com/MaroIshiku/dyniku/blob/v2.5.0/README.md) | [docs/](https://github.com/MaroIshiku/dyniku/blob/v2.5.0/docs) |
+This readme and the [docs/](docs/) directory describe the current Dyniku build.
 
 ## Features
 
 - Available as a Docker image [`ghcr.io/maroishiku/dyniku`](https://github.com/MaroIshiku/dyniku/pkgs/container/dyniku)
 - Available as [zero-dependency binaries for Linux, Windows and MacOS](https://github.com/MaroIshiku/dyniku/releases)
-- 🆕 Available in the AUR as [`dyniku`](https://aur.archlinux.org/packages/dyniku) - see [#808](https://github.com/MaroIshiku/dyniku/discussions/808)
 - Updates periodically A records for different DNS providers:
   - Aliyun
   - AllInkl
@@ -140,27 +131,22 @@ This readme and the [docs/](docs/) directory are **versioned** to match the prog
 
 ### Container
 
-[➡️ Qnap guide by @Araminta](https://github.com/MaroIshiku/dyniku/issues/708)
-
 1. Create a directory, for example, *data* which is:
     - writable by the Dyniku container user
     - has user read+write+execute permissions
 
     ```sh
     mkdir data
-    chown 1000 data
     chmod u+r+w+x data
     ```
 
     Dyniku runs as root by default for better compatibility with NAS and ZimaOS bind mounts. If you want to use another user ID, [build the image yourself](#build-the-image) with `--build-arg UID=<your-uid> --build-arg GID=<your-gid>`.
 
-1. Similarly, create a *data/config.json* file which is:
-    - owned by user id `1000`
-    - has user read permissions
+1. Similarly, create a *data/config.json* file with user read and write permissions.
 
     ```sh
     touch data/config.json
-    chmod u+r data/config.json
+    chmod u+rw data/config.json
     ```
 
 1. Edit *data/config.json*, for example:
@@ -295,12 +281,12 @@ Note that:
 | `ROOT_URL` | `/` | URL path to append to all paths to the webUI (i.e. `/ddns` for accessing `https://example.com/ddns` through a proxy) |
 | `HEALTH_SERVER_ADDRESS` | `127.0.0.1:9999` | Health server listening address |
 | `HEALTH_HEALTHCHECKSIO_BASE_URL` | `https://hc-ping.com` | Base URL for the [healthchecks.io](https://healthchecks.io) server |
-| `HEALTH_HEALTHCHECKSIO_UUID` | | UUID to idenfity with the [healthchecks.io](https://healthchecks.io) server |
+| `HEALTH_HEALTHCHECKSIO_UUID` | | UUID to identify with the [healthchecks.io](https://healthchecks.io) server |
 | `DATADIR` | `/updater/data` | Directory to read and write data files from internally |
 | `CONFIG_FILEPATH` | `/updater/data/config.json` | Path to the JSON configuration file |
 | `BACKUP_PERIOD` | `0` | Set to a period (i.e. `72h15m`) to enable zip backups of data/config.json and data/updates.json in a zip file |
 | `BACKUP_DIRECTORY` | `/updater/data` | Directory to write backup zip files to if `BACKUP_PERIOD` is not `0`. |
-| `RESOLVER_ADDRESS` | Your network DNS | A plaintext DNS address to use to resolve your domain names defined in your settings only. For example it can be `1.1.1.1:53`. This is useful for split dns, see [#389](https://github.com/MaroIshiku/dyniku/issues/389) |
+| `RESOLVER_ADDRESS` | Your network DNS | A plaintext DNS address to use to resolve your domain names defined in your settings only. For example it can be `1.1.1.1:53`. This is useful for split DNS setups. |
 | `LOG_LEVEL` | `info` | Level of logging, `debug`, `info`, `warning` or `error` |
 | `LOG_CALLER` | `hidden` | Show caller per log line, `hidden` or `short` |
 | `SHOUTRRR_ADDRESSES` | | (optional) Comma separated list of [Shoutrrr addresses](https://containrrr.dev/shoutrrr/v0.8/services/overview/) (notification services) |
@@ -349,7 +335,7 @@ You can otherwise customize it with the following:
   - `wtfismyip` using [https://ipv6.wtfismyip.com/text](https://ipv6.wtfismyip.com/text)
   - `seeip` using [https://ipv6.seeip.org](https://ipv6.seeip.org)
   - You can also specify an HTTPS URL with prefix `url:` for example `url:https://ipinfo.io/ip`
-- `PUBLICIP_DNS_PROVIDERS` gets your public IPv4 address only or IPv6 address only or one of them (see [#136](https://github.com/MaroIshiku/dyniku/issues/136)). It can be one or more of the following:
+- `PUBLICIP_DNS_PROVIDERS` gets your public IPv4 address only, IPv6 address only, or one of them. It can be one or more of the following:
   - `cloudflare`
   - `opendns`
 
@@ -439,5 +425,3 @@ This repository is under an [MIT license](LICENSE)
 ## Support
 
 Dyniku is maintained at [github.com/MaroIshiku/dyniku](https://github.com/MaroIshiku/dyniku).
-
-Many thanks to J. Famiglietti for supporting me financially 🥇👍
