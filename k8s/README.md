@@ -23,10 +23,10 @@ The Manifests have additional [Kustomize](https://kustomize.io/) overlays, which
 1. Connect the the web UI with a [kubectl port-forward](https://kubernetes.io/docs/tasks/access-application-cluster/port-forward-access-application-cluster/)
 
     ```sh
-    kubectl port-forward svc/dyniku 8080:80
+    kubectl port-forward svc/dyniku 8507:80
     ```
 
-The web UI should now be available at [http://localhost:8080](http://localhost:8080).
+The web UI should now be available at [http://localhost:8507](http://localhost:8507).
 
 ## Advanced usage
 

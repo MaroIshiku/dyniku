@@ -25,7 +25,7 @@
       "pattern": "https://(ip|ipv|v)6.+"
     },
     {
-      "pattern": "https://github.com/qdm12/ddns-updater/pkgs/container/ddns-updater"
+      "pattern": "https://github.com/MaroIshiku/dyniku/pkgs/container/dyniku"
     },
     {
       "pattern": "^https://www.duckdns.org/$"

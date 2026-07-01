@@ -182,7 +182,7 @@ This readme and the [docs/](docs/) directory are **versioned** to match the prog
 1. Run the container with
 
     ```sh
-    docker run -d -p 8000:8000/tcp -v "$(pwd)"/data:/updater/data ghcr.io/maroishiku/dyniku:latest
+    docker run -d -p 8507:8507/tcp -v "$(pwd)"/data:/updater/data ghcr.io/maroishiku/dyniku:latest
     ```
 
 1. The following is **optional**.
@@ -291,7 +291,7 @@ Note that:
 | `UPDATE_COOLDOWN_PERIOD` | `5m` | Duration to cooldown between updates for each record. This is useful to avoid being rate limited or banned. |
 | `HTTP_TIMEOUT` | `10s` | Timeout for all HTTP requests |
 | `SERVER_ENABLED` | `yes` | Enable the web server and web UI |
-| `LISTENING_ADDRESS` | `:8000` | Internal TCP listening port for the web UI |
+| `LISTENING_ADDRESS` | `:8507` | Internal TCP listening port for the web UI |
 | `ROOT_URL` | `/` | URL path to append to all paths to the webUI (i.e. `/ddns` for accessing `https://example.com/ddns` through a proxy) |
 | `HEALTH_SERVER_ADDRESS` | `127.0.0.1:9999` | Health server listening address |
 | `HEALTH_HEALTHCHECKSIO_BASE_URL` | `https://hc-ping.com` | Base URL for the [healthchecks.io](https://healthchecks.io) server |
@@ -359,7 +359,7 @@ If you have a host firewall in place, this container needs the following ports:
 
 - TCP 443 outbound for outbound HTTPS
 - UDP 53 outbound for outbound DNS resolution
-- TCP 8000 inbound (or other) for the WebUI
+- TCP 8507 inbound (or other) for the WebUI
 
 ## Architecture
 

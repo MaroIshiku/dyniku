@@ -10,11 +10,11 @@
 
 ## Submitting a pull request
 
-1. [Fork](https://github.com/qdm12/ddns-updater/fork) and clone the repository
+1. [Fork](https://github.com/MaroIshiku/dyniku/fork) and clone the repository
 1. Create a new branch `git checkout -b my-branch-name`
 1. Modify the code
 1. Commit your modifications
-1. Push to your fork and [submit a pull request](https://github.com/qdm12/ddns-updater/compare)
+1. Push to your fork and [submit a pull request](https://github.com/MaroIshiku/dyniku/compare)
 
 Additional resources:
 
@@ -51,8 +51,8 @@ You might want to use an editor such as [Visual Studio Code](https://code.visual
 - Test the code: `go test ./...`
 - Lint the code `golangci-lint run`
 - Build the program: `go build -o app cmd/ddns-updater/main.go`
-- Build the Docker image (tests and lint included): `docker build -t ghcr.io/qdm12/ddns-updater .`
-- Run the Docker container: `docker run -it --rm -v /yourpath/data:/updater/data ghcr.io/qdm12/ddns-updater`
+- Build the Docker image (tests and lint included): `docker build -t ghcr.io/maroishiku/dyniku .`
+- Run the Docker container: `docker run -it --rm -v /yourpath/data:/updater/data ghcr.io/maroishiku/dyniku`
 
 ## Add a new DNS provider
 
@@ -85,7 +85,7 @@ In more detailed steps:
     1. Add your provider name to the  list of providers supported `- Your provider`
     1. Add your provider name and link to its document to the second list: `- [Your provider](docs/yourprovider.md)`
 1. Make sure to run the actual program (in Docker or directly) and check it updates your DNS records as expected, of course 😉 You can do this by setting a record to `127.0.0.1` manually and then run the updater to see if the update succeeds.
-1. Profit 🎉 Don't forget to [open a pull request](https://github.com/qdm12/ddns-updater/compare)
+1. Profit 🎉 Don't forget to [open a pull request](https://github.com/MaroIshiku/dyniku/compare)
 
 ## License
 

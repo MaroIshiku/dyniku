@@ -4,7 +4,7 @@ services:
     container_name: dyniku
     network_mode: bridge
     ports:
-      - 8000:8000/tcp
+      - 8507:8507/tcp
     volumes:
       - ./data:/updater/data
     environment:
@@ -20,7 +20,7 @@ services:
       - HTTP_TIMEOUT=10s
 
       # Web UI
-      - LISTENING_ADDRESS=:8000
+      - LISTENING_ADDRESS=:8507
       - ROOT_URL=/
 
       # Backup

@@ -2,7 +2,7 @@ name: No trigger file paths
 on:
   push:
     branches:
-      - master
+      - main
     paths-ignore:
       - .github/workflows/build.yml
       - cmd/**

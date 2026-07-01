@@ -6,14 +6,14 @@ services:
     hostname: dyniku
     restart: unless-stopped
     ports:
-      - target: 8000
-        published: "8004"
+      - target: 8507
+        published: "8507"
         protocol: tcp
     environment:
       - BACKUP_DIRECTORY=/updater/data
       - BACKUP_PERIOD=0
       - HTTP_TIMEOUT=10s
-      - LISTENING_ADDRESS=:8000
+      - LISTENING_ADDRESS=:8507
       - LOG_CALLER=hidden
       - LOG_LEVEL=info
       - PERIOD=5m
@@ -40,7 +40,7 @@ x-casaos:
   icon: https://raw.githubusercontent.com/MaroIshiku/dyniku/main/internal/server/ui/static/dyniku-logo.png
   index: /
   is_uncontrolled: false
-  port_map: "8004"
+  port_map: "8507"
   scheme: http
   store_app_id: dyniku
   title:
