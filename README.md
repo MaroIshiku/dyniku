@@ -1,8 +1,8 @@
 # Dyniku
 
-DDNS-Updater Web GUI
+DDNS updater web GUI
 
-> Dyniku ist eine self-hosted Weboberflaeche zum Verwalten, Speichern und Ueberwachen dynamischer DNS-Updates.
+> Dyniku is a self-hosted web interface for managing, storing, and monitoring dynamic DNS updates.
 
 [![Build status](https://github.com/MaroIshiku/dyniku/actions/workflows/build.yml/badge.svg)](https://github.com/MaroIshiku/dyniku/actions/workflows/build.yml)
 [![MIT](https://img.shields.io/github/license/MaroIshiku/dyniku)](LICENSE)
@@ -10,190 +10,189 @@ DDNS-Updater Web GUI
 
 <img height="160" alt="Dyniku logo" src="internal/server/ui/static/dyniku-logo.png">
 
-## Kurzbeschreibung
+## Summary
 
-Dyniku ist eine self-hosted Web-App aus der ishiku-Familie. Sie verbindet den bewaehrten DDNS-Updater-Kern mit einer Pixel Soft Utility Web GUI fuer Status, Konfiguration und IP-Verlauf.
+Dyniku is a self-hosted web app from the ishiku family. It combines the proven DDNS updater core with a Pixel Soft Utility web GUI for status, configuration, and IP history.
 
-Die App ist fuer private oder kleine eigene Deployments gedacht. Der erste Start ist durch ein Setup-Secret geschuetzt und legt genau einen initialen Adminaccount an.
+The app is designed for private or small personal deployments. The first start is protected by a setup secret and creates exactly one initial admin account.
 
-## Teil der ishiku-Familie
+## Part of the ishiku Family
 
-Dyniku verwendet die gemeinsame ishiku Oberflaeche:
+Dyniku uses the shared ishiku interface:
 
-- ruhige, abgerundete Pixel-Soft-Utility-Komponenten
-- sechs gemeinsame Themes: Lavender, Mint, Sky, Amber, Rose und Graphite
-- Light, Dark und System Mode
-- einheitlicher AppHeader, Profil-, Settings-, About- und Admin-Bereiche
-- einheitliches First-Run-Setup fuer den ersten Adminaccount
+- calm, rounded Pixel Soft Utility components
+- six shared themes: Lavender, Mint, Sky, Amber, Rose, and Graphite
+- Light, Dark, and System modes
+- consistent AppHeader, profile, settings, About, and Admin areas
+- consistent first-run setup for the first admin account
 
-Die App soll sich bewusst wie Teil einer gemeinsamen Suite anfuehlen, nicht wie eine separate Marke mit eigener Designsprache.
+The app is intentionally meant to feel like part of a shared suite, not like a separate brand with its own design language.
 
-## Funktionen
+## Features
 
-- Web GUI fuer DDNS-Status, Provider-Konfiguration und Public-IP-Verlauf
-- First-Run-Setup mit Setup-Secret und Adminaccount
-- Login mit HttpOnly Session-Cookie
-- Passwort-Hashing mit bcrypt, keine Klartext-Passwoerter
-- Unterstuetzung vieler DNS-Provider, unter anderem Cloudflare, DuckDNS, Dynu, Hetzner, IONOS, Netcup, OVH, Porkbun, Route53, Strato und weitere
-- Manuelles "Update now" und periodische Updates
-- JSON-Konfiguration in einem persistenten Datenordner
-- Docker-Image fuer `amd64`, `arm64` und weitere Plattformen
-- Healthcheck fuer Containerbetrieb
+- Web GUI for DDNS status, provider configuration, and public IP history
+- First-run setup with setup secret and admin account
+- Login with HttpOnly session cookie
+- Password hashing with bcrypt, no plaintext passwords
+- Support for many DNS providers, including Cloudflare, DuckDNS, Dynu, Hetzner, IONOS, Netcup, OVH, Porkbun, Route53, Strato, and more
+- Manual "Update now" and periodic updates
+- JSON configuration in a persistent data folder
+- Docker image for `amd64`, `arm64`, and other platforms
+- Health check for container operation
 
 ## Tech Stack
 
-- Frontend: Vanilla HTML, CSS und JavaScript mit Pixel Soft Utility Designsystem
+- Frontend: vanilla HTML, CSS, and JavaScript with the Pixel Soft Utility design system
 - Backend: Go
-- Datenhaltung: JSON-Dateien im persistenten Datenordner
+- Storage: JSON files in the persistent data folder
 - Deployment: Docker / Docker Compose
 
 ## Installation
 
 ### Docker Compose
 
-```bash
-mkdir -p dyniku/secrets dyniku/data
-cd dyniku
-cp docker-compose.example.yml docker-compose.yml
-cp .env.example .env
-```
-
-Lege anschliessend ein langes zufaelliges Setup-Secret an:
+Create the persistent host folders on ZimaOS or your Docker host:
 
 ```bash
-openssl rand -base64 48 > secrets/setup_secret.txt
-chmod 600 secrets/setup_secret.txt
+mkdir -p /DATA/AppData/dyniku/data /DATA/AppData/dyniku/secrets
 ```
 
-Starte die App:
+Create a long random setup secret:
+
+```bash
+openssl rand -base64 48 > /DATA/AppData/dyniku/secrets/setup_secret.txt
+chmod 600 /DATA/AppData/dyniku/secrets/setup_secret.txt
+```
+
+Start the app:
 
 ```bash
 docker compose up -d
 ```
 
-Dyniku ist danach standardmaessig unter `http://localhost:8507` erreichbar.
+Dyniku is then available by default at `http://localhost:8507`.
 
-### Erstes Starten
+### First Start
 
-Beim ersten Oeffnen zeigt Dyniku automatisch das Registrierungsfenster fuer den ersten Adminaccount an. Die normale App ist vorher nicht erreichbar.
+On first open, Dyniku automatically shows the registration window for the first admin account. The normal app is not available before that account has been created.
 
-Die Registrierung ist nur moeglich, wenn das Setup-Secret korrekt eingegeben wird. Bevorzugt liest Dyniku das Secret aus:
+Registration is only possible when the setup secret is entered correctly. Dyniku prefers to read the secret from:
 
-```txt
+```text
 /run/secrets/ishiku_setup_secret
 ```
 
-### Adminaccount erstellen
+### Create the Admin Account
 
-Im Registrierungsfenster werden benoetigt:
+The registration window requires:
 
-- Setup-Secret aus `secrets/setup_secret.txt`
-- Admin-Benutzername
-- Anzeigename
-- optional E-Mail
-- Admin-Passwort
-- Passwort-Wiederholung
+- setup secret from `/DATA/AppData/dyniku/secrets/setup_secret.txt`
+- admin username
+- display name
+- optional email
+- admin password
+- password confirmation
 
-Das Admin-Passwort muss mindestens 12 Zeichen lang sein, darf nicht mit dem Setup-Secret uebereinstimmen und darf kein Platzhalter wie `admin`, `password`, `passwort`, `changeme`, `123456` oder `ishiku` sein.
+The admin password must be at least 12 characters long, must not match the setup secret, and must not be a placeholder such as `admin`, `password`, `passwort`, `changeme`, `123456`, or `ishiku`.
 
-Nach erfolgreicher Erstellung des ersten Adminaccounts wird die oeffentliche Registrierung geschlossen. Weitere App-Funktionen sind danach nur nach Login erreichbar.
+After the first admin account is created successfully, public registration is closed. Further app functions require login.
 
-## Konfiguration
+## Configuration
 
-### Umgebungsvariablen
+### Environment Variables
 
-| Variable | Beschreibung | Standard |
+| Variable | Description | Default |
 | --- | --- | --- |
-| `TZ` | Zeitzone fuer Logs und Anzeige | leer |
-| `ISHIKU_BASE_PATH` | Basis-Pfad hinter Reverse Proxy | `/` |
-| `ISHIKU_DATA_DIR` | Persistenter Datenpfad im Container | `/data` |
-| `ISHIKU_CONFIG_FILE` | Pfad zur DDNS JSON-Konfiguration | `/data/config.json` |
-| `ISHIKU_LOG_LEVEL` | Log-Level | `info` |
-| `ISHIKU_SETUP_SECRET_FILE` | Pfad zum Docker Secret | `/run/secrets/ishiku_setup_secret` |
-| `ISHIKU_SETUP_SECRET` | Fallback-Secret als ENV, nur wenn kein Secret-File genutzt wird | leer |
-| `LISTENING_ADDRESS` | Interne HTTP-Adresse | `:8507` |
-| `PERIOD` | Update-Intervall | `5m` |
-| `UPDATE_COOLDOWN_PERIOD` | Cooldown zwischen Updates | `5m` |
-| `HTTP_TIMEOUT` | HTTP-Timeout fuer Provider und Public-IP-Abfragen | `10s` |
-| `BACKUP_PERIOD` | Backup-Intervall, `0` deaktiviert Backups | `0` |
-| `ISHIKU_BACKUP_DIRECTORY` | Backup-Zielordner | `/data` |
-| `SHOUTRRR_ADDRESSES` | Optionale [Shoutrrr](https://containrrr.dev/shoutrrr/v0.8/services/overview/) Notification-URLs | leer |
+| `TZ` | Time zone for logs and display | empty |
+| `ISHIKU_BASE_PATH` | Base path behind a reverse proxy | `/` |
+| `ISHIKU_DATA_DIR` | Persistent data path in the container | `/data` |
+| `ISHIKU_CONFIG_FILE` | DDNS JSON configuration path | `/data/config.json` |
+| `ISHIKU_LOG_LEVEL` | Log level | `info` |
+| `ISHIKU_SETUP_SECRET_FILE` | Path to the Docker secret | `/run/secrets/ishiku_setup_secret` |
+| `ISHIKU_SETUP_SECRET` | Fallback secret as an environment variable, used only when no secret file is configured | empty |
+| `LISTENING_ADDRESS` | Internal HTTP address | `:8507` |
+| `PERIOD` | Update interval | `5m` |
+| `UPDATE_COOLDOWN_PERIOD` | Cooldown between updates | `5m` |
+| `HTTP_TIMEOUT` | HTTP timeout for provider and public IP requests | `10s` |
+| `BACKUP_PERIOD` | Backup interval, `0` disables backups | `0` |
+| `ISHIKU_BACKUP_DIRECTORY` | Backup target folder | `/data` |
+| `SHOUTRRR_ADDRESSES` | Optional [Shoutrrr](https://containrrr.dev/shoutrrr/v0.8/services/overview/) notification URLs | empty |
 
-Legacy-Variablen wie `DATADIR`, `CONFIG_FILEPATH`, `ROOT_URL`, `LOG_LEVEL` und `BACKUP_DIRECTORY` werden weiterhin akzeptiert. Die `ISHIKU_*` Namen sind fuer neue Deployments bevorzugt.
+Legacy variables such as `DATADIR`, `CONFIG_FILEPATH`, `ROOT_URL`, `LOG_LEVEL`, and `BACKUP_DIRECTORY` are still accepted. The `ISHIKU_*` names are preferred for new deployments.
 
 ### Docker Secrets
 
-Bevorzugt wird ein Docker/Compose Secret als Datei. In `docker-compose.example.yml` wird dieses Secret nach `/run/secrets/ishiku_setup_secret` gemountet.
+A Docker/Compose secret file is preferred. In `docker-compose.example.yml`, this secret is mounted to `/run/secrets/ishiku_setup_secret`.
 
 ```yaml
 secrets:
   ishiku_setup_secret:
-    file: ./secrets/setup_secret.txt
+    file: /DATA/AppData/dyniku/secrets/setup_secret.txt
 ```
 
-### Persistente Daten
+### Persistent Data
 
-Persistente Daten liegen standardmaessig in:
+Persistent data is stored by default in:
 
-```txt
-/data
+```text
+/DATA/AppData/dyniku/data
 ```
 
-In diesem Ordner liegen unter anderem:
+This folder contains, among other files:
 
-- `config.json` fuer DDNS-Provider
-- `auth.json` fuer den gehashten Adminaccount
-- Update- und Verlaufdaten
+- `config.json` for DDNS providers
+- `auth.json` for the hashed admin account
+- update and history data
 
-Sichere diesen Ordner regelmaessig, wenn Dyniku produktiv genutzt wird.
+Back up this folder regularly when Dyniku is used in production.
 
-## Sicherheit
+## Security
 
-- Das Setup-Secret dient nur zur ersten Admin-Registrierung.
-- Setup-Versuche mit falschem Secret werden rate-limited.
-- Das Admin-Passwort darf nicht dem Setup-Secret entsprechen.
-- Passwoerter werden mit bcrypt gehasht gespeichert.
-- Sessions werden ueber HttpOnly Cookies mit SameSite=Lax verwaltet.
-- Die oeffentliche Registrierung wird nach dem ersten Adminaccount geschlossen.
-- `/healthz` und `/readyz` sind oeffentlich, App- und Config-APIs brauchen Login.
-- Secrets, `.env`, Datenbanken und Logs gehoeren nicht ins Repository.
+- The setup secret is only used for the first admin registration.
+- Setup attempts with a wrong secret are rate-limited.
+- The admin password must not match the setup secret.
+- Passwords are stored with bcrypt hashes.
+- Sessions are handled through HttpOnly cookies with SameSite=Lax.
+- Public registration is closed after the first admin account.
+- `/healthz` and `/readyz` are public; app and config APIs require login.
+- Secrets, `.env`, databases, and logs do not belong in the repository.
 
-## Updates und Backup
+## Updates and Backup
 
 ```bash
 docker compose pull
 docker compose up -d
 ```
 
-Vor Updates sollte der persistente Datenordner gesichert werden:
+Back up the persistent data folder before updates:
 
 ```bash
-tar -czf backup-dyniku-$(date +%Y%m%d).tar.gz data
+tar -czf backup-dyniku-$(date +%Y%m%d).tar.gz /DATA/AppData/dyniku
 ```
 
-## Entwicklung
+## Development
 
 ```bash
 go test ./...
 go run ./cmd/dyniku
 ```
 
-Wichtige lokale URLs:
+Important local URLs:
 
 - Web GUI: `http://localhost:8507`
 - Health: `http://localhost:8507/healthz`
 - Ready: `http://localhost:8507/readyz`
 
-Codex soll bei Aenderungen das gemeinsame Pixel Soft Utility Designsystem beibehalten und keine app-spezifischen UI-Abweichungen einfuehren.
+When making changes, keep the shared Pixel Soft Utility design system intact and avoid app-specific UI deviations.
 
-## Erstellt mit ChatGPT Codex
+## Created with ChatGPT Codex
 
-Dieses Projekt wurde mit Unterstuetzung von ChatGPT Codex erstellt bzw. ueberarbeitet. Codex wurde verwendet, um Code, Struktur, UI-Komponenten und Dokumentation nach den Vorgaben der ishiku / Pixel Soft Utility Standards zu generieren.
+This project was created and revised with support from ChatGPT Codex. Codex was used to generate and refine code, structure, UI components, and documentation according to the ishiku / Pixel Soft Utility standards.
 
-Die Verantwortung fuer Betrieb, Pruefung, Sicherheit und Veroeffentlichung liegt beim Repository-Betreiber.
+Responsibility for operation, review, security, and publication remains with the repository owner.
 
-## Status und Lizenz
+## Status and License
 
-Status: aktiv gepflegtes Self-hosted Utility.
+Status: actively maintained self-hosted utility.
 
-Lizenz: [MIT](LICENSE)
+License: [MIT](LICENSE)

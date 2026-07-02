@@ -10,7 +10,9 @@ services:
       - path: .env
         required: false
     volumes:
-      - ./data:/data
+      - type: bind
+        source: /DATA/AppData/dyniku/data
+        target: /data
     secrets:
       - ishiku_setup_secret
     environment:
@@ -24,4 +26,4 @@ services:
 
 secrets:
   ishiku_setup_secret:
-    file: ./secrets/setup_secret.txt
+    file: /DATA/AppData/dyniku/secrets/setup_secret.txt

@@ -12,7 +12,9 @@ services:
     environment:
       ISHIKU_SETUP_SECRET_FILE: /run/secrets/ishiku_setup_secret
     volumes:
-      - ./data:/data
+      - type: bind
+        source: /DATA/AppData/dyniku/data
+        target: /data
     secrets:
       - ishiku_setup_secret
     healthcheck:
@@ -24,4 +26,4 @@ services:
 
 secrets:
   ishiku_setup_secret:
-    file: ./secrets/setup_secret.txt
+    file: /DATA/AppData/dyniku/secrets/setup_secret.txt
