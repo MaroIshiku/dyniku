@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	"net/http"
 	"net/netip"
@@ -59,6 +60,8 @@ func New(data json.RawMessage, domain, owner string,
 
 type flexibleString string
 
+var errFlexibleStringType = stderrors.New("expected string or number")
+
 func (s *flexibleString) UnmarshalJSON(data []byte) error {
 	data = bytes.TrimSpace(data)
 	if bytes.Equal(data, []byte("null")) {
@@ -80,7 +83,7 @@ func (s *flexibleString) UnmarshalJSON(data []byte) error {
 		return nil
 	}
 
-	return fmt.Errorf("expected string or number")
+	return errFlexibleStringType
 }
 
 func validateSettings(domain, customerNumber, apiKey, password string) (err error) {
