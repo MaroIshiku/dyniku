@@ -360,14 +360,57 @@ func (a *authService) loadLocked() (authFile, error) {
 	data, err := os.ReadFile(a.path)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			return authFile{}, errAuthNotFound
+			return a.loadLegacyAuthLocked()
 		}
 		return authFile{}, fmt.Errorf("reading auth state: %w", err)
 	}
 
+	return parseAuthFile(data, a.path)
+}
+
+func (a *authService) loadLegacyAuthLocked() (authFile, error) {
+	for _, legacyPath := range a.legacyAuthPaths() {
+		data, err := os.ReadFile(legacyPath)
+		if err != nil {
+			if errors.Is(err, os.ErrNotExist) {
+				continue
+			}
+			return authFile{}, fmt.Errorf("reading legacy auth state %s: %w", legacyPath, err)
+		}
+		file, err := parseAuthFile(data, legacyPath)
+		if err != nil {
+			return authFile{}, err
+		}
+		if err := a.saveLocked(file); err != nil {
+			return authFile{}, fmt.Errorf("migrating legacy auth state from %s to %s: %w", legacyPath, a.path, err)
+		}
+		return file, nil
+	}
+	return authFile{}, errAuthNotFound
+}
+
+func (a *authService) legacyAuthPaths() []string {
+	candidates := []string{
+		filepath.Join("/updater", "data", authFileName),
+		filepath.Join(".", "data", authFileName),
+	}
+	paths := make([]string, 0, len(candidates))
+	seen := map[string]struct{}{filepath.Clean(a.path): {}}
+	for _, candidate := range candidates {
+		cleaned := filepath.Clean(candidate)
+		if _, ok := seen[cleaned]; ok {
+			continue
+		}
+		seen[cleaned] = struct{}{}
+		paths = append(paths, cleaned)
+	}
+	return paths
+}
+
+func parseAuthFile(data []byte, path string) (authFile, error) {
 	var file authFile
 	if err := json.Unmarshal(data, &file); err != nil {
-		return authFile{}, fmt.Errorf("parsing auth state: %w", err)
+		return authFile{}, fmt.Errorf("parsing auth state %s: %w", path, err)
 	}
 	return file, nil
 }

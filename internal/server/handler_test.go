@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/MaroIshiku/dyniku/internal/models"
 	"github.com/MaroIshiku/dyniku/internal/records"
@@ -188,6 +189,47 @@ func TestFirstRunSetupCreatesAdminAndClosesRegistration(t *testing.T) {
 	handler.ServeHTTP(secondResponse, second)
 	if secondResponse.Code != http.StatusConflict {
 		t.Fatalf("expected status %d, got %d: %s", http.StatusConflict, secondResponse.Code, secondResponse.Body.String())
+	}
+}
+
+func TestAuthStateMigratesLegacyAuthFile(t *testing.T) {
+	t.Parallel()
+
+	primaryDataDir := t.TempDir()
+	legacyRoot := t.TempDir()
+	legacyDataDir := filepath.Join(legacyRoot, "data")
+	if err := os.MkdirAll(legacyDataDir, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	writeTestAuthFile(t, legacyDataDir)
+
+	service := newAuthService(primaryDataDir, models.BuildInformation{})
+	service.path = filepath.Join(primaryDataDir, authFileName)
+	service.dataDir = primaryDataDir
+	service.timeNow = time.Now
+
+	previousWorkingDir, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if chdirErr := os.Chdir(previousWorkingDir); chdirErr != nil {
+			t.Fatalf("restore working directory: %v", chdirErr)
+		}
+	})
+	if err := os.Chdir(legacyRoot); err != nil {
+		t.Fatal(err)
+	}
+
+	file, err := service.load()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if file.Admin == nil || file.Admin.Username != "admin" {
+		t.Fatalf("expected migrated admin auth, got %+v", file.Admin)
+	}
+	if _, err := os.Stat(filepath.Join(primaryDataDir, authFileName)); err != nil {
+		t.Fatalf("expected migrated auth file in primary data dir: %v", err)
 	}
 }
 
