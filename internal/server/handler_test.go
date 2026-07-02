@@ -61,6 +61,37 @@ func TestConfigAPIValidatesBeforeWriting(t *testing.T) {
 	}
 }
 
+func TestConfigAPIAcceptsNumericNetcupCustomerNumber(t *testing.T) {
+	t.Parallel()
+
+	dataDir := t.TempDir()
+	configPath := filepath.Join(dataDir, "config.json")
+	err := os.WriteFile(configPath, []byte(`{"settings":[]}`), os.FileMode(0o666))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	handler := newTestHandler(t, configPath, dataDir)
+	request := httptest.NewRequestWithContext(context.Background(), http.MethodPut, "/api/config", strings.NewReader(`{
+		"settings": [{
+			"provider": "netcup",
+			"domain": "sub.example.com",
+			"api_key": "api-key",
+			"password": "api-password",
+			"customer_number": 123456,
+			"ip_version": "ipv4"
+		}]
+	}`))
+	response := httptest.NewRecorder()
+	addAuthCookie(t, handler, request)
+
+	handler.ServeHTTP(response, request)
+
+	if response.Code != http.StatusOK {
+		t.Fatalf("expected status %d, got %d: %s", http.StatusOK, response.Code, response.Body.String())
+	}
+}
+
 func TestConfigAPIRejectsInvalidProviderConfig(t *testing.T) {
 	t.Parallel()
 

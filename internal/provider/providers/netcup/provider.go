@@ -1,6 +1,7 @@
 package netcup
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -29,16 +30,17 @@ func New(data json.RawMessage, domain, owner string,
 	p *Provider, err error,
 ) {
 	var extraSettings struct {
-		CustomerNumber string `json:"customer_number"`
-		APIKey         string `json:"api_key"`
-		Password       string `json:"password"`
+		CustomerNumber flexibleString `json:"customer_number"`
+		APIKey         string         `json:"api_key"`
+		Password       string         `json:"password"`
 	}
 	err = json.Unmarshal(data, &extraSettings)
 	if err != nil {
 		return nil, fmt.Errorf("JSON decoding provider specific settings: %w", err)
 	}
 
-	err = validateSettings(domain, extraSettings.CustomerNumber,
+	customerNumber := string(extraSettings.CustomerNumber)
+	err = validateSettings(domain, customerNumber,
 		extraSettings.APIKey, extraSettings.Password)
 	if err != nil {
 		return nil, fmt.Errorf("validating provider specific settings: %w", err)
@@ -49,10 +51,36 @@ func New(data json.RawMessage, domain, owner string,
 		owner:          owner,
 		ipVersion:      ipVersion,
 		ipv6Suffix:     ipv6Suffix,
-		customerNumber: extraSettings.CustomerNumber,
+		customerNumber: customerNumber,
 		apiKey:         extraSettings.APIKey,
 		password:       extraSettings.Password,
 	}, nil
+}
+
+type flexibleString string
+
+func (s *flexibleString) UnmarshalJSON(data []byte) error {
+	data = bytes.TrimSpace(data)
+	if bytes.Equal(data, []byte("null")) {
+		*s = ""
+		return nil
+	}
+
+	var text string
+	if err := json.Unmarshal(data, &text); err == nil {
+		*s = flexibleString(text)
+		return nil
+	}
+
+	var number json.Number
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.UseNumber()
+	if err := decoder.Decode(&number); err == nil {
+		*s = flexibleString(number.String())
+		return nil
+	}
+
+	return fmt.Errorf("expected string or number")
 }
 
 func validateSettings(domain, customerNumber, apiKey, password string) (err error) {

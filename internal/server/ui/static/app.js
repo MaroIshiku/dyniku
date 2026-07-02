@@ -738,13 +738,21 @@ async function handleAuthError(error) {
 }
 
 function renderUser() {
-  const initials = currentUser?.initials || "D";
   const displayName = currentUser?.display_name || "Dyniku Admin";
   const username = currentUser?.username || "admin";
+  const initials = initialsFromName(displayName || username, currentUser?.initials || "D");
   $("#avatar-initials").textContent = initials;
   $("#profile-avatar").textContent = initials;
   $("#profile-name").textContent = displayName;
   $("#profile-username").textContent = `@${username}`;
+}
+
+function initialsFromName(value, fallback = "D") {
+  const parts = String(value || "").trim().split(/[\s._-]+/).filter(Boolean);
+  const initials = parts.length > 1
+    ? `${parts[0][0]}${parts[parts.length - 1][0]}`
+    : (parts[0] || fallback).slice(0, 2);
+  return initials.toUpperCase() || fallback;
 }
 
 function renderAdminInfo() {
@@ -809,7 +817,7 @@ function isSecretKey(key) {
 }
 
 function coerceFieldValue(key, value) {
-  if (["ttl", "customer_number"].includes(key) && value !== "" && Number.isFinite(Number(value))) {
+  if (key === "ttl" && value !== "" && Number.isFinite(Number(value))) {
     return Number(value);
   }
   return value;

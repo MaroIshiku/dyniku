@@ -1,4 +1,4 @@
-@import url("./design-system/components.css");
+@import url("./design-system/components.css?v=20260702a");
 
 :root {
   --dyniku-table-min: 920px;
@@ -10,8 +10,12 @@ html {
 
 body {
   min-width: 320px;
-  background: var(--color-background);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--color-primary-container) 24%, var(--color-background)) 0%, var(--color-background) 40%) fixed;
   letter-spacing: 0;
+}
+
+.psu-setup-screen {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--color-primary-container) 24%, var(--color-background)) 0%, var(--color-background) 40%) fixed;
 }
 
 .icon-sprite {
