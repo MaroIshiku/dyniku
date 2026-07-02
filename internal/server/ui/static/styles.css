@@ -10,12 +10,18 @@ html {
 
 body {
   min-width: 320px;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--color-primary-container) 24%, var(--color-background)) 0%, var(--color-background) 40%) fixed;
+  background:
+    radial-gradient(circle at 12% -10%, color-mix(in srgb, var(--color-primary-container) 55%, transparent), transparent 30rem),
+    radial-gradient(circle at 95% 8%, color-mix(in srgb, var(--color-tertiary-container) 38%, transparent), transparent 26rem),
+    var(--color-background);
   letter-spacing: 0;
 }
 
 .psu-setup-screen {
-  background: linear-gradient(180deg, color-mix(in srgb, var(--color-primary-container) 24%, var(--color-background)) 0%, var(--color-background) 40%) fixed;
+  background:
+    radial-gradient(circle at 12% -10%, color-mix(in srgb, var(--color-primary-container) 55%, transparent), transparent 30rem),
+    radial-gradient(circle at 95% 8%, color-mix(in srgb, var(--color-tertiary-container) 38%, transparent), transparent 26rem),
+    var(--color-background);
 }
 
 .icon-sprite {
@@ -452,6 +458,18 @@ body {
 .profile-sheet {
   display: grid;
   gap: var(--space-4);
+}
+
+.dyniku-profile-card {
+  width: 100%;
+  border: 0;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.dyniku-profile-card:hover {
+  background: var(--color-primary-container);
 }
 
 .about-card {
