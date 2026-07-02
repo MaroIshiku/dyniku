@@ -192,6 +192,25 @@ func TestFirstRunSetupCreatesAdminAndClosesRegistration(t *testing.T) {
 	}
 }
 
+func TestLoginAcceptsAdminDisplayNameAlias(t *testing.T) {
+	t.Parallel()
+
+	dataDir := t.TempDir()
+	handler := newTestHandler(t, filepath.Join(dataDir, "config.json"), dataDir)
+	request := httptest.NewRequestWithContext(context.Background(), http.MethodPost, "/api/login", strings.NewReader(`{
+		"username": "dyniku admin",
+		"password": "CorrectHorseBatteryStaple"
+	}`))
+	request.Header.Set("Content-Type", "application/json")
+	response := httptest.NewRecorder()
+
+	handler.ServeHTTP(response, request)
+
+	if response.Code != http.StatusOK {
+		t.Fatalf("expected status %d, got %d: %s", http.StatusOK, response.Code, response.Body.String())
+	}
+}
+
 func TestAuthStateMigratesLegacyAuthFile(t *testing.T) {
 	t.Parallel()
 

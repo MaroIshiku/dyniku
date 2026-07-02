@@ -490,13 +490,27 @@ func (a *authService) authenticate(username, password string) (adminAccount, err
 	if err != nil || file.Admin == nil || !file.SetupCompleted {
 		return adminAccount{}, errInvalidCredentials
 	}
-	if file.Admin.Username != strings.TrimSpace(username) {
+	if !adminLoginNameMatches(*file.Admin, username) {
 		return adminAccount{}, errInvalidCredentials
 	}
 	if err := bcrypt.CompareHashAndPassword([]byte(file.Admin.PasswordHash), []byte(password)); err != nil {
 		return adminAccount{}, errInvalidCredentials
 	}
 	return *file.Admin, nil
+}
+
+func adminLoginNameMatches(admin adminAccount, input string) bool {
+	normalized := strings.ToLower(strings.TrimSpace(input))
+	if normalized == "" {
+		return false
+	}
+	candidates := []string{admin.Username, admin.DisplayName, admin.Email}
+	for _, candidate := range candidates {
+		if strings.ToLower(strings.TrimSpace(candidate)) == normalized {
+			return true
+		}
+	}
+	return false
 }
 
 func (a *authService) createSession(username string) string {
