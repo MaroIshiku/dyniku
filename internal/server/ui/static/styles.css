@@ -1,4 +1,4 @@
-@import url("./design-system/components.css?v=20260702a");
+@import url("./design-system/components.css?v=20260703a");
 
 :root {
   --dyniku-table-min: 920px;
@@ -19,8 +19,8 @@ body {
 
 .psu-setup-screen {
   background:
-    radial-gradient(circle at 12% -10%, color-mix(in srgb, var(--color-primary-container) 55%, transparent), transparent 30rem),
-    radial-gradient(circle at 95% 8%, color-mix(in srgb, var(--color-tertiary-container) 38%, transparent), transparent 26rem),
+    radial-gradient(circle at 20% 10%, color-mix(in srgb, var(--color-primary-container) 42%, transparent) 0, transparent 34%),
+    radial-gradient(circle at 85% 20%, color-mix(in srgb, var(--color-tertiary-container) 34%, transparent) 0, transparent 30%),
     var(--color-background);
 }
 
