@@ -137,6 +137,14 @@ type loginRequest struct {
 	Password string `json:"password"`
 }
 
+type accountUpdateRequest struct {
+	DisplayName     string `json:"display_name"`
+	Username        string `json:"username"`
+	CurrentPassword string `json:"current_password"`
+	NewPassword     string `json:"new_password"`
+	PasswordConfirm string `json:"password_confirm"`
+}
+
 func newAuthService(dataDir string, buildInfo models.BuildInformation) *authService {
 	return &authService{
 		path:          filepath.Join(dataDir, authFileName),
@@ -235,6 +243,30 @@ func (h *handlers) me(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, http.StatusOK, state)
+}
+
+func (h *handlers) updateAccount(w http.ResponseWriter, r *http.Request) {
+	var request accountUpdateRequest
+	if err := decodeJSONBody(r, &request); err != nil {
+		httpError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	username, ok := h.auth.usernameFromRequest(r)
+	if !ok {
+		httpError(w, http.StatusUnauthorized, "login required")
+		return
+	}
+	user, err := h.auth.updateAccount(username, request)
+	if err != nil {
+		status := http.StatusBadRequest
+		if errors.Is(err, errInvalidCredentials) {
+			status = http.StatusForbidden
+		}
+		httpError(w, status, err.Error())
+		return
+	}
+	h.setSessionCookie(w, r, user.Username)
+	writeJSON(w, http.StatusOK, map[string]any{"user": makePublicUser(user)})
 }
 
 func (h *handlers) adminInfo(w http.ResponseWriter, r *http.Request) {
@@ -495,6 +527,56 @@ func (a *authService) authenticate(username, password string) (adminAccount, err
 	}
 	if err := bcrypt.CompareHashAndPassword([]byte(file.Admin.PasswordHash), []byte(password)); err != nil {
 		return adminAccount{}, errInvalidCredentials
+	}
+	return *file.Admin, nil
+}
+
+func (a *authService) updateAccount(currentUsername string, request accountUpdateRequest) (adminAccount, error) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+
+	file, err := a.loadLocked()
+	if err != nil {
+		return adminAccount{}, err
+	}
+	if file.Admin == nil || file.Admin.Username != currentUsername {
+		return adminAccount{}, errInvalidCredentials
+	}
+
+	displayName := strings.TrimSpace(request.DisplayName)
+	username := strings.TrimSpace(request.Username)
+	if displayName == "" {
+		return adminAccount{}, errAdminDisplayNameRequired
+	}
+	if username == "" {
+		return adminAccount{}, errAdminUsernameRequired
+	}
+
+	wantsPassword := request.NewPassword != "" || request.PasswordConfirm != ""
+	if wantsPassword {
+		if err := bcrypt.CompareHashAndPassword([]byte(file.Admin.PasswordHash), []byte(request.CurrentPassword)); err != nil {
+			return adminAccount{}, errInvalidCredentials
+		}
+		validation := setupRequest{
+			AdminUsername:        username,
+			AdminDisplayName:     displayName,
+			AdminPassword:        request.NewPassword,
+			AdminPasswordConfirm: request.PasswordConfirm,
+		}
+		if err := validateAdminPassword(validation, ""); err != nil {
+			return adminAccount{}, err
+		}
+		hash, err := bcrypt.GenerateFromPassword([]byte(request.NewPassword), bcrypt.DefaultCost)
+		if err != nil {
+			return adminAccount{}, fmt.Errorf("hashing admin password: %w", err)
+		}
+		file.Admin.PasswordHash = string(hash)
+	}
+
+	file.Admin.DisplayName = displayName
+	file.Admin.Username = username
+	if err := a.saveLocked(file); err != nil {
+		return adminAccount{}, err
 	}
 	return *file.Admin, nil
 }

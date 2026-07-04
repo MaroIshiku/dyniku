@@ -472,6 +472,20 @@ body {
   background: var(--color-primary-container);
 }
 
+.dyniku-profile-inline {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.account-back-button {
+  justify-self: start;
+}
+
+.account-back-button svg {
+  inline-size: 22px;
+  block-size: 22px;
+}
+
 .about-card {
   border-radius: var(--radius-lg);
   background: var(--color-surface-soft);

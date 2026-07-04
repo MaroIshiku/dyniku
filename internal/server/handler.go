@@ -86,6 +86,7 @@ func newHandler(ctx context.Context, rootURL string,
 		protected.Get(rootURL+"/update", handlers.update)
 		protected.Post(rootURL+"/update", handlers.update)
 		protected.Get(rootURL+"/api/me", handlers.me)
+		protected.Put(rootURL+"/api/account", handlers.updateAccount)
 		protected.Get(rootURL+"/api/admin", handlers.adminInfo)
 		protected.Get(rootURL+"/api/status", handlers.status)
 		protected.Get(rootURL+"/api/config", handlers.getConfig)

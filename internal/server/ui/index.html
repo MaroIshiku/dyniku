@@ -260,14 +260,44 @@
         <h2 id="profile-title" class="psu-sheet-title">Profile</h2>
         <span></span>
       </div>
-      <button class="psu-account-card dyniku-profile-card" type="button" data-psu-open="#settings-sheet">
+      <button class="psu-account-card dyniku-profile-card" type="button" data-profile-account-open>
         <div class="psu-account-avatar" id="profile-avatar">D</div>
         <div>
           <p class="psu-account-name" id="profile-name">Dyniku Admin</p>
           <p class="psu-account-id" id="profile-username">@admin</p>
         </div>
       </button>
-      <div class="psu-list">
+      <section id="profile-account-editor" class="dyniku-profile-inline" hidden>
+        <button class="psu-button psu-button--text account-back-button" type="button" data-profile-account-back>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>
+          Account
+        </button>
+        <form id="account-form" class="psu-form-stack">
+          <label class="psu-field">
+            <span class="psu-label">Display name</span>
+            <input class="psu-input" name="display_name" autocomplete="name" required maxlength="120">
+          </label>
+          <label class="psu-field">
+            <span class="psu-label">Username</span>
+            <input class="psu-input" name="username" autocomplete="username" required minlength="3" maxlength="80">
+          </label>
+          <label class="psu-field">
+            <span class="psu-label">Current password</span>
+            <input class="psu-input" name="current_password" type="password" autocomplete="current-password">
+          </label>
+          <label class="psu-field">
+            <span class="psu-label">New password</span>
+            <input class="psu-input" name="new_password" type="password" autocomplete="new-password" minlength="12">
+          </label>
+          <label class="psu-field">
+            <span class="psu-label">Repeat new password</span>
+            <input class="psu-input" name="password_confirm" type="password" autocomplete="new-password" minlength="12">
+          </label>
+          <p id="account-error" class="psu-field-error" role="alert"></p>
+          <button class="psu-button psu-button--filled psu-button--full" type="submit">Save account</button>
+        </form>
+      </section>
+      <div id="profile-menu-list" class="psu-list">
         <button class="psu-list-row" type="button" data-psu-open="#settings-sheet">
           <svg class="psu-list-row__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#psu-icon-palette"></use></svg>
           <span class="psu-list-row__label">Appearance</span>

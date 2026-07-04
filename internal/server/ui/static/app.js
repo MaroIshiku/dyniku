@@ -116,6 +116,9 @@ function bindStaticActions() {
   $("#save-config-button").addEventListener("click", saveConfig);
   $("#record-search").addEventListener("input", () => renderRecords(lastStatus.records || []));
   $("#copy-debug-button").addEventListener("click", copyDebugDetails);
+  $("[data-profile-account-open]").addEventListener("click", () => showAccountEditor(true));
+  $("[data-profile-account-back]").addEventListener("click", () => showAccountEditor(false));
+  $("#account-form").addEventListener("submit", saveAccount);
 }
 
 function bindAuthActions() {
@@ -745,6 +748,40 @@ function renderUser() {
   $("#profile-avatar").textContent = initials;
   $("#profile-name").textContent = displayName;
   $("#profile-username").textContent = `@${username}`;
+  $("#account-form [name='display_name']").value = displayName;
+  $("#account-form [name='username']").value = username;
+}
+
+function showAccountEditor(open) {
+  $("#profile-account-editor").hidden = !open;
+  $("#profile-menu-list").hidden = open;
+  $("[data-profile-account-open]").hidden = open;
+  $("#account-error").textContent = "";
+  if (open) requestAnimationFrame(() => $("#account-form [name='display_name']")?.focus());
+}
+
+async function saveAccount(event) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const submit = form.querySelector("button[type='submit']");
+  const data = Object.fromEntries(new FormData(form).entries());
+  $("#account-error").textContent = "";
+  submit.disabled = true;
+  try {
+    const result = await fetchJSON("api/account", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
+    currentUser = result.user;
+    renderUser();
+    showAccountEditor(false);
+    showToast("Account saved");
+  } catch (error) {
+    $("#account-error").textContent = error.message;
+  } finally {
+    submit.disabled = false;
+  }
 }
 
 function initialsFromName(value, fallback = "D") {
