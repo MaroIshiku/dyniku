@@ -29,9 +29,8 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
-    permissions:
       actions: read
+      contents: read
     steps:
       - name: No trigger path triggered for required verify workflow.
         run: exit 0
