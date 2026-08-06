@@ -137,14 +137,6 @@ type loginRequest struct {
 	Password string `json:"password"`
 }
 
-type accountUpdateRequest struct {
-	DisplayName     string `json:"display_name"`
-	Username        string `json:"username"`
-	CurrentPassword string `json:"current_password"`
-	NewPassword     string `json:"new_password"`
-	PasswordConfirm string `json:"password_confirm"`
-}
-
 func newAuthService(dataDir string, buildInfo models.BuildInformation) *authService {
 	return &authService{
 		path:          filepath.Join(dataDir, authFileName),
@@ -245,30 +237,6 @@ func (h *handlers) me(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, state)
 }
 
-func (h *handlers) updateAccount(w http.ResponseWriter, r *http.Request) {
-	var request accountUpdateRequest
-	if err := decodeJSONBody(r, &request); err != nil {
-		httpError(w, http.StatusBadRequest, err.Error())
-		return
-	}
-	username, ok := h.auth.usernameFromRequest(r)
-	if !ok {
-		httpError(w, http.StatusUnauthorized, "login required")
-		return
-	}
-	user, err := h.auth.updateAccount(username, request)
-	if err != nil {
-		status := http.StatusBadRequest
-		if errors.Is(err, errInvalidCredentials) {
-			status = http.StatusForbidden
-		}
-		httpError(w, status, err.Error())
-		return
-	}
-	h.setSessionCookie(w, r, user.Username)
-	writeJSON(w, http.StatusOK, map[string]any{"user": makePublicUser(user)})
-}
-
 func (h *handlers) adminInfo(w http.ResponseWriter, r *http.Request) {
 	state, err := h.makeAuthState(r)
 	if err != nil {
@@ -304,7 +272,7 @@ func (h *handlers) makeAuthState(r *http.Request) (authStateResponse, error) {
 		},
 	}
 	if setupRequired && !setupConfigured {
-		response.Message = "Setup-Secret fehlt. Setze ISHIKU_SETUP_SECRET_FILE oder ISHIKU_SETUP_SECRET."
+		response.Message = "Setup secret is missing. Set ISHIKU_SETUP_SECRET_FILE or ISHIKU_SETUP_SECRET."
 	}
 	if authenticated {
 		response.AdminInfo = h.makeAdminInfo(authFile)
@@ -392,57 +360,14 @@ func (a *authService) loadLocked() (authFile, error) {
 	data, err := os.ReadFile(a.path)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			return a.loadLegacyAuthLocked()
+			return authFile{}, errAuthNotFound
 		}
 		return authFile{}, fmt.Errorf("reading auth state: %w", err)
 	}
 
-	return parseAuthFile(data, a.path)
-}
-
-func (a *authService) loadLegacyAuthLocked() (authFile, error) {
-	for _, legacyPath := range a.legacyAuthPaths() {
-		data, err := os.ReadFile(legacyPath)
-		if err != nil {
-			if errors.Is(err, os.ErrNotExist) {
-				continue
-			}
-			return authFile{}, fmt.Errorf("reading legacy auth state %s: %w", legacyPath, err)
-		}
-		file, err := parseAuthFile(data, legacyPath)
-		if err != nil {
-			return authFile{}, err
-		}
-		if err := a.saveLocked(file); err != nil {
-			return authFile{}, fmt.Errorf("migrating legacy auth state from %s to %s: %w", legacyPath, a.path, err)
-		}
-		return file, nil
-	}
-	return authFile{}, errAuthNotFound
-}
-
-func (a *authService) legacyAuthPaths() []string {
-	candidates := []string{
-		filepath.Join("/updater", "data", authFileName),
-		filepath.Join(".", "data", authFileName),
-	}
-	paths := make([]string, 0, len(candidates))
-	seen := map[string]struct{}{filepath.Clean(a.path): {}}
-	for _, candidate := range candidates {
-		cleaned := filepath.Clean(candidate)
-		if _, ok := seen[cleaned]; ok {
-			continue
-		}
-		seen[cleaned] = struct{}{}
-		paths = append(paths, cleaned)
-	}
-	return paths
-}
-
-func parseAuthFile(data []byte, path string) (authFile, error) {
 	var file authFile
 	if err := json.Unmarshal(data, &file); err != nil {
-		return authFile{}, fmt.Errorf("parsing auth state %s: %w", path, err)
+		return authFile{}, fmt.Errorf("parsing auth state: %w", err)
 	}
 	return file, nil
 }
@@ -522,77 +447,13 @@ func (a *authService) authenticate(username, password string) (adminAccount, err
 	if err != nil || file.Admin == nil || !file.SetupCompleted {
 		return adminAccount{}, errInvalidCredentials
 	}
-	if !adminLoginNameMatches(*file.Admin, username) {
+	if file.Admin.Username != strings.TrimSpace(username) {
 		return adminAccount{}, errInvalidCredentials
 	}
 	if err := bcrypt.CompareHashAndPassword([]byte(file.Admin.PasswordHash), []byte(password)); err != nil {
 		return adminAccount{}, errInvalidCredentials
 	}
 	return *file.Admin, nil
-}
-
-func (a *authService) updateAccount(currentUsername string, request accountUpdateRequest) (adminAccount, error) {
-	a.mu.Lock()
-	defer a.mu.Unlock()
-
-	file, err := a.loadLocked()
-	if err != nil {
-		return adminAccount{}, err
-	}
-	if file.Admin == nil || file.Admin.Username != currentUsername {
-		return adminAccount{}, errInvalidCredentials
-	}
-
-	displayName := strings.TrimSpace(request.DisplayName)
-	username := strings.TrimSpace(request.Username)
-	if displayName == "" {
-		return adminAccount{}, errAdminDisplayNameRequired
-	}
-	if username == "" {
-		return adminAccount{}, errAdminUsernameRequired
-	}
-
-	wantsPassword := request.NewPassword != "" || request.PasswordConfirm != ""
-	if wantsPassword {
-		if err := bcrypt.CompareHashAndPassword([]byte(file.Admin.PasswordHash), []byte(request.CurrentPassword)); err != nil {
-			return adminAccount{}, errInvalidCredentials
-		}
-		validation := setupRequest{
-			AdminUsername:        username,
-			AdminDisplayName:     displayName,
-			AdminPassword:        request.NewPassword,
-			AdminPasswordConfirm: request.PasswordConfirm,
-		}
-		if err := validateAdminPassword(validation, ""); err != nil {
-			return adminAccount{}, err
-		}
-		hash, err := bcrypt.GenerateFromPassword([]byte(request.NewPassword), bcrypt.DefaultCost)
-		if err != nil {
-			return adminAccount{}, fmt.Errorf("hashing admin password: %w", err)
-		}
-		file.Admin.PasswordHash = string(hash)
-	}
-
-	file.Admin.DisplayName = displayName
-	file.Admin.Username = username
-	if err := a.saveLocked(file); err != nil {
-		return adminAccount{}, err
-	}
-	return *file.Admin, nil
-}
-
-func adminLoginNameMatches(admin adminAccount, input string) bool {
-	normalized := strings.ToLower(strings.TrimSpace(input))
-	if normalized == "" {
-		return false
-	}
-	candidates := []string{admin.Username, admin.DisplayName, admin.Email}
-	for _, candidate := range candidates {
-		if strings.ToLower(strings.TrimSpace(candidate)) == normalized {
-			return true
-		}
-	}
-	return false
 }
 
 func (a *authService) createSession(username string) string {

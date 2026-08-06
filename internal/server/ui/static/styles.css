@@ -10,14 +10,11 @@ html {
 
 body {
   min-width: 320px;
-  background:
-    radial-gradient(circle at 12% -10%, color-mix(in srgb, var(--color-primary-container) 55%, transparent), transparent 30rem),
-    radial-gradient(circle at 95% 8%, color-mix(in srgb, var(--color-tertiary-container) 38%, transparent), transparent 26rem),
-    var(--color-background);
+  background: var(--color-background);
   letter-spacing: 0;
 }
 
-.psu-setup-screen {
+#auth-gate.psu-setup-screen {
   background:
     radial-gradient(circle at 20% 10%, color-mix(in srgb, var(--color-primary-container) 42%, transparent) 0, transparent 34%),
     radial-gradient(circle at 85% 20%, color-mix(in srgb, var(--color-tertiary-container) 34%, transparent) 0, transparent 30%),
@@ -430,7 +427,7 @@ body {
   color: var(--color-on-surface-muted);
 }
 
-.toast-host {
+.psu-toast-host {
   position: fixed;
   z-index: 140;
   inset-inline: var(--space-4);
@@ -440,7 +437,7 @@ body {
   pointer-events: none;
 }
 
-.toast {
+.psu-toast {
   max-width: min(100%, 430px);
   border-radius: var(--radius-pill);
   background: var(--color-on-surface);
@@ -458,32 +455,6 @@ body {
 .profile-sheet {
   display: grid;
   gap: var(--space-4);
-}
-
-.dyniku-profile-card {
-  width: 100%;
-  border: 0;
-  color: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-
-.dyniku-profile-card:hover {
-  background: var(--color-primary-container);
-}
-
-.dyniku-profile-inline {
-  display: grid;
-  gap: var(--space-3);
-}
-
-.account-back-button {
-  justify-self: start;
-}
-
-.account-back-button svg {
-  inline-size: 22px;
-  block-size: 22px;
 }
 
 .about-card {

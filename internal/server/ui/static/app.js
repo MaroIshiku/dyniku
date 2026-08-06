@@ -116,9 +116,6 @@ function bindStaticActions() {
   $("#save-config-button").addEventListener("click", saveConfig);
   $("#record-search").addEventListener("input", () => renderRecords(lastStatus.records || []));
   $("#copy-debug-button").addEventListener("click", copyDebugDetails);
-  $("[data-profile-account-open]").addEventListener("click", () => showAccountEditor(true));
-  $("[data-profile-account-back]").addEventListener("click", () => showAccountEditor(false));
-  $("#account-form").addEventListener("submit", saveAccount);
 }
 
 function bindAuthActions() {
@@ -148,7 +145,7 @@ async function bootstrapAuth() {
     applyAuthState(state);
   } catch (error) {
     showAuthGate("error");
-    $("#setup-error-message").textContent = `Auth-Status konnte nicht geladen werden: ${error.message}`;
+    $("#setup-error-message").textContent = `Authentication status could not be loaded: ${error.message}`;
   }
 }
 
@@ -163,7 +160,7 @@ function applyAuthState(state) {
       showAuthGate("setup");
     } else {
       showAuthGate("error");
-      $("#setup-error-message").textContent = state.message || "Setup-Secret fehlt.";
+      $("#setup-error-message").textContent = state.message || "Setup secret is missing.";
     }
     return;
   }
@@ -226,7 +223,7 @@ async function submitSetup(formData, form) {
       })
     });
     currentUser = result.user || null;
-    showToast("Adminaccount erstellt");
+    showToast("Administrator account created");
     await bootstrapAuth();
   } catch (error) {
     showToast(error.message);
@@ -271,6 +268,7 @@ function buildAppearanceControls() {
     button.type = "button";
     button.className = "theme-button";
     button.dataset.theme = theme;
+    button.dataset.themeChoice = theme;
     button.textContent = themeLabels[theme] || theme;
     button.addEventListener("click", () => {
       setPixelSoftUtilityTheme(theme);
@@ -280,7 +278,7 @@ function buildAppearanceControls() {
   }
 
   $("#mode-picker").addEventListener("click", (event) => {
-    const button = event.target.closest("[data-mode]");
+    const button = event.target.closest("[data-mode-choice]");
     if (!button || !PSU_MODES.includes(button.dataset.mode)) return;
     setPixelSoftUtilityMode(button.dataset.mode);
     syncAppearanceControls();
@@ -511,7 +509,7 @@ function duplicateSetting(index) {
   editingSettingIndex = index + 1;
   renderSettings();
   showView("config");
-  showToast("Eintrag dupliziert");
+  showToast("Entry duplicated");
 }
 
 function makeField(setting, key) {
@@ -589,7 +587,7 @@ function renderDuplicateWarnings() {
       return;
     }
     warning.hidden = false;
-    warning.textContent = `Warnung: Dieser Domain/Subdomain-Eintrag existiert bereits in Eintrag ${duplicates.join(", ")}. Du kannst trotzdem speichern.`;
+    warning.textContent = `Warning: This domain/subdomain entry already exists in entry ${duplicates.join(", ")}. You can still save it.`;
   });
 }
 
@@ -741,55 +739,13 @@ async function handleAuthError(error) {
 }
 
 function renderUser() {
+  const initials = currentUser?.initials || "D";
   const displayName = currentUser?.display_name || "Dyniku Admin";
   const username = currentUser?.username || "admin";
-  const initials = initialsFromName(displayName || username, currentUser?.initials || "D");
   $("#avatar-initials").textContent = initials;
   $("#profile-avatar").textContent = initials;
   $("#profile-name").textContent = displayName;
   $("#profile-username").textContent = `@${username}`;
-  $("#account-form [name='display_name']").value = displayName;
-  $("#account-form [name='username']").value = username;
-}
-
-function showAccountEditor(open) {
-  $("#profile-account-editor").hidden = !open;
-  $("#profile-menu-list").hidden = open;
-  $("[data-profile-account-open]").hidden = open;
-  $("#account-error").textContent = "";
-  if (open) requestAnimationFrame(() => $("#account-form [name='display_name']")?.focus());
-}
-
-async function saveAccount(event) {
-  event.preventDefault();
-  const form = event.currentTarget;
-  const submit = form.querySelector("button[type='submit']");
-  const data = Object.fromEntries(new FormData(form).entries());
-  $("#account-error").textContent = "";
-  submit.disabled = true;
-  try {
-    const result = await fetchJSON("api/account", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    });
-    currentUser = result.user;
-    renderUser();
-    showAccountEditor(false);
-    showToast("Account saved");
-  } catch (error) {
-    $("#account-error").textContent = error.message;
-  } finally {
-    submit.disabled = false;
-  }
-}
-
-function initialsFromName(value, fallback = "D") {
-  const parts = String(value || "").trim().split(/[\s._-]+/).filter(Boolean);
-  const initials = parts.length > 1
-    ? `${parts[0][0]}${parts[parts.length - 1][0]}`
-    : (parts[0] || fallback).slice(0, 2);
-  return initials.toUpperCase() || fallback;
 }
 
 function renderAdminInfo() {
@@ -819,7 +775,7 @@ async function copyDebugDetails() {
     `Log Level: ${info.log_level || "unknown"}`
   ].join("\n");
   await navigator.clipboard.writeText(lines);
-  showToast("Debugdetails kopiert");
+  showToast("Debug details copied");
 }
 
 function showView(name) {
@@ -854,7 +810,7 @@ function isSecretKey(key) {
 }
 
 function coerceFieldValue(key, value) {
-  if (key === "ttl" && value !== "" && Number.isFinite(Number(value))) {
+  if (["ttl", "customer_number"].includes(key) && value !== "" && Number.isFinite(Number(value))) {
     return Number(value);
   }
   return value;
@@ -916,10 +872,10 @@ function showConfigWarning(message) {
 }
 
 function showToast(message) {
-  const host = $("#toast-host");
+  const host = $("#psu-toast-host");
   host.innerHTML = "";
   const toast = document.createElement("div");
-  toast.className = "toast";
+  toast.className = "psu-toast";
   toast.textContent = message;
   host.append(toast);
   window.setTimeout(() => {

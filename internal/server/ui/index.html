@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de" data-theme="lavender" data-mode="system" data-resolved-mode="light">
+<html lang="en" data-theme="lavender" data-mode="system" data-resolved-mode="light">
 
 <head>
   <title>Dyniku</title>
@@ -37,19 +37,19 @@
     <symbol id="psu-icon-close" viewBox="0 0 24 24"><path fill="currentColor" d="M12 13.4 7.1 18.3q-.28.28-.7.28-.43 0-.7-.28-.28-.27-.28-.7 0-.42.28-.7l4.9-4.9-4.9-4.9q-.28-.28-.28-.7 0-.43.28-.7.27-.28.7-.28.42 0 .7.28l4.9 4.9 4.9-4.9q.28-.28.7-.28.43 0 .7.28.28.27.28.7 0 .42-.28.7L13.4 12l4.9 4.9q.28.28.28.7 0 .43-.28.7-.27.28-.7.28-.42 0-.7-.28L12 13.4Z"/></symbol>
   </svg>
 
-  <section id="auth-gate" class="psu-setup-screen" hidden>
+  <main id="auth-gate" class="psu-setup-screen" hidden>
     <div id="setup-error-window" class="psu-setup-error-window" hidden>
       <div class="psu-setup-brand">
         <div class="psu-setup-logo">
           <img data-psu-app-logo src="static/dyniku-logo.png" alt="">
           <svg data-psu-fallback-symbol viewBox="0 0 24 24"><use href="#psu-icon-dns"></use></svg>
         </div>
-        <h1 class="psu-setup-title">Setup blockiert</h1>
-        <p class="psu-setup-subtitle" id="setup-error-message">Setup-Secret fehlt.</p>
+        <h1 class="psu-setup-title">Setup blocked</h1>
+        <p class="psu-setup-subtitle" id="setup-error-message">Setup secret is missing.</p>
       </div>
       <table class="psu-env-table">
         <tbody>
-          <tr><th>Bevorzugt</th><td><code>ISHIKU_SETUP_SECRET_FILE=/run/secrets/ishiku_setup_secret</code></td></tr>
+          <tr><th>Preferred</th><td><code>ISHIKU_SETUP_SECRET_FILE=/run/secrets/ishiku_setup_secret</code></td></tr>
           <tr><th>Fallback</th><td><code>ISHIKU_SETUP_SECRET</code></td></tr>
         </tbody>
       </table>
@@ -61,51 +61,51 @@
           <img data-psu-app-logo src="static/dyniku-logo.png" alt="">
           <svg data-psu-fallback-symbol viewBox="0 0 24 24"><use href="#psu-icon-dns"></use></svg>
         </div>
-        <h1 class="psu-setup-title">Admin einrichten</h1>
-        <p class="psu-setup-subtitle">Erstelle den ersten Dyniku-Adminaccount.</p>
+        <h1 class="psu-setup-title">Set up an administrator</h1>
+        <p class="psu-setup-subtitle">Create the first Dyniku administrator account.</p>
       </div>
       <div class="psu-form-stack">
         <label class="psu-field">
-          <span class="psu-label">Setup-Secret</span>
+          <span class="psu-label">Setup secret</span>
           <input class="psu-input" name="setup_secret" type="password" autocomplete="one-time-code" required autofocus>
           <span class="psu-field-error" data-field-error="setup_secret" hidden></span>
         </label>
         <label class="psu-field">
-          <span class="psu-label">Admin-Benutzername</span>
+          <span class="psu-label">Administrator username</span>
           <input class="psu-input" name="admin_username" type="text" autocomplete="username" required>
           <span class="psu-field-error" data-field-error="admin_username" hidden></span>
         </label>
         <label class="psu-field">
-          <span class="psu-label">Anzeigename</span>
+          <span class="psu-label">Display name</span>
           <input class="psu-input" name="admin_display_name" type="text" autocomplete="name" required>
         </label>
         <label class="psu-field">
-          <span class="psu-label">E-Mail optional</span>
+          <span class="psu-label">Email (optional)</span>
           <input class="psu-input" name="admin_email" type="email" autocomplete="email">
         </label>
         <label class="psu-field">
-          <span class="psu-label">Admin-Passwort</span>
+          <span class="psu-label">Administrator password</span>
           <input class="psu-input" name="admin_password" type="password" autocomplete="new-password" required>
           <span class="psu-field-error" data-field-error="admin_password" hidden></span>
         </label>
         <label class="psu-field">
-          <span class="psu-label">Passwort wiederholen</span>
+          <span class="psu-label">Repeat password</span>
           <input class="psu-input" name="admin_password_confirm" type="password" autocomplete="new-password" required>
           <span class="psu-field-error" data-field-error="admin_password_confirm" hidden></span>
         </label>
         <div class="psu-password-requirements">
-          Passwortregeln
+          Password requirements
           <ul>
-            <li>mindestens 12 Zeichen</li>
-            <li>nicht identisch mit Setup-Secret, Benutzername, App-ID oder App-Name</li>
-            <li>kein Platzhalter wie admin, password, passwort oder changeme</li>
+            <li>at least 12 characters</li>
+            <li>different from the setup secret, username, app ID, and app name</li>
+            <li>not a placeholder such as admin, password, or changeme</li>
           </ul>
         </div>
       </div>
       <div class="psu-setup-actions">
-        <button class="psu-button psu-button--filled psu-button--full" type="submit">Adminaccount erstellen</button>
+        <button class="psu-button psu-button--filled psu-button--full" type="submit">Create administrator account</button>
       </div>
-      <p class="psu-setup-footnote">Nach dem ersten Adminaccount wird die Registrierung geschlossen.</p>
+      <p class="psu-setup-footnote">Registration closes after the first administrator account is created.</p>
     </form>
 
     <form id="login-form" class="psu-auth-window" hidden>
@@ -134,7 +134,7 @@
         </div>
       </div>
     </form>
-  </section>
+  </main>
 
   <div class="psu-app-shell app-shell" data-app-content hidden>
     <header class="psu-app-header" data-psu-app-header>
@@ -148,7 +148,7 @@
           <p class="psu-app-subtitle" data-psu-app-subtitle>DDNS-Updater Web GUI</p>
         </div>
         <div class="psu-spacer"></div>
-        <button class="psu-avatar-button" id="open-profile-button" type="button" data-psu-open="#profile-sheet" aria-label="Profil öffnen" title="Profil">
+        <button class="psu-avatar-button" id="open-profile-button" type="button" data-psu-open="#profile-sheet" aria-label="Open profile" title="Profile">
           <span id="avatar-initials">D</span>
         </button>
       </div>
@@ -198,7 +198,7 @@
             <p class="section-kicker">DNS records</p>
             <h2 id="records-title">Update status</h2>
           </div>
-          <input id="record-search" class="psu-search-field compact-search" type="search" placeholder="Filter records" autocomplete="off">
+              <input id="record-search" class="psu-search-field compact-search" type="search" placeholder="Filter records" aria-label="Filter records" autocomplete="off">
         </div>
         <div id="records-empty" class="empty-state" hidden>
           <img src="static/dyniku-logo.png" alt="">
@@ -256,59 +256,33 @@
   <div id="profile-sheet" class="psu-backdrop" hidden>
     <section class="psu-sheet profile-sheet" role="dialog" aria-modal="true" aria-labelledby="profile-title">
       <div class="psu-sheet-header">
+        <span></span>
+        <h2 id="profile-title" class="psu-sheet-title">Profile</h2>
         <button class="psu-icon-button" type="button" data-psu-close aria-label="Close profile" title="Close">
           <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#psu-icon-close"></use></svg>
         </button>
-        <h2 id="profile-title" class="psu-sheet-title">Profile</h2>
-        <span></span>
       </div>
-      <button class="psu-account-card dyniku-profile-card" type="button" data-profile-account-open>
+      <div class="psu-account-card">
         <div class="psu-account-avatar" id="profile-avatar">D</div>
         <div>
           <p class="psu-account-name" id="profile-name">Dyniku Admin</p>
           <p class="psu-account-id" id="profile-username">@admin</p>
         </div>
-      </button>
-      <section id="profile-account-editor" class="dyniku-profile-inline" hidden>
-        <button class="psu-button psu-button--text account-back-button" type="button" data-profile-account-back>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>
-          Account
-        </button>
-        <form id="account-form" class="psu-form-stack">
-          <label class="psu-field">
-            <span class="psu-label">Display name</span>
-            <input class="psu-input" name="display_name" autocomplete="name" required maxlength="120">
-          </label>
-          <label class="psu-field">
-            <span class="psu-label">Username</span>
-            <input class="psu-input" name="username" autocomplete="username" required minlength="3" maxlength="80">
-          </label>
-          <label class="psu-field">
-            <span class="psu-label">Current password</span>
-            <input class="psu-input" name="current_password" type="password" autocomplete="current-password">
-          </label>
-          <label class="psu-field">
-            <span class="psu-label">New password</span>
-            <input class="psu-input" name="new_password" type="password" autocomplete="new-password" minlength="12">
-          </label>
-          <label class="psu-field">
-            <span class="psu-label">Repeat new password</span>
-            <input class="psu-input" name="password_confirm" type="password" autocomplete="new-password" minlength="12">
-          </label>
-          <p id="account-error" class="psu-field-error" role="alert"></p>
-          <button class="psu-button psu-button--filled psu-button--full" type="submit">Save account</button>
-        </form>
-      </section>
-      <div id="profile-menu-list" class="psu-list">
+      </div>
+      <div class="psu-list">
         <button class="psu-list-row" type="button" data-psu-open="#settings-sheet">
-          <svg class="psu-list-row__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#psu-icon-palette"></use></svg>
-          <span class="psu-list-row__label">Appearance</span>
+          <svg class="psu-list-row__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#psu-icon-settings"></use></svg>
+          <span>
+            <span class="psu-list-row__label">Settings</span>
+            <span class="psu-list-row__support">Appearance, about, and administrator information</span>
+          </span>
           <span aria-hidden="true">›</span>
         </button>
         <button class="psu-list-row" id="logout-button" type="button">
           <svg class="psu-list-row__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#psu-icon-logout"></use></svg>
           <span>
             <span class="psu-list-row__label">Sign out</span>
+            <span class="psu-list-row__support">End the current session</span>
           </span>
           <span aria-hidden="true"></span>
         </button>
@@ -337,11 +311,11 @@
       </div>
       <div class="settings-group">
         <h3>Appearance</h3>
-        <div class="theme-grid" id="theme-picker" aria-label="Theme"></div>
-        <div class="psu-segmented-control mode-picker" id="mode-picker" aria-label="Mode">
-          <button type="button" data-mode="system">System</button>
-          <button type="button" data-mode="light">Light</button>
-          <button type="button" data-mode="dark">Dark</button>
+        <div class="theme-grid" id="theme-picker" data-theme-picker aria-label="Theme"></div>
+        <div class="psu-segmented-control mode-picker" id="mode-picker" data-mode-picker aria-label="Mode">
+          <button type="button" data-mode="system" data-mode-choice="system">System</button>
+          <button type="button" data-mode="light" data-mode-choice="light">Light</button>
+          <button type="button" data-mode="dark" data-mode-choice="dark">Dark</button>
         </div>
       </div>
       <div class="psu-technical-card">
@@ -358,19 +332,19 @@
           <div><dt>Log Level</dt><dd id="admin-log-level">unknown</dd></div>
         </dl>
         <div class="psu-card-actions">
-          <button class="psu-button psu-button--outlined" id="copy-debug-button" type="button">Debugdetails kopieren</button>
+          <button class="psu-button psu-button--outlined" id="copy-debug-button" type="button">Copy debug details</button>
         </div>
       </div>
       <div class="psu-technical-card">
         <strong>Runtime</strong>
-        <p class="psu-technical-value" id="runtime-info">API: bereit nach Anmeldung</p>
+        <p class="psu-technical-value" id="runtime-info">API: ready after sign-in</p>
       </div>
     </section>
   </div>
 
   <div id="dialog-host" class="dialog-host" aria-live="polite"></div>
 
-  <div id="toast-host" class="toast-host" aria-live="polite" aria-atomic="true"></div>
+  <div id="psu-toast-host" class="psu-toast-host" aria-live="polite" aria-atomic="true"></div>
 
   <template id="setting-summary-template">
     <article class="config-card">
@@ -382,7 +356,7 @@
         </div>
       </div>
       <div class="action-row">
-        <button class="psu-button psu-button--tonal duplicate-entry" type="button">Duplizieren</button>
+        <button class="psu-button psu-button--tonal duplicate-entry" type="button">Duplicate</button>
         <button class="psu-button psu-button--outlined edit-entry" type="button">Edit</button>
       </div>
     </article>
@@ -397,7 +371,7 @@
         </div>
         <div class="action-row">
           <button class="psu-button psu-button--tonal add-field" type="button">Field</button>
-          <button class="psu-button psu-button--tonal duplicate-entry" type="button">Duplizieren</button>
+          <button class="psu-button psu-button--tonal duplicate-entry" type="button">Duplicate</button>
           <button class="psu-button psu-button--danger delete-entry" type="button">Delete</button>
           <button class="psu-button psu-button--outlined close-entry" type="button">Done</button>
         </div>
@@ -424,7 +398,7 @@
     </div>
   </template>
 
-  <script type="module" src="static/app.js?v=20260702b"></script>
+  <script type="module" src="static/app.js"></script>
 </body>
 
 </html>

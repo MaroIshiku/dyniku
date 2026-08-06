@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/MaroIshiku/dyniku/internal/models"
 	"github.com/MaroIshiku/dyniku/internal/records"
@@ -59,37 +58,6 @@ func TestConfigAPIValidatesBeforeWriting(t *testing.T) {
 	}
 	if !strings.Contains(string(configBytes), `"provider": "netcup"`) {
 		t.Fatalf("expected netcup config to be written, got:\n%s", configBytes)
-	}
-}
-
-func TestConfigAPIAcceptsNumericNetcupCustomerNumber(t *testing.T) {
-	t.Parallel()
-
-	dataDir := t.TempDir()
-	configPath := filepath.Join(dataDir, "config.json")
-	err := os.WriteFile(configPath, []byte(`{"settings":[]}`), os.FileMode(0o666))
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	handler := newTestHandler(t, configPath, dataDir)
-	request := httptest.NewRequestWithContext(context.Background(), http.MethodPut, "/api/config", strings.NewReader(`{
-		"settings": [{
-			"provider": "netcup",
-			"domain": "sub.example.com",
-			"api_key": "api-key",
-			"password": "api-password",
-			"customer_number": 123456,
-			"ip_version": "ipv4"
-		}]
-	}`))
-	response := httptest.NewRecorder()
-	addAuthCookie(t, handler, request)
-
-	handler.ServeHTTP(response, request)
-
-	if response.Code != http.StatusOK {
-		t.Fatalf("expected status %d, got %d: %s", http.StatusOK, response.Code, response.Body.String())
 	}
 }
 
@@ -189,66 +157,6 @@ func TestFirstRunSetupCreatesAdminAndClosesRegistration(t *testing.T) {
 	handler.ServeHTTP(secondResponse, second)
 	if secondResponse.Code != http.StatusConflict {
 		t.Fatalf("expected status %d, got %d: %s", http.StatusConflict, secondResponse.Code, secondResponse.Body.String())
-	}
-}
-
-func TestLoginAcceptsAdminDisplayNameAlias(t *testing.T) {
-	t.Parallel()
-
-	dataDir := t.TempDir()
-	handler := newTestHandler(t, filepath.Join(dataDir, "config.json"), dataDir)
-	request := httptest.NewRequestWithContext(context.Background(), http.MethodPost, "/api/login", strings.NewReader(`{
-		"username": "dyniku admin",
-		"password": "CorrectHorseBatteryStaple"
-	}`))
-	request.Header.Set("Content-Type", "application/json")
-	response := httptest.NewRecorder()
-
-	handler.ServeHTTP(response, request)
-
-	if response.Code != http.StatusOK {
-		t.Fatalf("expected status %d, got %d: %s", http.StatusOK, response.Code, response.Body.String())
-	}
-}
-
-func TestAuthStateMigratesLegacyAuthFile(t *testing.T) {
-	t.Parallel()
-
-	primaryDataDir := t.TempDir()
-	legacyRoot := t.TempDir()
-	legacyDataDir := filepath.Join(legacyRoot, "data")
-	if err := os.MkdirAll(legacyDataDir, 0o700); err != nil {
-		t.Fatal(err)
-	}
-	writeTestAuthFile(t, legacyDataDir)
-
-	service := newAuthService(primaryDataDir, models.BuildInformation{})
-	service.path = filepath.Join(primaryDataDir, authFileName)
-	service.dataDir = primaryDataDir
-	service.timeNow = time.Now
-
-	previousWorkingDir, err := os.Getwd()
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Cleanup(func() {
-		if chdirErr := os.Chdir(previousWorkingDir); chdirErr != nil {
-			t.Fatalf("restore working directory: %v", chdirErr)
-		}
-	})
-	if err := os.Chdir(legacyRoot); err != nil {
-		t.Fatal(err)
-	}
-
-	file, err := service.load()
-	if err != nil {
-		t.Fatal(err)
-	}
-	if file.Admin == nil || file.Admin.Username != "admin" {
-		t.Fatalf("expected migrated admin auth, got %+v", file.Admin)
-	}
-	if _, err := os.Stat(filepath.Join(primaryDataDir, authFileName)); err != nil {
-		t.Fatalf("expected migrated auth file in primary data dir: %v", err)
 	}
 }
 

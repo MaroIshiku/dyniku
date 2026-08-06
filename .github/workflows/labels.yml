@@ -8,11 +8,14 @@ on:
 jobs:
   labeler:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
       - name: Labeler
         if: success()
-        uses: crazy-max/ghaction-github-labeler@v6
+        uses: crazy-max/ghaction-github-labeler@548a7c3603594ec17c819e1239f281a3b801ab4d # v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}

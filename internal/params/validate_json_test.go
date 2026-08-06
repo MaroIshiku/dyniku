@@ -16,16 +16,6 @@ func TestValidateJSONAcceptsQDM12CompatibleConfigs(t *testing.T) {
 				"ip_version": "ipv4"
 			}]
 		}`,
-		"netcup numeric customer number": `{
-			"settings": [{
-				"provider": "netcup",
-				"domain": "sub.example.com",
-				"api_key": "api-key",
-				"password": "api-password",
-				"customer_number": 123456,
-				"ip_version": "ipv4"
-			}]
-		}`,
 		"multiple providers": `{
 			"settings": [
 				{

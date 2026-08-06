@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: dyniku
-          image: ghcr.io/maroishiku/dyniku:latest
+          image: ${DYNIKU_IMAGE:-ghcr.io/maroishiku/dyniku:0.1.0}
           envFrom:
             - secretRef:
                 name: dyniku-config
