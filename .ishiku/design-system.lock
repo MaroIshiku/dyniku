@@ -13,7 +13,7 @@
   "implementation": [
     {
       "path": "internal/server/ui/static/design-system/components.css",
-      "sha256": "3fe59132586cd63bea14f174f5cd30e038a527e5e61acace999cd25563bbf155",
+      "sha256": "5bc01946944ec7cbba1f1798060c426c596873f51d7cde14aa043f74caac201d",
       "roles": [
         "components"
       ]
@@ -27,7 +27,7 @@
     },
     {
       "path": "internal/server/ui/static/design-system/tokens.css",
-      "sha256": "3cad920738ec3fb21ba8b0250c0f5a5bd541b795ed750f34eb9fd7eb75e61faf",
+      "sha256": "fef640e4ae2efa8ddee021bad6bfc0acd952dc63c594fd9051172521b950b69e",
       "roles": [
         "tokens"
       ]

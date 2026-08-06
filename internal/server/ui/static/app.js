@@ -289,12 +289,11 @@ function buildAppearanceControls() {
 
 function syncAppearanceControls() {
   const root = document.documentElement;
-  document.querySelectorAll("[data-theme]").forEach((button) => {
-    if (!button.classList.contains("theme-button")) return;
-    button.setAttribute("aria-pressed", String(button.dataset.theme === root.dataset.theme));
+  document.querySelectorAll("[data-theme-choice]").forEach((button) => {
+    button.setAttribute("aria-pressed", String(button.dataset.themeChoice === root.dataset.theme));
   });
-  document.querySelectorAll("[data-mode]").forEach((button) => {
-    button.setAttribute("aria-selected", String(button.dataset.mode === root.dataset.mode));
+  document.querySelectorAll("[data-mode-choice]").forEach((button) => {
+    button.setAttribute("aria-selected", String(button.dataset.modeChoice === root.dataset.mode));
   });
 }
 
