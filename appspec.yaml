@@ -34,7 +34,8 @@
       "priority": "high",
       "acceptance": [
         "All user-facing interface text is English.",
-        "The app uses ishiku semantic tokens, shared layout contracts, responsive behavior, and WCAG 2.2 AA interaction."
+        "The app uses ishiku semantic tokens, shared layout contracts, responsive behavior, and WCAG 2.2 AA interaction.",
+        "Launcher, browser, catalog, and repository consumers use the approved Dyniku icon source and its direct raster exports."
       ],
       "security_critical": false
     },
@@ -44,7 +45,8 @@
       "priority": "high",
       "acceptance": [
         "A fresh clone can build, test, and run without the outer workspace.",
-        "Health checks, persistent data, runtime secrets, backup, restore, and upgrade procedures are verifiable."
+        "Health checks, persistent data, runtime secrets, backup, restore, and upgrade procedures are verifiable.",
+        "Primary standalone and ZimaOS Compose delivery publishes host port 65000 while preserving container port 8507."
       ],
       "security_critical": true
     },

@@ -8,7 +8,7 @@ DDNS-Updater Web GUI
 [![MIT](https://img.shields.io/github/license/MaroIshiku/dyniku)](LICENSE)
 ![Go version](https://img.shields.io/github/go-mod/go-version/MaroIshiku/dyniku)
 
-<img height="160" alt="Dyniku logo" src="internal/server/ui/static/dyniku-logo.png">
+<img height="160" alt="Dyniku logo" src="assets/icon-256.png">
 
 ## Kurzbeschreibung
 
@@ -68,7 +68,7 @@ Starte die App:
 docker compose up -d
 ```
 
-Dyniku ist danach standardmaessig unter `http://localhost:8507` erreichbar.
+Dyniku ist danach standardmaessig unter `http://localhost:65000` erreichbar. Compose veroeffentlicht den zentral zugewiesenen Host-Port `65000`; im Container bleibt Dyniku kompatibel auf Port `8507`.
 
 ### Erstes Starten
 

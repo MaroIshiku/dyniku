@@ -1,13 +1,13 @@
 name: dyniku
 services:
   dyniku:
-    image: ${DYNIKU_IMAGE:-ghcr.io/maroishiku/dyniku:0.1.0}
+    image: ${DYNIKU_IMAGE:-ghcr.io/maroishiku/dyniku:0.2.6}
     container_name: dyniku
     hostname: dyniku
     restart: unless-stopped
     ports:
       - target: 8507
-        published: "8507"
+        published: "65000"
         protocol: tcp
     environment:
       - BACKUP_DIRECTORY=/data
@@ -41,16 +41,16 @@ services:
         target: /run/secrets/ishiku_setup_secret
         read_only: true
     labels:
-      icon: https://raw.githubusercontent.com/MaroIshiku/dyniku/main/internal/server/ui/static/dyniku-logo.png
+      icon: https://raw.githubusercontent.com/MaroIshiku/dyniku/main/assets/icon-512.png
       title.en_us: Dyniku
 x-casaos:
   author: self
   category: self
   hostname: ""
-  icon: https://raw.githubusercontent.com/MaroIshiku/dyniku/main/internal/server/ui/static/dyniku-logo.png
+  icon: https://raw.githubusercontent.com/MaroIshiku/dyniku/main/assets/icon-512.png
   index: /
   is_uncontrolled: false
-  port_map: "8507"
+  port_map: "65000"
   scheme: http
   store_app_id: dyniku
   title:

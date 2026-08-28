@@ -395,7 +395,7 @@ function renderHistory(lines) {
   const list = $("#history-list");
   list.innerHTML = "";
   if (lines.length === 0) {
-    list.innerHTML = `<div class="empty-state"><img src="static/dyniku-logo.png" alt=""><strong>No IP changes yet</strong><span>Dyniku will list public IP changes here after they are logged.</span></div>`;
+    list.innerHTML = `<div class="empty-state"><img src="static/icons/icon-512.png" alt=""><strong>No IP changes yet</strong><span>Dyniku will list public IP changes here after they are logged.</span></div>`;
     return;
   }
 
@@ -431,7 +431,7 @@ function renderSettings() {
   list.innerHTML = "";
 
   if (loadedConfig.settings.length === 0) {
-    list.innerHTML = `<div class="empty-state"><img src="static/dyniku-logo.png" alt=""><strong>No provider entries</strong><span>Add an entry and save the config to begin updating DNS records.</span></div>`;
+    list.innerHTML = `<div class="empty-state"><img src="static/icons/icon-512.png" alt=""><strong>No provider entries</strong><span>Add an entry and save the config to begin updating DNS records.</span></div>`;
     return;
   }
 

@@ -1,10 +1,10 @@
 services:
   dyniku:
-    image: ${DYNIKU_IMAGE:-ghcr.io/maroishiku/dyniku:0.1.0}
+    image: ${DYNIKU_IMAGE:-ghcr.io/maroishiku/dyniku:0.2.6}
     container_name: dyniku
     restart: unless-stopped
     ports:
-      - "8507:8507"
+      - "65000:8507"
     env_file:
       - path: .env.example
       - path: .env

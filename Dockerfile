@@ -1,6 +1,6 @@
 ARG BUILDPLATFORM=linux/amd64
 ARG ALPINE_VERSION=3.23
-ARG GO_VERSION=1.26
+ARG GO_VERSION=1.26.7
 ARG XCPUTRANSLATE_VERSION=v0.9.0
 ARG GOLANGCI_LINT_VERSION=v2.11.4
 ARG MOCKGEN_VERSION=v0.6.0
@@ -9,7 +9,7 @@ FROM --platform=${BUILDPLATFORM} ghcr.io/qdm12/xcputranslate:${XCPUTRANSLATE_VER
 FROM --platform=${BUILDPLATFORM} ghcr.io/qdm12/binpot:golangci-lint-${GOLANGCI_LINT_VERSION}@sha256:73c023176fc6b6101b3900b2f4847b8ae285be1fe1be13250d9fe33fe3715d77 AS golangci-lint
 FROM --platform=${BUILDPLATFORM} ghcr.io/qdm12/binpot:mockgen-${MOCKGEN_VERSION}@sha256:4abd2daf88441bedef242a36844d26b3b673375cdafef13bcfb7db3120fc385e AS mockgen
 
-FROM --platform=$BUILDPLATFORM golang:${GO_VERSION}-alpine${ALPINE_VERSION}@sha256:622e56dbc11a8cfe87cafa2331e9a201877271cbff918af53d3be315f3da88cc AS base
+FROM --platform=$BUILDPLATFORM golang:${GO_VERSION}-alpine${ALPINE_VERSION}@sha256:b17af760035fc2f338eed92d448a6c67f2d45438844fc6c60678fa5f99e44b57 AS base
 WORKDIR /tmp/gobuild
 ENV CGO_ENABLED=0
 # Note: findutils needed to have xargs support `-d` flag for mocks stage.

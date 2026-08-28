@@ -3,7 +3,7 @@
   "app_name": "Dyniku",
   "app_subtitle": "DDNS-Updater Web GUI",
   "app_symbol": "dns",
-  "primary_purpose": "Self-hosted Web GUI zum Verwalten und Ueberwachen dynamischer DNS-Updates.",
+  "primary_purpose": "Self-hosted web interface for managing and observing dynamic DNS updates.",
   "main_sections": [
     {
       "id": "records",
@@ -21,8 +21,8 @@
   "default_theme": "lavender",
   "default_mode": "system",
   "app_logo": {
-    "src": "internal/server/ui/static/dyniku-logo.png",
-    "favicon": "internal/server/ui/static/dyniku-logo.png",
+    "src": "internal/server/ui/static/icons/icon-512.png",
+    "favicon": "internal/server/ui/static/icons/favicon-32.png",
     "alt": "",
     "use_as_favicon": true,
     "use_in_header": true,
