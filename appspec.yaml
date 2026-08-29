@@ -46,7 +46,20 @@
       "acceptance": [
         "A fresh clone can build, test, and run without the outer workspace.",
         "Health checks, persistent data, runtime secrets, backup, restore, and upgrade procedures are verifiable.",
-        "Primary standalone and ZimaOS Compose delivery publishes host port 65000 while preserving container port 8507."
+        "Primary standalone and ZimaOS Compose delivery publishes host port 65000 while preserving container port 8507.",
+        "Every published deployment artifact and its metadata uses the centrally assigned host port 65000."
+      ],
+      "security_critical": true
+    },
+    {
+      "id": "DEPLOY-001",
+      "title": "Breaking ZimaOS deployment contract",
+      "priority": "critical",
+      "acceptance": [
+        "Version 0.3.0 is an approved breaking deployment change with documented migration and rollback instructions.",
+        "The primary ZimaOS Compose uses direct scalar values, an immutable version-and-digest image reference, and no interpolation variables.",
+        "The primary ZimaOS Compose contains only a synthetic ISHIKU_SETUP_SECRET replacement value of at least 32 characters and requires the operator to replace it before first start.",
+        "Standard Docker Compose keeps the runtime secret-file profile while defaulting to the same immutable release image."
       ],
       "security_critical": true
     },

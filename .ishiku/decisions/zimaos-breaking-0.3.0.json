@@ -1,0 +1,13 @@
+{
+  "id": "DEC-002",
+  "date": "2026-08-29",
+  "decision": "Treat Dyniku 0.3.0 as a breaking deployment release that adopts the ZimaOS-first Compose contract and the active host port 65000 everywhere.",
+  "rationale": "The primary ZimaOS import must be standalone, contain no interpolation variables, expose a replaceable setup-secret placeholder directly, and pin the release image by version and digest.",
+  "consequences": [
+    "New ZimaOS installations must replace the synthetic ISHIKU_SETUP_SECRET placeholder before first start.",
+    "Existing ZimaOS installations must migrate from the setup-secret file mount to the inline one-time setup secret only when recreating an uninitialized deployment.",
+    "The published host port is 65000; the compatible container port remains 8507.",
+    "Standard Docker Compose retains the runtime secret-file profile.",
+    "Rollback pins Dyniku 0.2.6 by digest and restores the previous Compose file after backing up persistent data."
+  ]
+}

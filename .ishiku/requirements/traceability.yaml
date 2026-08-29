@@ -118,6 +118,31 @@
         ]
       },
       "status": "verified"
+    },
+    {
+      "id": "DEPLOY-001",
+      "implementation": [
+        "VERSION",
+        "zimaos-compose.yaml",
+        "docker-compose.yml",
+        "docker-compose.example.yml",
+        "scripts/check-zimaos-compose.mjs",
+        "CHANGELOG.md",
+        ".ishiku/decisions/zimaos-breaking-0.3.0.json"
+      ],
+      "tests": {
+        "unit": [],
+        "integration": [
+          "scripts/check-zimaos-compose.mjs",
+          "docker compose -f zimaos-compose.yaml config --quiet"
+        ],
+        "e2e": [],
+        "security": [
+          "scripts/check-zimaos-compose.mjs",
+          ".ishiku/kit/scripts/check-security"
+        ]
+      },
+      "status": "verified"
     }
   ]
 }

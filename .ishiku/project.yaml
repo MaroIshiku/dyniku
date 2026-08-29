@@ -46,6 +46,11 @@
         "required_for_verified": true
       },
       {
+        "name": "zimaos-compose",
+        "command": "docker compose -f zimaos-compose.yaml config --quiet && node scripts/check-zimaos-compose.mjs",
+        "required_for_verified": true
+      },
+      {
         "name": "container",
         "command": "docker build -t dyniku:verify .",
         "required_for_verified": true

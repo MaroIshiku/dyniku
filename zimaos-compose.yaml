@@ -1,10 +1,19 @@
+# ZimaOS-first, standard Docker Compose deployment.
+# Breaking in 0.3.0: replace the setup-secret placeholder before first start.
 name: dyniku
 services:
   dyniku:
-    image: ${DYNIKU_IMAGE:-ghcr.io/maroishiku/dyniku:0.2.6}
+    image: ghcr.io/maroishiku/dyniku:0.3.0@sha256:4ed4741a1294281d4ede33a0345bd3abf624d0b2f5e65142b6a6c5a9b9575214
     container_name: dyniku
     hostname: dyniku
+    init: true
     restart: unless-stopped
+    user: "10001:10001"
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
     ports:
       - target: 8507
         published: "65000"
@@ -18,7 +27,7 @@ services:
       - ISHIKU_CONFIG_FILE=/data/config.json
       - ISHIKU_DATA_DIR=/data
       - ISHIKU_LOG_LEVEL=info
-      - ISHIKU_SETUP_SECRET_FILE=/run/secrets/ishiku_setup_secret
+      - ISHIKU_SETUP_SECRET=REPLACE-WITH-A-UNIQUE-SECRET-OF-AT-LEAST-32-CHARACTERS
       - LISTENING_ADDRESS=:8507
       - LOG_CALLER=hidden
       - LOG_LEVEL=info
@@ -36,23 +45,51 @@ services:
       - type: bind
         source: /DATA/AppData/dyniku/data
         target: /data
-      - type: bind
-        source: /DATA/AppData/dyniku/secrets/setup_secret.txt
-        target: /run/secrets/ishiku_setup_secret
-        read_only: true
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    stop_grace_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
     labels:
       icon: https://raw.githubusercontent.com/MaroIshiku/dyniku/main/assets/icon-512.png
       title.en_us: Dyniku
+    x-casaos:
+      envs:
+        - container: ISHIKU_SETUP_SECRET
+          description:
+            en_us: Unique first-run setup secret with at least 32 characters
+      ports:
+        - container: "8507"
+          description:
+            en_us: Web interface on host port 65000
+      volumes:
+        - container: /data
+          description:
+            en_us: Persistent application data
 x-casaos:
+  id: dev.ishiku.dyniku
+  architectures:
+    - amd64
+    - arm64
+  main: dyniku
   author: self
-  category: self
+  category: Network
+  developer: ishiku
   hostname: ""
   icon: https://raw.githubusercontent.com/MaroIshiku/dyniku/main/assets/icon-512.png
   index: /
   is_uncontrolled: false
   port_map: "65000"
+  repo: https://github.com/MaroIshiku/dyniku
   scheme: http
   store_app_id: dyniku
+  tagline:
+    en_us: Self-hosted dynamic DNS management
+  description:
+    en_us: Manage, execute, and observe dynamic DNS updates through a private web interface.
   title:
     custom: Dyniku
     en_us: Dyniku

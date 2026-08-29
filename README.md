@@ -51,6 +51,8 @@ Die App soll sich bewusst wie Teil einer gemeinsamen Suite anfuehlen, nicht wie 
 
 ### Docker Compose
 
+The regular `docker-compose.yml` profile keeps secrets outside the Compose file and mounts the setup secret at runtime.
+
 ```bash
 mkdir -p /DATA/AppData/dyniku/data /DATA/AppData/dyniku/secrets
 ```
@@ -69,6 +71,18 @@ docker compose up -d
 ```
 
 Dyniku ist danach standardmaessig unter `http://localhost:65000` erreichbar. Compose veroeffentlicht den zentral zugewiesenen Host-Port `65000`; im Container bleibt Dyniku kompatibel auf Port `8507`.
+
+### ZimaOS (breaking since 0.3.0)
+
+`zimaos-compose.yaml` is the primary ZimaOS import and intentionally uses direct scalar values. Before importing it, replace:
+
+```yaml
+ISHIKU_SETUP_SECRET: "REPLACE-WITH-A-UNIQUE-SECRET-OF-AT-LEAST-32-CHARACTERS"
+```
+
+with a unique value of at least 32 characters. Do not commit or reuse that value. ZimaOS publishes host port `65000`; Dyniku continues to listen on container port `8507`.
+
+Upgrading an existing ZimaOS installation to `0.3.0` is a breaking deployment change. Back up `/DATA/AppData/dyniku/data`, stop the existing stack, import the new Compose file, verify that port `65000` is free, and then start Dyniku. An installation that already has an administrator remains initialized; the setup-secret source change does not recreate the account.
 
 ### Erstes Starten
 
@@ -120,7 +134,7 @@ Legacy-Variablen wie `DATADIR`, `CONFIG_FILEPATH`, `ROOT_URL`, `LOG_LEVEL` und `
 
 ### Docker Secrets
 
-Bevorzugt wird ein Docker/Compose Secret als Datei. In `docker-compose.example.yml` wird dieses Secret nach `/run/secrets/ishiku_setup_secret` gemountet.
+For regular Docker Compose, a file-backed Compose secret is preferred. `docker-compose.example.yml` mounts it at `/run/secrets/ishiku_setup_secret`. The primary ZimaOS profile instead follows the appliance import policy and carries a synthetic `ISHIKU_SETUP_SECRET` placeholder that must be replaced locally before deployment.
 
 ```yaml
 secrets:
@@ -167,6 +181,8 @@ Vor Updates sollte der persistente Datenordner gesichert werden:
 ```bash
 tar -czf backup-dyniku-$(date +%Y%m%d).tar.gz data
 ```
+
+Release `0.3.0` is pinned in the shipped Compose files by both semantic version and image digest. Detailed migration and rollback instructions are recorded in [CHANGELOG.md](CHANGELOG.md).
 
 ## Entwicklung
 
