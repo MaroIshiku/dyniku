@@ -76,6 +76,7 @@
         "Dockerfile",
         "docker-compose.yml",
         "docker-compose.example.yml",
+        ".env.example",
         "zimaos-compose.yaml"
       ],
       "tests": {

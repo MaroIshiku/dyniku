@@ -51,17 +51,16 @@ Die App soll sich bewusst wie Teil einer gemeinsamen Suite anfuehlen, nicht wie 
 
 ### Docker Compose
 
-The regular `docker-compose.yml` profile keeps secrets outside the Compose file and mounts the setup secret at runtime.
+All shipped Compose profiles contain a clearly synthetic setup-secret replacement value. Replace it with a unique value of at least 32 characters before the first start:
 
-```bash
-mkdir -p /DATA/AppData/dyniku/data /DATA/AppData/dyniku/secrets
+```yaml
+ISHIKU_SETUP_SECRET: "REPLACE-WITH-A-UNIQUE-SECRET-OF-AT-LEAST-32-CHARACTERS"
 ```
 
-Lege anschliessend ein langes zufaelliges Setup-Secret an:
+Create the persistent data directory:
 
 ```bash
-openssl rand -base64 48 > /DATA/AppData/dyniku/secrets/setup_secret.txt
-chmod 600 /DATA/AppData/dyniku/secrets/setup_secret.txt
+mkdir -p /DATA/AppData/dyniku/data
 ```
 
 Starte die App:
@@ -98,7 +97,7 @@ Die Registrierung ist nur moeglich, wenn das Setup-Secret korrekt eingegeben wir
 
 Im Registrierungsfenster werden benoetigt:
 
-- Setup-Secret aus `/DATA/AppData/dyniku/secrets/setup_secret.txt`
+- the setup-secret value configured in the Compose file
 - Admin-Benutzername
 - Anzeigename
 - optional E-Mail
@@ -134,13 +133,9 @@ Legacy-Variablen wie `DATADIR`, `CONFIG_FILEPATH`, `ROOT_URL`, `LOG_LEVEL` und `
 
 ### Docker Secrets
 
-For regular Docker Compose, a file-backed Compose secret is preferred. `docker-compose.example.yml` mounts it at `/run/secrets/ishiku_setup_secret`. The primary ZimaOS profile instead follows the appliance import policy and carries a synthetic `ISHIKU_SETUP_SECRET` placeholder that must be replaced locally before deployment.
+The shipped Compose files use a direct synthetic `ISHIKU_SETUP_SECRET` replacement value for consistent ZimaOS, Docker Compose, and Portainer imports. Replace it locally before deployment and never commit the real value.
 
-```yaml
-secrets:
-  ishiku_setup_secret:
-    file: /DATA/AppData/dyniku/secrets/setup_secret.txt
-```
+Dyniku still supports `ISHIKU_SETUP_SECRET_FILE` as an optional compatibility input for custom deployments, but it is not the default in any shipped Compose file.
 
 ### Persistente Daten
 

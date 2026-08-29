@@ -9,6 +9,8 @@ const composeFiles = [
   readFileSync(new URL('../docker-compose.yml', import.meta.url), 'utf8'),
   readFileSync(new URL('../docker-compose.example.yml', import.meta.url), 'utf8'),
 ];
+const allComposeFiles = [zimaos, ...composeFiles];
+const setupSecretReplacement = 'REPLACE-WITH-A-UNIQUE-SECRET-OF-AT-LEAST-32-CHARACTERS';
 
 assert.match(version, /^\d+\.\d+\.\d+$/, 'VERSION must be semantic');
 assert.doesNotMatch(zimaos, /\$\{/, 'primary ZimaOS Compose must not interpolate variables');
@@ -25,11 +27,13 @@ for (const compose of composeFiles) {
   assert.match(compose, /["']65000:8507["']/, 'Compose must publish host port 65000 to container port 8507');
 }
 
-const secretMatch = zimaos.match(/^\s*- ISHIKU_SETUP_SECRET=(.+)$/m);
-assert.ok(secretMatch, 'ZimaOS must expose the setup secret directly');
-assert.match(secretMatch[1], /^REPLACE-WITH-/, 'ZimaOS must ship only a synthetic setup-secret placeholder');
-assert.ok(secretMatch[1].length >= 32, 'ZimaOS setup-secret placeholder must have at least 32 characters');
-assert.doesNotMatch(zimaos, /ISHIKU_SETUP_SECRET_FILE|\/run\/secrets/, 'ZimaOS must not depend on an external setup-secret file');
+for (const compose of allComposeFiles) {
+  const hasDirectReplacement = compose.includes(`ISHIKU_SETUP_SECRET=${setupSecretReplacement}`)
+    || compose.includes(`ISHIKU_SETUP_SECRET: "${setupSecretReplacement}"`);
+  assert.ok(hasDirectReplacement, 'every shipped Compose file must expose the synthetic setup-secret replacement directly');
+  assert.ok(setupSecretReplacement.length >= 32, 'setup-secret replacement must have at least 32 characters');
+  assert.doesNotMatch(compose, /ISHIKU_SETUP_SECRET_FILE|\/run\/secrets|^\s*secrets:\s*$/m, 'shipped Compose files must not use setup-secret files');
+}
 
 assert.match(zimaos, /target:\s*8507/, 'ZimaOS container port must remain 8507');
 assert.match(zimaos, /published:\s*"65000"/, 'ZimaOS host port must be 65000');

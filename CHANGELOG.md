@@ -5,7 +5,7 @@
 Breaking deployment release:
 
 - Adopt the centrally assigned host port `65000` in standalone and ZimaOS deployment metadata while preserving container port `8507`.
-- Require the primary ZimaOS Compose to use a direct `ISHIKU_SETUP_SECRET` placeholder instead of an external setup-secret file mount.
+- Require every shipped Compose file to use a direct `ISHIKU_SETUP_SECRET` placeholder instead of an external setup-secret file mount.
 - Pin all shipped deployment defaults to the scanned Dyniku `0.3.0` multi-architecture image digest.
 - Remove interpolation from the primary ZimaOS Compose and add executable policy regression checks.
 
