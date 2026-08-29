@@ -1,6 +1,6 @@
 services:
   dyniku:
-    image: ${DYNIKU_IMAGE:-ghcr.io/maroishiku/dyniku:0.2.6}
+    image: ${DYNIKU_IMAGE:-ghcr.io/maroishiku/dyniku:0.3.0}
     container_name: dyniku
     restart: unless-stopped
     ports:

@@ -3,6 +3,17 @@ name: Publish GHCR image
 on:
   push:
     branches: [main]
+    paths:
+      - .dockerignore
+      - .github/workflows/ghcr.yml
+      - .github/workflows/ishiku-pull-request-verify.yml
+      - Dockerfile
+      - VERSION
+      - cmd/**
+      - go.mod
+      - go.sum
+      - internal/**
+      - pkg/**
   workflow_dispatch:
 
 permissions:
