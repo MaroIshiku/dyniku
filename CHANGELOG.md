@@ -4,6 +4,8 @@
 
 Security and deployment hardening release:
 
+Published image: `ghcr.io/maroishiku/dyniku:0.3.1@sha256:42ec75dcb5d218ae8cc7f6ddbe0d43b8b777b4066e695d90da36679dde5e851f` (`linux/amd64`, `linux/arm64`).
+
 - Hash new administrator passwords with Argon2id using the ishiku baseline parameters.
 - Preserve compatibility with existing bcrypt accounts and upgrade their password hash automatically after a successful login.
 - Rate-limit failed logins by normalized account and network signal, enforce idle and absolute session expiry, reject cross-origin browser mutations, add restrictive browser security headers, and emit structured authentication audit events without secret values.

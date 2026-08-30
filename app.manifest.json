@@ -39,7 +39,7 @@
   "readme_profile": {
     "owner": "MaroIshiku",
     "repository": "dyniku",
-    "docker_image": "ghcr.io/maroishiku/dyniku:0.3.0@sha256:4ed4741a1294281d4ede33a0345bd3abf624d0b2f5e65142b6a6c5a9b9575214",
+    "docker_image": "ghcr.io/maroishiku/dyniku:0.3.1@sha256:42ec75dcb5d218ae8cc7f6ddbe0d43b8b777b4066e695d90da36679dde5e851f",
     "public": true,
     "codex_notice": true
   }
