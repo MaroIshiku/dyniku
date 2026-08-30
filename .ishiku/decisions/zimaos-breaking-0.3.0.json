@@ -8,6 +8,7 @@
     "Existing ZimaOS installations must migrate from the setup-secret file mount to the inline one-time setup secret only when recreating an uninitialized deployment.",
     "The published host port is 65000; the compatible container port remains 8507.",
     "All shipped Compose profiles use a direct synthetic ISHIKU_SETUP_SECRET replacement value; the application retains secret-file input only as an optional compatibility feature.",
+    "Existing persistent data must be retained and assigned to runtime UID/GID 10001 before the hardened container is started.",
     "Rollback pins Dyniku 0.2.6 by digest and restores the previous Compose file after backing up persistent data."
   ]
 }

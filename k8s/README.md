@@ -8,12 +8,13 @@ The Manifests have additional [Kustomize](https://kustomize.io/) overlays, which
 
     ```sh
     curl -O https://raw.githubusercontent.com/MaroIshiku/dyniku/main/k8s/base/deployment.yaml
+    curl -O https://raw.githubusercontent.com/MaroIshiku/dyniku/main/k8s/base/persistent-volume-claim.yaml
     curl -O https://raw.githubusercontent.com/MaroIshiku/dyniku/main/k8s/base/secret-config.yaml
     curl -O https://raw.githubusercontent.com/MaroIshiku/dyniku/main/k8s/base/service.yaml
     curl -O https://raw.githubusercontent.com/MaroIshiku/dyniku/main/k8s/base/kustomization.yaml
     ```
 
-1. Modify `secret-config.yaml` as described in the [project readme](../README.md#configuration)
+1. Replace every synthetic value in `secret-config.yaml`, especially `ISHIKU_SETUP_SECRET`, before applying it. Do not commit the resulting Secret. Adjust the PVC storage class or size when your cluster requires it.
 1. Use [kubectl](https://kubernetes.io/docs/reference/kubectl/) to apply the manifest:
 
     ```sh

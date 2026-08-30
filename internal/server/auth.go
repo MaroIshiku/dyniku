@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net"
 	"net/http"
 	"os"
@@ -17,6 +18,8 @@ import (
 	"time"
 
 	"github.com/MaroIshiku/dyniku/internal/models"
+	chimiddleware "github.com/go-chi/chi/v5/middleware"
+	"golang.org/x/crypto/argon2"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -25,11 +28,19 @@ const (
 	setupSecretDefaultPath = "/run/secrets/ishiku_setup_secret"
 	sessionCookieName      = "dyniku_session"
 	sessionTTL             = 7 * 24 * time.Hour
+	sessionIdleTTL         = 30 * time.Minute
 	setupRateLimitWindow   = 15 * time.Minute
 	setupMaxFailures       = 5
+	loginRateLimitWindow   = 15 * time.Minute
+	loginMaxFailures       = 5
 	authDirPerm            = os.FileMode(0o700)
 	authFilePerm           = os.FileMode(0o600)
 	sessionTokenBytes      = 32
+	argon2SaltBytes        = 16
+	argon2KeyBytes         = 32
+	argon2Memory           = 19 * 1024
+	argon2Iterations       = 2
+	argon2Parallelism      = 1
 	minAdminPasswordLength = 12
 	maxAuthBodyBytes       = 128 * 1024
 )
@@ -50,6 +61,11 @@ var (
 	errAdminPasswordPlaceholder     = errors.New("admin password must not be a placeholder")
 	errAdminPasswordMatchesUsername = errors.New("admin password must not match username")
 	errAdminPasswordMatchesApp      = errors.New("admin password must not match app name")
+	errPasswordHashInvalidFormat    = errors.New("invalid password hash format")
+	errPasswordHashInvalidParams    = errors.New("invalid password hash parameters")
+	errPasswordHashUnsupported      = errors.New("unsupported password hash parameters")
+	errPasswordHashInvalidSalt      = errors.New("invalid password salt")
+	errPasswordHashInvalidKey       = errors.New("invalid password key")
 )
 
 type authService struct {
@@ -60,6 +76,7 @@ type authService struct {
 	mu            sync.Mutex
 	sessions      map[string]authSession
 	setupFailures map[string]failureBucket
+	loginFailures map[string]failureBucket
 	timeNow       func() time.Time
 }
 
@@ -80,6 +97,16 @@ type adminAccount struct {
 type authSession struct {
 	Username  string
 	ExpiresAt time.Time
+	LastSeen  time.Time
+}
+
+type securityAuditRecord struct {
+	Event     string    `json:"event"`
+	Actor     string    `json:"actor"`
+	Target    string    `json:"target"`
+	Result    string    `json:"result"`
+	RequestID string    `json:"request_id"`
+	Time      time.Time `json:"time"`
 }
 
 type failureBucket struct {
@@ -144,6 +171,7 @@ func newAuthService(dataDir string, buildInfo models.BuildInformation) *authServ
 		buildInfo:     buildInfo,
 		sessions:      make(map[string]authSession),
 		setupFailures: make(map[string]failureBucket),
+		loginFailures: make(map[string]failureBucket),
 		timeNow:       time.Now,
 	}
 }
@@ -159,6 +187,7 @@ func (h *handlers) authState(w http.ResponseWriter, r *http.Request) {
 
 func (h *handlers) setup(w http.ResponseWriter, r *http.Request) {
 	if !h.auth.allowSetupAttempt(clientIP(r)) {
+		writeSecurityAudit(r, "first_run_setup", "anonymous", "administrator", "rate_limited")
 		httpError(w, http.StatusTooManyRequests, errTooManySetupAttempt.Error())
 		return
 	}
@@ -166,6 +195,7 @@ func (h *handlers) setup(w http.ResponseWriter, r *http.Request) {
 	var request setupRequest
 	if err := decodeJSONBody(r, &request); err != nil {
 		h.auth.recordSetupFailure(clientIP(r))
+		writeSecurityAudit(r, "first_run_setup", "anonymous", "administrator", "invalid_request")
 		httpError(w, http.StatusBadRequest, err.Error())
 		return
 	}
@@ -173,6 +203,7 @@ func (h *handlers) setup(w http.ResponseWriter, r *http.Request) {
 	user, err := h.auth.createFirstAdmin(request)
 	if err != nil {
 		h.auth.recordSetupFailure(clientIP(r))
+		writeSecurityAudit(r, "first_run_setup", "anonymous", strings.TrimSpace(request.AdminUsername), "failed")
 		status := http.StatusBadRequest
 		switch {
 		case errors.Is(err, errSetupAlreadyDone):
@@ -187,6 +218,7 @@ func (h *handlers) setup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	h.auth.clearSetupFailures(clientIP(r))
+	writeSecurityAudit(r, "first_run_setup", user.Username, user.Username, "succeeded")
 	h.setSessionCookie(w, r, user.Username)
 	writeJSON(w, http.StatusCreated, map[string]any{
 		"authenticated": true,
@@ -197,16 +229,28 @@ func (h *handlers) setup(w http.ResponseWriter, r *http.Request) {
 func (h *handlers) login(w http.ResponseWriter, r *http.Request) {
 	var request loginRequest
 	if err := decodeJSONBody(r, &request); err != nil {
+		writeSecurityAudit(r, "sign_in", "anonymous", "unknown", "invalid_request")
 		httpError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	loginKey := loginRateLimitKey(request.Username, clientIP(r))
+	if !h.auth.allowLoginAttempt(loginKey) {
+		writeSecurityAudit(r, "sign_in", "anonymous", strings.TrimSpace(request.Username), "rate_limited")
+		httpError(w, http.StatusTooManyRequests, errInvalidCredentials.Error())
 		return
 	}
 
 	user, err := h.auth.authenticate(request.Username, request.Password)
 	if err != nil {
+		h.auth.recordLoginFailure(loginKey)
+		writeSecurityAudit(r, "sign_in", "anonymous", strings.TrimSpace(request.Username), "failed")
 		httpError(w, http.StatusUnauthorized, errInvalidCredentials.Error())
 		return
 	}
 
+	h.auth.clearLoginFailures(loginKey)
+	writeSecurityAudit(r, "sign_in", user.Username, user.Username, "succeeded")
 	h.setSessionCookie(w, r, user.Username)
 	writeJSON(w, http.StatusOK, map[string]any{
 		"authenticated": true,
@@ -215,14 +259,16 @@ func (h *handlers) login(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *handlers) logout(w http.ResponseWriter, r *http.Request) {
+	username, _ := h.auth.usernameFromRequest(r)
 	h.auth.destroySessionFromRequest(r)
+	writeSecurityAudit(r, "session_revocation", username, username, "succeeded")
 	http.SetCookie(w, &http.Cookie{
 		Name:     sessionCookieName,
 		Value:    "",
 		Path:     "/",
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,
-		Secure:   r.TLS != nil,
+		Secure:   requestIsSecure(r),
 		MaxAge:   -1,
 	})
 	writeJSON(w, http.StatusOK, map[string]bool{"logged_out": true})
@@ -272,7 +318,8 @@ func (h *handlers) makeAuthState(r *http.Request) (authStateResponse, error) {
 		},
 	}
 	if setupRequired && !setupConfigured {
-		response.Message = "Setup secret is missing. Set ISHIKU_SETUP_SECRET_FILE or ISHIKU_SETUP_SECRET."
+		response.Message = "Setup secret is missing. Set ISHIKU_SETUP_SECRET " +
+			"or use ISHIKU_SETUP_SECRET_FILE in a custom deployment."
 	}
 	if authenticated {
 		response.AdminInfo = h.makeAdminInfo(authFile)
@@ -344,7 +391,7 @@ func (h *handlers) setSessionCookie(w http.ResponseWriter, r *http.Request, user
 		Path:     "/",
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,
-		Secure:   r.TLS != nil,
+		Secure:   requestIsSecure(r),
 		Expires:  h.auth.timeNow().Add(sessionTTL),
 		MaxAge:   int(sessionTTL.Seconds()),
 	})
@@ -400,7 +447,7 @@ func (a *authService) createFirstAdmin(request setupRequest) (adminAccount, erro
 
 	username := strings.TrimSpace(request.AdminUsername)
 	displayName := strings.TrimSpace(request.AdminDisplayName)
-	hash, err := bcrypt.GenerateFromPassword([]byte(request.AdminPassword), bcrypt.DefaultCost)
+	hash, err := hashPassword(request.AdminPassword)
 	if err != nil {
 		return adminAccount{}, fmt.Errorf("hashing admin password: %w", err)
 	}
@@ -409,7 +456,7 @@ func (a *authService) createFirstAdmin(request setupRequest) (adminAccount, erro
 		DisplayName:  displayName,
 		Username:     username,
 		Email:        strings.TrimSpace(request.AdminEmail),
-		PasswordHash: string(hash),
+		PasswordHash: hash,
 		CreatedAt:    a.timeNow().UTC(),
 	}
 	file := authFile{
@@ -450,10 +497,84 @@ func (a *authService) authenticate(username, password string) (adminAccount, err
 	if file.Admin.Username != strings.TrimSpace(username) {
 		return adminAccount{}, errInvalidCredentials
 	}
-	if err := bcrypt.CompareHashAndPassword([]byte(file.Admin.PasswordHash), []byte(password)); err != nil {
+	valid, upgrade, err := verifyPassword(file.Admin.PasswordHash, password)
+	if err != nil || !valid {
 		return adminAccount{}, errInvalidCredentials
 	}
+	if upgrade {
+		if err := a.upgradePasswordHash(file.Admin.Username, password); err != nil {
+			return adminAccount{}, errInvalidCredentials
+		}
+	}
 	return *file.Admin, nil
+}
+
+func (a *authService) upgradePasswordHash(username, password string) error {
+	hash, err := hashPassword(password)
+	if err != nil {
+		return err
+	}
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	file, err := a.loadLocked()
+	if err != nil || file.Admin == nil || file.Admin.Username != username {
+		return errInvalidCredentials
+	}
+	file.Admin.PasswordHash = hash
+	return a.saveLocked(file)
+}
+
+func hashPassword(password string) (string, error) {
+	salt := make([]byte, argon2SaltBytes)
+	if _, err := rand.Read(salt); err != nil {
+		return "", fmt.Errorf("creating password salt: %w", err)
+	}
+	key := argon2.IDKey([]byte(password), salt, argon2Iterations, argon2Memory, argon2Parallelism, argon2KeyBytes)
+	return fmt.Sprintf("$argon2id$v=%d$m=%d,t=%d,p=%d$%s$%s",
+		argon2.Version, argon2Memory, argon2Iterations, argon2Parallelism,
+		base64.RawStdEncoding.EncodeToString(salt), base64.RawStdEncoding.EncodeToString(key)), nil
+}
+
+func verifyPassword(encodedHash, password string) (valid, upgrade bool, err error) {
+	if strings.HasPrefix(encodedHash, "$2") {
+		if bcrypt.CompareHashAndPassword([]byte(encodedHash), []byte(password)) != nil {
+			return false, false, errInvalidCredentials
+		}
+		return true, true, nil
+	}
+
+	parts := strings.Split(encodedHash, "$")
+	if len(parts) != 6 || parts[0] != "" || parts[1] != "argon2id" {
+		return false, false, errPasswordHashInvalidFormat
+	}
+	var version int
+	var memory, iterations uint32
+	var parallelism uint8
+	if _, err := fmt.Sscanf(parts[2], "v=%d", &version); err != nil {
+		return false, false, fmt.Errorf("parsing password hash: %w", err)
+	}
+	if _, err := fmt.Sscanf(parts[3], "m=%d,t=%d,p=%d", &memory, &iterations, &parallelism); err != nil {
+		return false, false, fmt.Errorf("parsing password parameters: %w", err)
+	}
+	if parts[2] != fmt.Sprintf("v=%d", version) ||
+		parts[3] != fmt.Sprintf("m=%d,t=%d,p=%d", memory, iterations, parallelism) {
+		return false, false, errPasswordHashInvalidParams
+	}
+	if version != argon2.Version || memory < argon2Memory || iterations < argon2Iterations ||
+		parallelism < argon2Parallelism || memory > 256*1024 || iterations > 10 || parallelism > 8 {
+		return false, false, errPasswordHashUnsupported
+	}
+	salt, err := base64.RawStdEncoding.DecodeString(parts[4])
+	if err != nil || len(salt) < 16 || len(salt) > 64 {
+		return false, false, errPasswordHashInvalidSalt
+	}
+	expected, err := base64.RawStdEncoding.DecodeString(parts[5])
+	if err != nil || len(expected) < 16 || len(expected) > 64 {
+		return false, false, errPasswordHashInvalidKey
+	}
+	keyLength := uint32(len(expected)) //nolint:gosec // Length is validated as 16..64 directly above.
+	actual := argon2.IDKey([]byte(password), salt, iterations, memory, parallelism, keyLength)
+	return subtle.ConstantTimeCompare(actual, expected) == 1, false, nil
 }
 
 func (a *authService) createSession(username string) string {
@@ -464,7 +585,8 @@ func (a *authService) createSession(username string) string {
 	token := base64.RawURLEncoding.EncodeToString(tokenBytes)
 	a.mu.Lock()
 	defer a.mu.Unlock()
-	a.sessions[token] = authSession{Username: username, ExpiresAt: a.timeNow().Add(sessionTTL)}
+	now := a.timeNow()
+	a.sessions[token] = authSession{Username: username, ExpiresAt: now.Add(sessionTTL), LastSeen: now}
 	return token
 }
 
@@ -476,10 +598,13 @@ func (a *authService) usernameFromRequest(r *http.Request) (string, bool) {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 	session, ok := a.sessions[cookie.Value]
-	if !ok || a.timeNow().After(session.ExpiresAt) {
+	now := a.timeNow()
+	if !ok || now.After(session.ExpiresAt) || now.Sub(session.LastSeen) > sessionIdleTTL {
 		delete(a.sessions, cookie.Value)
 		return "", false
 	}
+	session.LastSeen = now
+	a.sessions[cookie.Value] = session
 	return session.Username, true
 }
 
@@ -520,6 +645,57 @@ func (a *authService) clearSetupFailures(ip string) {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 	delete(a.setupFailures, ip)
+}
+
+func (a *authService) allowLoginAttempt(key string) bool {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	bucket := a.loginFailures[key]
+	now := a.timeNow()
+	return now.After(bucket.WindowEnds) || bucket.Count < loginMaxFailures
+}
+
+func (a *authService) recordLoginFailure(key string) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	now := a.timeNow()
+	bucket := a.loginFailures[key]
+	if now.After(bucket.WindowEnds) {
+		bucket = failureBucket{WindowEnds: now.Add(loginRateLimitWindow)}
+	}
+	bucket.Count++
+	a.loginFailures[key] = bucket
+}
+
+func (a *authService) clearLoginFailures(key string) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	delete(a.loginFailures, key)
+}
+
+func loginRateLimitKey(username, ip string) string {
+	return strings.ToLower(strings.TrimSpace(username)) + "\x00" + ip
+}
+
+func writeSecurityAudit(r *http.Request, event, actor, target, result string) {
+	if actor == "" {
+		actor = "anonymous"
+	}
+	if target == "" {
+		target = "unknown"
+	}
+	record := securityAuditRecord{
+		Event:     event,
+		Actor:     actor,
+		Target:    target,
+		Result:    result,
+		RequestID: chimiddleware.GetReqID(r.Context()),
+		Time:      time.Now().UTC(),
+	}
+	data, err := json.Marshal(record)
+	if err == nil {
+		log.Printf("security_audit %s", data)
+	}
 }
 
 func readSetupSecret() (secret string, configured bool, source string, err error) {

@@ -1,9 +1,9 @@
 # ZimaOS-first, standard Docker Compose deployment.
-# Breaking in 0.3.0: replace the setup-secret placeholder before first start.
+# Breaking since 0.3.0: replace the setup-secret placeholder before first start.
 name: dyniku
 services:
   dyniku:
-    image: ghcr.io/maroishiku/dyniku:0.3.0@sha256:4ed4741a1294281d4ede33a0345bd3abf624d0b2f5e65142b6a6c5a9b9575214
+    image: ghcr.io/maroishiku/dyniku:0.3.1@sha256:4ed4741a1294281d4ede33a0345bd3abf624d0b2f5e65142b6a6c5a9b9575214
     container_name: dyniku
     hostname: dyniku
     init: true
@@ -14,6 +14,9 @@ services:
       - ALL
     security_opt:
       - no-new-privileges:true
+    mem_limit: 256m
+    cpus: 1.0
+    pids_limit: 256
     ports:
       - target: 8507
         published: "65000"

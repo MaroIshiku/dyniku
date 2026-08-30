@@ -28,7 +28,8 @@
     {
       "id": "AUTH-001",
       "implementation": [
-        "See migration inventory and application source."
+        "internal/server/auth.go",
+        "internal/server/handler.go"
       ],
       "tests": {
         "unit": [
@@ -77,7 +78,8 @@
         "docker-compose.yml",
         "docker-compose.example.yml",
         ".env.example",
-        "zimaos-compose.yaml"
+        "zimaos-compose.yaml",
+        "k8s/base/"
       ],
       "tests": {
         "unit": [
@@ -86,6 +88,7 @@
         ],
         "integration": [
           ".ishiku/reports/ops-001-verification.json",
+          "scripts/check-zimaos-compose.mjs",
           "internal/server/handler_test.go",
           "internal/config/settings_test.go"
         ],

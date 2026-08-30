@@ -13,7 +13,7 @@ FROM --platform=$BUILDPLATFORM golang:${GO_VERSION}-alpine${ALPINE_VERSION}@sha2
 WORKDIR /tmp/gobuild
 ENV CGO_ENABLED=0
 # Note: findutils needed to have xargs support `-d` flag for mocks stage.
-RUN apk --update add git g++ findutils
+RUN apk add --no-cache git g++ findutils
 COPY --from=xcputranslate /xcputranslate /usr/local/bin/xcputranslate
 COPY --from=golangci-lint /bin /go/bin/golangci-lint
 COPY --from=mockgen /bin /go/bin/mockgen
@@ -31,7 +31,7 @@ FROM --platform=$BUILDPLATFORM base AS test
 ENV CGO_ENABLED=1
 COPY readme/ ./readme/
 COPY README.md ./README.md
-ENTRYPOINT go test -race -coverpkg=./... -coverprofile=coverage.txt -covermode=atomic ./...
+ENTRYPOINT ["sh", "-c", "go test -race -coverpkg=./... -coverprofile=coverage.txt -covermode=atomic ./..."]
 
 FROM --platform=$BUILDPLATFORM base AS lint
 COPY .golangci.yml ./
@@ -88,7 +88,6 @@ ENV \
     ISHIKU_CONFIG_FILE=/data/config.json \
     ISHIKU_BASE_PATH=/ \
     ISHIKU_LOG_LEVEL=info \
-    ISHIKU_SETUP_SECRET_FILE=/run/secrets/ishiku_setup_secret \
     DATADIR=/data \
     CONFIG_FILEPATH=/data/config.json \
     RESOLVER_ADDRESS= \

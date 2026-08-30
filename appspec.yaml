@@ -23,8 +23,11 @@
       "title": "Secure account access",
       "priority": "critical",
       "acceptance": [
-        "Account authentication uses generic errors, rate limits, and a supported password hash.",
-        "Sessions are server-side revocable, rotated, time-bounded, cookie-protected, and CSRF-protected."
+        "New account passwords use baseline Argon2id parameters; legacy bcrypt hashes remain usable and upgrade automatically after successful authentication.",
+        "Account authentication uses generic errors and rate limits by normalized account and network signal without permanent lockout.",
+        "Sessions are server-side revocable, rotated, idle- and absolute-time-bounded, cookie-protected, and same-origin protected for browser mutations.",
+        "Browser responses define restrictive content, framing, MIME, referrer, permissions, and transport security controls without trusting forwarding headers by default.",
+        "Successful and failed sign-ins, first-run setup, and explicit session revocation emit structured security audit events without secret values."
       ],
       "security_critical": true
     },
@@ -46,6 +49,8 @@
       "acceptance": [
         "A fresh clone can build, test, and run without the outer workspace.",
         "Health checks, persistent data, runtime secrets, backup, restore, and upgrade procedures are verifiable.",
+        "Every shipped Compose profile runs as UID/GID 10001 with a read-only root filesystem, dropped capabilities, no privilege escalation, bounded resources, bounded logs, and graceful shutdown.",
+        "The optional Kubernetes example uses the same immutable image, persistent storage, non-root security contexts, probes, bounded resources, and a synthetic setup-secret replacement.",
         "Primary standalone and ZimaOS Compose delivery publishes host port 65000 while preserving container port 8507.",
         "Every published deployment artifact and its metadata uses the centrally assigned host port 65000."
       ],
@@ -59,7 +64,8 @@
         "Version 0.3.0 is an approved breaking deployment change with documented migration and rollback instructions.",
         "The primary ZimaOS Compose uses direct scalar values, an immutable version-and-digest image reference, and no interpolation variables.",
         "Every shipped Compose file contains only a synthetic ISHIKU_SETUP_SECRET replacement value of at least 32 characters and requires the operator to replace it before first start.",
-        "Standard Docker Compose and ZimaOS default to the same immutable release image and direct setup-secret contract."
+        "Standard Docker Compose and ZimaOS default to the same immutable release image and direct setup-secret contract.",
+        "Existing persistent data is preserved during upgrade and its documented ownership is migrated to runtime UID/GID 10001 before restart."
       ],
       "security_critical": true
     },

@@ -33,7 +33,7 @@ Die App soll sich bewusst wie Teil einer gemeinsamen Suite anfuehlen, nicht wie 
 - Web GUI fuer DDNS-Status, Provider-Konfiguration und Public-IP-Verlauf
 - First-Run-Setup mit Setup-Secret und Adminaccount
 - Login mit HttpOnly Session-Cookie
-- Passwort-Hashing mit bcrypt, keine Klartext-Passwoerter
+- Passwort-Hashing mit Argon2id; bestehende bcrypt-Hashes werden beim naechsten erfolgreichen Login automatisch aktualisiert
 - Unterstuetzung vieler DNS-Provider, unter anderem Cloudflare, DuckDNS, Dynu, Hetzner, IONOS, Netcup, OVH, Porkbun, Route53, Strato und weitere
 - Manuelles "Update now" und periodische Updates
 - JSON-Konfiguration in einem persistenten Datenordner
@@ -61,7 +61,10 @@ Create the persistent data directory:
 
 ```bash
 mkdir -p /DATA/AppData/dyniku/data
+sudo chown -R 10001:10001 /DATA/AppData/dyniku/data
 ```
+
+Dyniku runs as the fixed non-root UID/GID `10001:10001`. Existing data must remain in place and be readable and writable by that identity. Do not delete `auth.json`; it contains the existing administrator account.
 
 Starte die App:
 
@@ -81,13 +84,13 @@ ISHIKU_SETUP_SECRET: "REPLACE-WITH-A-UNIQUE-SECRET-OF-AT-LEAST-32-CHARACTERS"
 
 with a unique value of at least 32 characters. Do not commit or reuse that value. ZimaOS publishes host port `65000`; Dyniku continues to listen on container port `8507`.
 
-Upgrading an existing ZimaOS installation to `0.3.0` is a breaking deployment change. Back up `/DATA/AppData/dyniku/data`, stop the existing stack, import the new Compose file, verify that port `65000` is free, and then start Dyniku. An installation that already has an administrator remains initialized; the setup-secret source change does not recreate the account.
+Upgrading an existing ZimaOS installation from before `0.3.0` is a breaking deployment change. Back up `/DATA/AppData/dyniku/data`, stop the existing stack, preserve every file, run `sudo chown -R 10001:10001 /DATA/AppData/dyniku/data`, import the new Compose file, verify that port `65000` is free, and then start Dyniku. An installation that already has an administrator remains initialized; the setup-secret source change does not recreate the account. The setup secret is only for first-run registration and is not the administrator password.
 
 ### Erstes Starten
 
 Beim ersten Oeffnen zeigt Dyniku automatisch das Registrierungsfenster fuer den ersten Adminaccount an. Die normale App ist vorher nicht erreichbar.
 
-Die Registrierung ist nur moeglich, wenn das Setup-Secret korrekt eingegeben wird. Bevorzugt liest Dyniku das Secret aus:
+Die Registrierung ist nur moeglich, wenn das Setup-Secret korrekt eingegeben wird. Die ausgelieferten Compose-Dateien setzen es direkt ueber `ISHIKU_SETUP_SECRET`. Eigene Deployments koennen alternativ weiterhin eine Secret-Datei unter folgendem Pfad verwenden:
 
 ```txt
 /run/secrets/ishiku_setup_secret
@@ -119,8 +122,9 @@ Nach erfolgreicher Erstellung des ersten Adminaccounts wird die oeffentliche Reg
 | `ISHIKU_DATA_DIR` | Persistenter Datenpfad im Container | `/data` |
 | `ISHIKU_CONFIG_FILE` | Pfad zur DDNS JSON-Konfiguration | `/data/config.json` |
 | `ISHIKU_LOG_LEVEL` | Log-Level | `info` |
-| `ISHIKU_SETUP_SECRET_FILE` | Pfad zum Docker Secret | `/run/secrets/ishiku_setup_secret` |
-| `ISHIKU_SETUP_SECRET` | Fallback-Secret als ENV, nur wenn kein Secret-File genutzt wird | leer |
+| `ISHIKU_SETUP_SECRET_FILE` | Optionaler Pfad zum Docker Secret fuer eigene Deployments | `/run/secrets/ishiku_setup_secret` |
+| `ISHIKU_SETUP_SECRET` | Direktes einmaliges Setup-Secret der ausgelieferten Compose-Profile | leer |
+| `ISHIKU_SECURE_COOKIES` | Auf `true` setzen, wenn TLS vor Dyniku terminiert und der Proxy keine vertrauenswuerdige Scheme-Information weitergibt | `false` |
 | `LISTENING_ADDRESS` | Interne HTTP-Adresse | `:8507` |
 | `PERIOD` | Update-Intervall | `5m` |
 | `UPDATE_COOLDOWN_PERIOD` | Cooldown zwischen Updates | `5m` |
@@ -153,12 +157,22 @@ In diesem Ordner liegen unter anderem:
 
 Sichere diesen Ordner regelmaessig, wenn Dyniku produktiv genutzt wird.
 
+The directory must be owned by UID/GID `10001:10001`. If `/readyz` reports that `auth.json` is not readable after an upgrade, stop Dyniku and repair ownership without deleting data:
+
+```bash
+sudo chown -R 10001:10001 /DATA/AppData/dyniku/data
+```
+
 ## Sicherheit
 
 - Das Setup-Secret dient nur zur ersten Admin-Registrierung.
 - Setup-Versuche mit falschem Secret werden rate-limited.
 - Das Admin-Passwort darf nicht dem Setup-Secret entsprechen.
-- Passwoerter werden mit bcrypt gehasht gespeichert.
+- Neue Passwoerter werden mit Argon2id gehasht gespeichert; gueltige bestehende bcrypt-Hashes werden nach erfolgreichem Login automatisch migriert.
+- Fehlgeschlagene Logins werden pro normalisiertem Account und Netzwerksignal zeitlich begrenzt.
+- Browser-Mutationen mit fremdem `Origin` werden abgewiesen.
+- Browserantworten setzen CSP, Clickjacking-, MIME-, Referrer- und Permissions-Schutzheader; `ISHIKU_SECURE_COOKIES=true` erzwingt Secure-Cookies und HSTS hinter einem TLS-Proxy.
+- Anmeldungen, First-Run-Setup und Abmeldungen erzeugen strukturierte Security-Audit-Ereignisse ohne Secret-Werte.
 - Sessions werden ueber HttpOnly Cookies mit SameSite=Lax verwaltet.
 - Die oeffentliche Registrierung wird nach dem ersten Adminaccount geschlossen.
 - `/healthz` und `/readyz` sind oeffentlich, App- und Config-APIs brauchen Login.
@@ -177,7 +191,7 @@ Vor Updates sollte der persistente Datenordner gesichert werden:
 tar -czf backup-dyniku-$(date +%Y%m%d).tar.gz data
 ```
 
-Release `0.3.0` is pinned in the shipped Compose files by both semantic version and image digest. Detailed migration and rollback instructions are recorded in [CHANGELOG.md](CHANGELOG.md).
+Release `0.3.1` is pinned in the shipped Compose files by both semantic version and image digest. Detailed migration and rollback instructions are recorded in [CHANGELOG.md](CHANGELOG.md).
 
 ## Entwicklung
 

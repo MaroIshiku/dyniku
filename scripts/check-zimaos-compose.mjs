@@ -33,6 +33,14 @@ for (const compose of allComposeFiles) {
   assert.ok(hasDirectReplacement, 'every shipped Compose file must expose the synthetic setup-secret replacement directly');
   assert.ok(setupSecretReplacement.length >= 32, 'setup-secret replacement must have at least 32 characters');
   assert.doesNotMatch(compose, /ISHIKU_SETUP_SECRET_FILE|\/run\/secrets|^\s*secrets:\s*$/m, 'shipped Compose files must not use setup-secret files');
+  assert.match(compose, /^\s*user:\s*["']10001:10001["']\s*$/m, 'every shipped Compose file must run as UID/GID 10001');
+  assert.match(compose, /^\s*read_only:\s*true\s*$/m, 'every shipped Compose file must use a read-only root filesystem');
+  assert.match(compose, /^\s*cap_drop:\s*$/m, 'every shipped Compose file must drop capabilities');
+  assert.match(compose, /^\s*-\s*no-new-privileges:true\s*$/m, 'every shipped Compose file must prevent privilege escalation');
+  assert.match(compose, /^\s*mem_limit:\s*256m\s*$/m, 'every shipped Compose file must bound memory');
+  assert.match(compose, /^\s*cpus:\s*1\.0\s*$/m, 'every shipped Compose file must bound CPU');
+  assert.match(compose, /^\s*pids_limit:\s*256\s*$/m, 'every shipped Compose file must bound processes');
+  assert.match(compose, /^\s*stop_grace_period:\s*30s\s*$/m, 'every shipped Compose file must define graceful shutdown');
 }
 
 assert.match(zimaos, /target:\s*8507/, 'ZimaOS container port must remain 8507');

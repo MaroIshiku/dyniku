@@ -1,8 +1,18 @@
 services:
   dyniku:
-    image: ${DYNIKU_IMAGE:-ghcr.io/maroishiku/dyniku:0.3.0@sha256:4ed4741a1294281d4ede33a0345bd3abf624d0b2f5e65142b6a6c5a9b9575214}
+    image: ${DYNIKU_IMAGE:-ghcr.io/maroishiku/dyniku:0.3.1@sha256:4ed4741a1294281d4ede33a0345bd3abf624d0b2f5e65142b6a6c5a9b9575214}
     container_name: dyniku
+    init: true
     restart: unless-stopped
+    user: "10001:10001"
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 256m
+    cpus: 1.0
+    pids_limit: 256
     ports:
       - "65000:8507"
     env_file:
@@ -15,6 +25,14 @@ services:
       - type: bind
         source: /DATA/AppData/dyniku/data
         target: /data
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    stop_grace_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
     healthcheck:
       test: ["CMD", "/updater/dyniku", "healthcheck"]
       interval: 30s

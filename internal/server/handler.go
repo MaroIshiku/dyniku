@@ -5,6 +5,8 @@ import (
 	"embed"
 	"io/fs"
 	"net/http"
+	"net/url"
+	"os"
 	"path/filepath"
 	"strings"
 	"text/template"
@@ -59,8 +61,10 @@ func newHandler(ctx context.Context, rootURL string,
 
 	router := chi.NewRouter()
 
-	router.Use(middleware.RealIP)
+	router.Use(middleware.RequestID)
 	router.Use(middleware.Logger)
+	router.Use(securityHeaders)
+	router.Use(sameOriginMutations)
 	rootURL = strings.TrimSuffix(rootURL, "/")
 
 	if rootURL != "" {
@@ -95,4 +99,48 @@ func newHandler(ctx context.Context, rootURL string,
 	router.Handle(rootURL+"/static/*", http.StripPrefix(rootURL+"/static/", http.FileServerFS(staticFolder)))
 
 	return router
+}
+
+func securityHeaders(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		headers := w.Header()
+		const contentSecurityPolicy = "default-src 'none'; base-uri 'self'; connect-src 'self'; " +
+			"form-action 'self'; frame-ancestors 'none'; img-src 'self' data:; manifest-src 'self'; " +
+			"object-src 'none'; script-src 'self' " +
+			"'sha256-nbAg/09+zk6B/gV0bF8LxQ9nIv1Z3pEkKViXcfNYPGc='; style-src 'self'; " +
+			"style-src-attr 'unsafe-inline'; style-src-elem 'self'"
+		headers.Set("Content-Security-Policy", contentSecurityPolicy)
+		headers.Set("Permissions-Policy", "camera=(), geolocation=(), microphone=()")
+		headers.Set("Referrer-Policy", "no-referrer")
+		headers.Set("X-Content-Type-Options", "nosniff")
+		headers.Set("X-Frame-Options", "DENY")
+		if requestIsSecure(r) {
+			headers.Set("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
+func requestIsSecure(r *http.Request) bool {
+	return r.TLS != nil || strings.EqualFold(strings.TrimSpace(os.Getenv("ISHIKU_SECURE_COOKIES")), "true")
+}
+
+func sameOriginMutations(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodGet || r.Method == http.MethodHead || r.Method == http.MethodOptions {
+			next.ServeHTTP(w, r)
+			return
+		}
+		origin := r.Header.Get("Origin")
+		if origin == "" {
+			next.ServeHTTP(w, r)
+			return
+		}
+		parsed, err := url.Parse(origin)
+		if err != nil || (parsed.Scheme != "http" && parsed.Scheme != "https") || !strings.EqualFold(parsed.Host, r.Host) {
+			http.Error(w, "cross-origin request rejected", http.StatusForbidden)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
 }
